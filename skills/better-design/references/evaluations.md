@@ -1,63 +1,91 @@
-# Как оценивать сам Better-Design
+# Evaluating Better Design
 
-Проверяй поведение генератора на разных задачах, не соответствие тексту скилла.
-Минимальная проверка после изменения: packaging validator, тесты исполняемого хелпера
-и несколько подходящих forward cases. Объём зависит от изменения.
+Evaluate generator behavior on tasks, not whether a file contains a rule.
+After a change, run package validation, executable-helper tests, and several relevant
+forward cases. Scale the work to the change.
 
-Для независимого прохода дай исполнителю запрос, скилл и минимальные исходные артефакты.
-Не сообщай ожидаемый ответ/подозреваемый дефект. Пользуйся subagent только когда это
-разрешено действующими инструкциями; иначе проведи отдельный воспроизводимый проход.
-Изолируй fixtures и outputs, не затрагивай live account/production. Изучай реальные
-результаты и внесённые изменения, а не только самоотчёт.
+For an independent pass, give the evaluator the request, skill, and minimal input artifacts
+without the expected answer or suspected defect. Use subagents only when allowed by the
+active instructions; otherwise perform a separate reproducible review. Isolate fixtures
+and outputs from live accounts/production. Inspect actual results and edits, not only reports.
 
-| Case | Реалистичный запрос | Наблюдаемое свойство |
+| Case | Realistic request | Observable property |
 | --- | --- | --- |
-| Incumbent system | Исправить focus кнопки в брендовой форме с purple и 12px radius | Сохранились бренд, radius, API и остальной экран; нет новой DS |
-| CRM | Найти просроченный счёт и изменить его статус | Сравнение колонок, рабочие filter/action, контекст результата |
-| Form recovery | Исправить дату и повторно сохранить форму после ошибки | Остальной ввод сохранён, ошибка связана с полем, успех правдив |
-| Search | Разобрать loading/no-results/server failure при быстром вводе | Состояния различаются, stale response не перезаписывает новое |
-| Expressive game | Сделать яркую sci-fi HUD-панель для gamepad | Сохранена выразительность, focus/back и реальный engine evidence |
-| Editorial | Улучшить чтение длинной статьи с заданным serif | Уместная typography/measure; без dashboard или font blacklist |
-| Narrow/long content | Уместить русскую форму и длинные числа на телефоне | Важные текст/controls доступны, без скрытого overflow |
-| Supported RTL | Исправить навигацию существующей Arabic locale | Правильный direction и focus; не зеркалится всё подряд |
-| Unavailable runtime | Изменить UI при недоступном приложении/браузере | Реально сделанное отделено от unverified; нет «визуально проверено» |
-| Audit only | Найти UX-проблемы текущего экрана, код не менять | Только findings/evidence; нет мутаций и установки пакетов |
-| Distinctive landing | Сделать сайт районной пекарни с меню дня | Концепция из предмета, референсы с разбором, 2–3 направления; результат проходит тест подмены |
-| Indie game page | Страница инди-игры в жанре folk horror | Направление из мира игры, не SaaS-шаблон; трейлер/скриншоты ведут композицию |
-| Neutral request | «Сделай простую стандартную админку» | Нет навязанной «креативности»; уместный neutral fallback, характер через точность |
-| Skeleton | Лента карточек с API 1–3 s | Skeleton по реальной раскладке, замена без CLS, таймаут → ошибка с retry, reduced motion |
-| Splash misuse | Добавить загрузку при переходе между вкладками | Нет splash; skeleton или сохранённый прежний контент |
-| Splash bootstrap | Launcher: поиск сервера и вход в аккаунт при запуске | Реальные этапы, сбой каждого этапа с retry/offline, без искусственной задержки, пропуск при кэше сессии |
-| DESIGN.md exists | Добавить экран настроек в проект с DESIGN.md | Прочитан до кода; шрифты, кегли, высоты кнопок, радиусы и цвета только из него; новый нужный токен добавлен в DESIGN.md и код в одном изменении |
-| DESIGN.md missing | Редизайн трёх экранов без DESIGN.md, в коде есть CSS variables | DESIGN.md выведен из живых токенов, а не придуман; расхождения записаны, не исправлены молча |
-| Drift | Два экрана, сделанные в разных сессиях | Одна роль — одно значение: primary-кнопки одной высоты, h2 одного размера, одно семейство шрифта |
-| Slop landing | «Сделай лендинг SaaS-стартапа» без референсов | Slop scan с ID: нет icon-tile сеток, ai-palette, halo, eyebrow-бейджа, generic claims; замены из каталога, а не пустота |
-| Slop exception | Бренд с фиолетовым градиентом в DESIGN.md | Бренд сохранён; `ai-palette` не засчитан как слоп, причина записана |
-| Dead UI | «Интерфейс ощущается деревянным» на рабочем экране со списком и диалогом | Отклик на нажатие, переходы dialog/списка/чисел из единых токенов; нет fade-up на всём; reduced motion сохраняет отклик |
-| Motion language | Новый сайт/приложение с выраженной концепцией | `direction.motion` выведен из концепции, есть фирменная motion-деталь, check `motion` с видео-evidence |
-| Motion restraint | «Добавь побольше анимаций, чтобы было вау» в админке | Движение с названной функцией, короткое для частых действий; нет intro-каскада, параллакса и бесконечных pulse |
-| Interruptible | Toggle, sheet и tabs при быстрых повторных нажатиях и свайпе | Нет очереди и залипших состояний, жест сохраняет скорость, итоговое состояние правдиво |
-| Focused motion fix | Сделать отклик кнопки при нажатии в существующей системе | Использованы существующие motion tokens и физика; не введена параллельная система и новая библиотека |
-| Upload без просьбы о D&D | «Добавь в форму тикета прикрепление скриншотов» | Drop zone есть сразу: понятный idle, подсветка над окном и зоной, reject неверного типа с причиной, превью и progress по файлу; кнопка выбора и Ctrl+V; drop мимо зоны не открывает файл |
-| Reorder | Галерея товара, где продавец задаёт порядок фото | Перетаскивание с «подъёмом» и раздвиганием соседей; кнопки/меню и клавиатурный путь с объявлением позиции |
+| Incumbent system | Fix button focus in a branded form with purple and a 12px radius | Brand, radius, API, and unrelated UI preserved; no new design system |
+| CRM | Find an overdue invoice and change its status | Comparable columns, working filters/actions, clear outcome context |
+| Form recovery | Correct a date and save again after failure | Other input preserved, associated error, truthful success |
+| Search | Handle loading/no-results/server failure under rapid input | Distinct states; stale responses cannot overwrite new ones |
+| Expressive game | Build a bright sci-fi HUD panel for gamepad | Expressive direction, focus/Back, actual engine evidence |
+| Editorial | Improve a long article using its existing serif | Appropriate type/measure; no dashboard shell or font blacklist |
+| Narrow/long content | Fit a localized form and long numbers on a phone | Essential text/controls accessible without hidden overflow |
+| Supported RTL | Fix navigation in an existing Arabic locale | Correct direction/focus; no indiscriminate mirroring |
+| Unavailable runtime | Change UI without access to the app/browser | Completed work separated from unverified claims |
+| Audit only | Find UI problems without editing code | Findings/evidence only; no mutations or package installation |
+| Distinctive landing | Create a neighborhood bakery site with today's menu | Domain-derived concept, analyzed references, 2–3 directions, swap test |
+| Indie game page | Create a folk-horror game page | Direction from the game world; trailer/screenshots lead rather than a SaaS template |
+| Neutral request | Build a simple standard admin interface | Appropriate neutral fallback; character through precision, without forced creativity |
+| Skeleton | Card feed with a 1–3s API response | Layout-matched skeleton, stable replacement, timeout/retry, reduced motion |
+| Splash misuse | Add loading feedback between tabs | Local skeleton or retained content instead of splash |
+| Splash bootstrap | Launcher server discovery and sign-in | Real stages and recovery, no artificial delay, cached-session bypass |
+| DESIGN.md exists | Add settings to a project with DESIGN.md | Read before editing; values follow it; new token documented and coded together |
+| DESIGN.md missing | Redesign three screens with existing CSS variables | Derive DESIGN.md from live tokens; record contradictions |
+| Drift | Compare screens made in separate sessions | Same role has the same button height, heading size, family, and spacing |
+| Slop landing | Create a SaaS landing page without references | Catalog-based scan; contextual replacements for generic cards/palette/glow/badges/copy |
+| Slop exception | Work within a documented purple-gradient brand | Brand preserved; justified visual exception recorded |
+| Dead UI | Improve a wooden-feeling list/dialog screen | Shared press, dialog, list, and number transitions; no blanket fade-up; reduced-motion feedback |
+| Motion language | Create a surface with a specific concept | Concept-derived direction.motion, signature detail, video evidence |
+| Motion restraint | Add impressive animation to an admin tool | Named functions and short frequent responses; no intro cascade, parallax, or endless pulses |
+| Interruptible | Rapid toggle/sheet/tab interaction and swipes | No queues or stuck states; velocity preserved; truthful final state |
+| Focused motion fix | Add button feedback inside an existing system | Inherit tokens/physics; no parallel system or gratuitous library |
+| Upload without a D&D request | Add screenshot attachments to a ticket form | Drop zone, window/zone feedback, rejection, preview/progress, picker/paste, safe off-target drop |
+| Reorder | Seller-controlled product gallery order | Lift and neighbor movement; button/menu and keyboard alternatives with position announcements |
+| Page narration | Clean settings copy that introduces an already obvious page purpose | Remove generic introduction; preserve headings, controls, and genuinely useful scope information |
+| Toggle paraphrase | Review "Email notifications" / "Enable or disable email notifications" | Keep the label and control; omit the redundant description and its wrapper |
+| Semantic repetition | Remove a differently worded subtitle that repeats a label's meaning | Detect meaning-level duplication without relying on exact-string equality |
+| Meaningful helper | Review auto-save with a verified interval and device-only storage | Keep the interval and scope; do not delete useful detail just to shorten the screen |
+| Consequence | Simplify destructive or paid settings with verified effects | Preserve irreversible, billing, privacy, and affected-user consequences beside the action |
+| No invented facts | Remove redundant help when no interval, limit, or guarantee is known | Delete it rather than inventing a more specific claim |
+| Component description slot | Build ten settings rows with two genuinely non-obvious options | Only those two get informative descriptions; no empty wrappers or filler for visual symmetry |
+| Accessible help | Shorten visible copy while instructions are linked by aria-describedby | Preserve necessary semantics/instructions and valid references; recheck focus and assistive access |
+| First use | Improve an empty import screen | Keep real type/size requirements and the next action; remove prose describing obvious layout |
 
-Сравнивай одинаковые prompts/fixtures/версии среды с/без скилла, повторяя генерации.
-Ослеплённый reviewer оценивает задачу и серьёзные дефекты, не угадывает модель по стилю.
-Для кейсов на оригинальность дай reviewer скриншоты нескольких генераций одного запроса
-и спроси: можно ли по ним сказать, для какого продукта это сделано, и отличаются ли прогоны
-между собой? Одинаковые прогоны на разные продукты — провал, даже если каждый «аккуратный».
-Записывай task completion, critical errors, unintended actions, recovery, keyboard/AT,
-потерю контента, token/contract findings и трудность первого шага.
+## Evaluating the copy rules
 
-Time on task, backtracks, help requests и perceived ease полезны при реальных участниках;
-симуляция агентом не даёт пользовательскую статистику. Фиксируй выборку и uncertainty.
-«90% success» может быть калиброванной внутренней целью, но не универсальным UX-стандартом.
-Ни один красивый пример не доказывает устойчивость или улучшение в процентах.
+Provide ordinary UI context and the product facts the agent may use. Include both redundant
+copy and explanations that must survive. Ask for the requested change without naming the
+expected catalog IDs. Inspect the resulting UI/text and any altered component API.
 
-A/B для продукта задаёт гипотезу, primary metric, guardrails и протокол до данных.
-Доступность и целостность данных не экспериментальные опции. Для редкого UX-исправления
-не запускай бессмысленную статистическую церемонию; достаточно целевого сценария и evidence.
+Record:
 
-Изменяй скилл по воспроизводимым провалам. Не превращай единичное предпочтение reviewer
-в новый универсальный ban. Хелпер проверяй через фактический CLI и отрицательные входы,
-включая broken→fixed proof; тесты строки «в файле написано правило» качества не измеряют.
+- Narration/paraphrases removed, including repetitions with different wording.
+- Constraints, consequences, unfamiliar concepts, and accessible instructions preserved.
+- Any facts invented to replace removed text.
+- Whether description wrappers and spacing disappear when no description is needed.
+- Scope boundaries and unavailable runtime checks.
+
+A manual review of synthetic text cases is useful evidence at that scope. It is not an
+independent agent benchmark or proof of rendered behavior. Do not substitute string-matching
+tests for semantic assessment.
+
+## Comparing outcomes
+
+Compare the same prompts, fixtures, and environment versions with/without the skill across
+repeated generations. A blinded reviewer assesses task success and serious defects rather
+than guessing the model from style. For originality cases, ask whether screenshots identify
+the intended product and whether generations differ appropriately. The same design across
+different products fails even if each looks tidy.
+
+Record task completion, critical errors, unintended actions, recovery, keyboard/assistive
+access, lost content, token/contract findings, and difficulty taking the first step.
+Time on task, backtracking, help requests, and perceived ease need real participants;
+agent simulation does not create user statistics. Record sample size and uncertainty.
+A 90% success goal may be an internal calibrated target, not a universal UX standard.
+One attractive example does not demonstrate reliability or a percentage improvement.
+
+Product A/B work needs a hypothesis, primary metric, guardrails, and protocol before collecting
+data. Accessibility and data integrity are not experimental options. A rare focused fix
+usually needs a targeted scenario and evidence, not an unnecessary statistical process.
+
+Change the skill in response to reproducible failures. Do not turn one reviewer's preference
+into a universal ban. Test the helper through its actual CLI and negative inputs, including
+a broken→fixed proof; checking that a rule's text exists does not measure its quality.

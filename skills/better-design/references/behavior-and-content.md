@@ -1,211 +1,199 @@
-# Поведение, содержание и восстановление
+# Behavior, content, and recovery
 
-Читай только изменяемые компоненты и их общие зависимости. Не реализуй новые состояния,
-интеграции или локализации вне задачи; покрывай состояния, которые этот поток уже допускает.
+Read only the affected components and their shared dependencies. Cover states the requested
+flow already permits; do not add unrelated states, integrations, or localization work.
 
-## Задача и информационная архитектура
+## Tasks and information architecture
 
-Покажи пользовательский объект, текущий контекст и следующий шаг. Названия должны совпадать
-с предметной областью пользователя. Согласуй labels одной сущности между search, detail,
-navigation и feedback. Видимая активная локация, предсказуемый Back и сохранённые фильтры
-обычно полезнее дополнительной инструкции. Не заставляй помнить данные предыдущего экрана.
+Show the user's object, current context, and next step. Use terms from the user's domain.
+Keep names consistent across search, details, navigation, and feedback. A visible location,
+predictable Back action, and preserved filters are usually more useful than extra instructions.
+Do not make users remember data from the previous screen.
 
-Один доминирующий смысл и один primary action на task region — эвристика иерархии.
-Несколько независимых регионов могут иметь свои primary actions. Не скрывай частые
-действия ради чистого screenshot и не добавляй вторую CTA ради шаблона.
+One dominant purpose and one primary action per task region are hierarchy heuristics.
+Independent regions may each have a primary action. Do not hide frequent actions for a cleaner
+screenshot or add a second CTA to satisfy a template. Apply the copy information test in
+[ai-slop.md](ai-slop.md) instead of introducing the page with a paragraph about its controls.
 
-## Контракты компонентов
+## Component contracts
 
-| Компонент | Поведение и применимые состояния | Наблюдаемая проверка |
+| Component | Behavior and applicable states | Observable check |
 | --- | --- | --- |
-| Button/link | Команда — button, переход — link; default, focus-visible, pressed и hover при указателе; disabled только по смыслу. Icon-only имеет имя. Submit может работать через form без onClick | Enter/Space для button; link сохраняет URL, Back, открытие новой вкладки; действие меняет ожидаемый объект/вид |
-| Async submit | Pending не сдвигает соседей и не допускает дубликат; успех конкретен; сбой сохраняет ввод и допускает retry | Два быстрых запуска не создают два результата; сбой не становится success |
-| Input/select | Постоянный связанный label; hint отдельно; placeholder — пример. required/readOnly/disabled различимы; type/inputmode/autocomplete по данным | Label фокусирует поле; valid/invalid значения сохранены после ошибки; correctable error связан с полем |
-| Checkbox/radio/toggle | Видны значение и доступное действие; семантическое checked; toggle сохраняет значение или сообщает сбой | Клавиатура меняет состояние; ошибка persistence не оставляет ложное «сохранено» |
-| Tabs/menu | Используй проверенный платформенный/APG паттерн, соответствующие роли, roving focus/arrows по паттерну; focus и selected — разные состояния | Стрелки/Tab работают ожидаемо; содержимое связано с tab; Escape закрывает popup и возвращает focus |
-| Dialog | Доступный title, подходящий initial focus, inert background, modal containment; Escape обычно закрывает; после закрытия логичный focus | Open → Tab/Shift+Tab → Escape → invoker или следующий логичный элемент, если invoker удалён |
-| Navigation | Постоянные названия мест, current семантически и визуально; осмысленный collapse; стабильные назначения | Перейти, вернуться Back, восстановить контекст; важные destinations доступны на узком экране |
-| Table/list | Сравниваемые данные сохраняют колонки; read-only table — native table, не interactive grid. Grid нужен только при отдельной модели клавиатурного редактирования | Headers/caption/context доступны; sorting меняет порядок и сообщает направление; numeric alignment помогает сравнению |
-| Cards/regions | Граница выражает отдельный объект/инструмент/группу; сложную card с действиями не делай целиком вложенной кнопкой | Независимые действия доступны без случайного открытия; элементы не конкурируют за pointer/focus |
-| Search/filter | Query, выбранные фильтры и количество результатов видны; clear/reset предсказуемы. Различай first-use, loading, no results, service error и stale data | Быстрый ввод не показывает устаревший ответ; «ничего не найдено» предлагает сброс условий; ошибка допускает retry |
-| Drag/reorder | Есть single-pointer способ без drag и отдельный keyboard путь | Переместить через кнопки/menu без удерживания pointer; затем повторить с клавиатуры |
-| File/image upload | Drop zone с первой версии + реальная кнопка выбора + paste, где естественно. Ограничения видны до выбора; idle, drag-over, reject, uploading, done, error различимы не только цветом | Перетащить один и несколько файлов, неверный тип, слишком большой; бросить мимо зоны — файл не открылся, форма цела; выбрать с клавиатуры |
-| Toast/status | Успех/результат понятен вне визуального окружения; подходящий status/live region, без лишнего перебивания | Статус программно доступен; не уводит focus без причины; критическая ошибка не исчезает до исправления |
+| Button/link | Buttons issue commands; links navigate. Default, focus-visible, pressed, and pointer hover; disable only for a real reason. Icon-only actions have names. Native form submission needs no onClick | Enter/Space works for buttons; links preserve URL, Back, and opening in another tab; actions change the expected object/view |
+| Async submit | Pending preserves geometry and prevents duplicates; success is specific; failure preserves input and permits retry | Two rapid submissions do not create two results; failure is not reported as success |
+| Input/select | Persistent associated label; separate hint only when informative; placeholder as example. Distinguish required/readOnly/disabled; choose type/inputmode/autocomplete for the data | Label focuses the field; values survive errors; correctable errors are associated with the field |
+| Checkbox/radio/toggle | Value and available action are clear; semantic checked state; persist the value or report failure | Keyboard changes state; persistence failure does not leave a false saved indication |
+| Tabs/menu | Follow an established platform/APG pattern, roles, and roving focus/arrows where applicable; focus and selection are distinct | Arrows/Tab behave as expected; panels relate to tabs; Escape closes a popup and restores focus |
+| Dialog | Accessible title, appropriate initial focus, inert background, modal containment, usual Escape dismissal, logical focus after closing | Open → Tab/Shift+Tab → Escape → invoker or another logical target if the invoker was removed |
+| Navigation | Consistent destination names; visual and semantic current location; meaningful collapse and stable destinations | Navigate and go Back with context restored; important destinations remain available on narrow screens |
+| Table/list | Comparable data keeps its columns; a read-only table uses native table semantics. Use a grid only for a distinct keyboard-editing model | Headers/caption/context are accessible; sorting changes order and announces direction; numeric alignment supports comparison |
+| Cards/regions | Boundaries express a separate object, tool, or group. Do not make a complex card with independent actions one nested button | Independent actions remain reachable without accidental opening or competing pointer/focus behavior |
+| Search/filter | Show query, selected filters, and result count; predictable clear/reset. Distinguish first use, loading, no results, service error, and stale data | Rapid input cannot show an obsolete response; no-results offers a useful reset; errors permit retry |
+| Drag/reorder | Provide a non-drag single-pointer method and a separate keyboard path | Move with buttons/menu without holding the pointer, then repeat with keyboard |
+| File/image upload | Drop zone from the first version, real file-picker button, and paste where appropriate. Show limits before selection; distinguish idle, drag-over, rejection, uploading, done, and error beyond color | Try one/multiple files, wrong type, excessive size, a drop outside the zone, and keyboard selection; the form remains intact |
+| Toast/status | Outcome understandable beyond visual context; suitable status/live region without unnecessary interruption | Status is programmatically available; focus stays put unless needed; critical errors remain until addressed |
 
-Не назначай одинаковую матрицу всем сущностям: у статичного текста нет pending, у toggle
-обязательны on/off, у async search есть гонки, у простого link нет выдуманного success toast.
+Do not give every component the same state matrix. Static text has no pending state,
+a toggle needs on/off, async search has response races, and an ordinary link does not need
+an invented success toast.
 
-## Drag & Drop: предусматривай сразу
+## Drag and drop: include it from the start
 
-Пользователь ожидает, что файл можно просто перетащить. Не жди отдельной просьбы: если в задаче
-есть выбор файла, D&D входит в первую версию, как label у поля.
+If the task includes file selection, include drag and drop in its first version rather
+than waiting for a separate request.
 
-### Где обязателен
+### Where it belongs
 
-- **Любая загрузка файлов и изображений**: аватар, обложка, вложение к сообщению или тикету,
-  импорт CSV/JSON, галерея, ассеты в редакторе, моды/скины/сохранения в лаунчере. Есть
-  `<input type="file">` или системный диалог выбора — рядом есть drop zone.
-- **Порядок, который задаёт пользователь**: галерея, плейлист, приоритеты, слои, шаги;
-  перемещение между группами — kanban, папки. Drag здесь основной жест, кнопки/меню — обязательная
-  альтернатива (строка Drag/reorder выше).
-- Не добавляй там, где порядок вычисляется (сортировка по дате) или перетаскивать нечего.
+- **Every file/image upload:** avatar, cover, message/ticket attachment, CSV/JSON import,
+  gallery, editor assets, launcher mods/skins/saves. A file input or native picker has a
+  corresponding drop zone.
+- **User-defined order:** galleries, playlists, priorities, layers, steps, and moving between
+  groups such as kanban columns or folders. Buttons/menus remain required alternatives.
+- Do not add it to computed ordering, such as sort-by-date, or where there is nothing to drag.
 
-### Понятная drop zone
+### A clear drop zone
 
-- В покое объясняет себя сама: иконка загрузки из набора проекта, текст «Перетащите файлы сюда
-  или» + реальная `button` «Выберите», допустимые типы, лимит размера и количества. Пунктирная
-  рамка — конвенциональный маркер, но не единственный: текст и иконка обязательны.
-- Масштаб по роли: главная задача экрана (импорт, галерея) — крупная зона; вложение в форме —
-  компактная строка; аватар/обложка — сама превью-область с оверлеем «Заменить».
-- Оформление из DESIGN.md: цвета, радиусы, иконки — токены, а не отдельный стиль «загрузчика».
+- At rest, use the project's upload icon, "Drop files here or" plus a real "Choose files"
+  button, supported types, and size/count limits. A dashed border is a convention, not the
+  only cue; text and icon remain visible.
+- Match size to role: a large zone for a primary import/gallery task, a compact row for an
+  attachment, or the avatar/cover preview itself with a Replace overlay.
+- Use DESIGN.md colors, radii, and icons; do not invent a separate uploader style.
 
-| Состояние | Что видно |
+| State | Visible result |
 | --- | --- |
-| idle | Иконка, текст, кнопка выбора, ограничения |
-| файл над окном | Все drop zones на экране подсвечиваются, чтобы было видно, куда бросать. Если зона одна и главная — допустим полноэкранный оверлей «Отпустите, чтобы загрузить» |
-| файл над зоной | Рамка и фон усиливаются, текст меняется на «Отпустите — загрузим 3 файла» |
-| reject | Иконка + текст причины («Только PNG и JPG до 10 МБ»), не только красная рамка. Если тип виден на dragover — сразу, иначе после drop по каждому файлу |
-| uploading | Список: превью, имя, размер, determinate progress на файл, cancel |
-| done | Миниатюра, имя, «Удалить», «Заменить»; зона остаётся для добавления, если файлов может быть несколько |
-| error | Причина на уровне файла, retry; остальные файлы и данные формы не теряются |
+| Idle | Icon, instruction, picker button, and actual limits |
+| File over window | Highlight available drop zones. A single primary zone may use a full-window drop overlay |
+| File over zone | Stronger border/background; a concrete release-to-upload message, with count when available |
+| Reject | Icon and reason, such as supported formats and size. Reject during dragover when available metadata permits, otherwise per file after drop |
+| Uploading | Preview, name, size, per-file determinate progress, and cancel |
+| Done | Thumbnail, name, Remove and Replace; keep the zone available for additional files when supported |
+| Error | Per-file reason and retry; preserve other files and form data |
 
-- Превью изображения показывай сразу из локального файла (object URL), не дожидаясь сервера;
-  освобождай URL после замены или удаления.
-- Одиночное поле при drop заменяет значение с возможностью отмены; множественное — добавляет.
-- Загрузка дольше ~10 s — правила из раздела «Загрузка» ниже: determinate progress, не skeleton.
+- Show image previews from a local object URL immediately; release it after replacement/removal.
+- A single-value field replaces its value with an undo path; multiple-value fields append.
+- Uploads longer than roughly 10 seconds use determinate progress, not skeletons.
 
-### Альтернативы и доступность
+### Alternatives and accessibility
 
-- Drag никогда не единственный путь (WCAG 2.5.7): кнопка выбора работает мышью, касанием и
-  клавиатурой. Для изображений в сообщениях, тикетах и редакторах поддержи вставку из буфера
-  (Ctrl/Cmd+V).
-- На touch-устройствах файлы из ОС почти не перетаскивают: зона становится крупной кнопкой
-  выбора, для фото — камера/галерея (`accept="image/*"`, `capture` по задаче). Слово
-  «Перетащите» на телефоне не показывай.
-- Результат drop и ошибки объявляются через live region; focus после drop не уводится.
-- Reorder с клавиатуры: Space — взять, стрелки — двигать, Space — положить, Escape — отмена,
-  новая позиция объявляется («Элемент 3 из 7»).
+- Drag is never the only path. The picker works with mouse, touch, and keyboard.
+  For images in messages, tickets, and editors, support Ctrl/Cmd+V where appropriate.
+- On touch, present the zone as a large picker, with camera/gallery choices as appropriate
+  (`accept="image/*"`, task-appropriate `capture`). Omit desktop drag wording.
+- Announce drop results and errors through a live region; do not move focus after a drop.
+- Keyboard reorder: Space to pick up, arrows to move, Space to place, Escape to cancel;
+  announce the position, such as "Item 3 of 7."
 
-### Техническая корректность
+### Technical correctness
 
-- Web: на `window` отменяй default у `dragover`/`drop` с файлами, иначе промах мимо зоны
-  откроет файл во вкладке и уничтожит введённые данные.
-- Подсветка не мигает над дочерними элементами: счётчик `dragenter`/`dragleave` или проверка
-  `relatedTarget`; сброс состояния на `drop`, `dragend` и уходе курсора из окна.
-- Реагируй только на файлы (`dataTransfer.types` содержит `Files`), а не на перетаскивание
-  выделенного текста или ссылки.
-- На dragover доступны только MIME-типы, без имён и размеров; финальная проверка типа, размера
-  и количества — после drop и ещё раз на сервере.
-- Папки принимай, только если задача этого требует.
-- Desktop (Electron, Tauri, WPF, Qt) и лаунчеры: используй платформенное событие file drop
-  (актуальный API — по документации), тот же набор состояний; окно не открывает файл как навигацию.
-- Движение зоны и списка файлов — строки Drag и Drop zone в каталоге [motion.md](motion.md).
+- On web, prevent file `dragover`/`drop` defaults at the window level so an off-target drop
+  does not navigate to the file and discard entered data.
+- Avoid highlight flicker over children with a dragenter/dragleave counter or relatedTarget
+  checks. Reset on drop, dragend, and leaving the window.
+- Respond to files (`dataTransfer.types` includes `Files`), not dragged text or links.
+- Dragover exposes limited metadata, typically types rather than names/sizes. Validate type,
+  size, and count after drop and again on the server.
+- Accept directories only when the task requires them.
+- In Electron, Tauri, WPF, Qt, and launchers, use the current native file-drop API and the same
+  states. A drop must not become window navigation.
+- Follow the Drag and Drop zone rows in [motion.md](motion.md).
 
-## Загрузка: skeleton, spinner, loading splash
+## Loading: skeletons, spinners, and splash screens
 
-Любой асинхронный контент получает явное состояние загрузки. Пустой экран, прыгающий layout
-или «Нет данных» во время запроса — дефект. Индикатор выбирай по ожидаемой длительности
-и по тому, известна ли форма будущего контента.
+Every async content region needs an explicit loading state. A blank screen, jumping layout,
+or "No data" while a request is pending is a defect. Choose by expected duration and whether
+the future content shape is known.
 
-| Ситуация | Индикатор | Чего не делать |
+| Situation | Indicator | Avoid |
 | --- | --- | --- |
-| Ответ обычно быстрее ~300 ms | Ничего не показывать сразу; оставить прежний контент. Если индикатор нужен — показать с задержкой ~200–300 ms и, появившись, держать ≥300–500 ms | Мигание skeleton/spinner на долю секунды |
-| Первичная загрузка экрана, списка, ленты, карточки, профиля; форма контента известна; ~1–10 s | **Skeleton loader** по реальной раскладке: те же размеры строк, аватаров, изображений, колонок таблицы | Абстрактная рамка без структуры; skeleton, не совпадающий с итоговым layout (сдвиг = CLS) |
-| Действие пользователя: submit, сохранение, toggle, отправка | Pending **в самом control**: кнопка блокирует повтор, показывает прогресс, сохраняет ширину | Skeleton на месте формы; полноэкранный overlay ради одной кнопки |
-| Отдельный модуль (видео, график, виджет), форма неизвестна | Локальный spinner в границах модуля | Spinner на весь экран, блокирующий готовые части |
-| Операция дольше ~10 s: импорт, экспорт, upload, установка, обработка | Determinate progress с этапом и остатком, cancel или фоновое выполнение | Skeleton (это не загрузка контента) или бесконечный spinner без статуса |
-| Приложение не может показать ничего осмысленного, пока не соберёт данные | **Loading splash** с реальными этапами (см. ниже) | Splash для обычной навигации между экранами |
+| Usually under ~300 ms | Retain existing content; if needed, delay the indicator ~200–300 ms and avoid a flash shorter than ~300–500 ms once shown | A split-second skeleton/spinner |
+| Initial screen/list/feed/card/profile load, known shape, ~1–10 s | A **skeleton** matching actual rows, avatars, images, and columns | Abstract boxes or a skeleton whose geometry differs from the final layout |
+| Submit, save, toggle, send | Pending **inside the control**, preventing repeats and preserving width | Replacing the form with a skeleton or blocking the whole screen |
+| Separate module with unknown shape, such as video/chart/widget | Local spinner within that module | A full-screen spinner blocking ready regions |
+| More than ~10 s: import/export/upload/install/process | Determinate progress, stage and remaining work, cancel or background execution | A content skeleton or endless spinner without status |
+| App cannot show meaningful UI until required data is ready | **Loading splash** with real stages | Splash for normal screen navigation |
 
 ### Skeleton loader
 
-- Повторяет **конкретную** раскладку экрана и её responsive-варианты. Количество строк
-  разумно ожидаемое, а не десять одинаковых полос.
-- Заменяется реальным контентом по частям по мере прихода данных; уже готовые регионы
-  не ждут самый медленный. Замена — короткий crossfade без сдвига, не резкая подмена
-  и не «въезд» контента.
-- Shimmer/pulse спокойный; при `prefers-reduced-motion` — статичный или очень медленный.
-- Доступность: регион получает `aria-busy="true"`, один раз объявляется статус загрузки;
-  сами плашки скрыты от AT (`aria-hidden`) и не получают focus.
-- Skeleton не живёт вечно: по таймауту или ошибке превращается в error с причиной и retry.
-  Сбой загрузки не маскируется под пустой список.
-- При повторном заходе с кэшем показывай кэшированные данные и обновляй их, а не skeleton.
+- Match the specific layout and its responsive variants, with a plausible count of rows.
+- Replace each region as its data arrives; ready regions do not wait for the slowest.
+  Use a short crossfade without shifting layout or sliding content in.
+- Keep shimmer/pulse restrained; under reduced motion, use a static or very slow treatment.
+- Mark the region `aria-busy="true"`, announce loading once, and hide skeleton shapes from
+  assistive technology with `aria-hidden`; they do not take focus.
+- On timeout/failure, show an error with reason and retry. A failed load is not an empty list.
+- On a cached revisit, show cached content and refresh it instead of reverting to a skeleton.
 
-### Loading splash — только для настоящего bootstrap
+### Loading splash: only for genuine bootstrap
 
-Это отдельный полноэкранный этап запуска, а не украшение. Он уместен, только если приложение
-**не может показать осмысленный интерфейс**, пока не выполнит обязательные долгие шаги:
+A splash is a full-screen startup phase, appropriate only when the app **cannot show a
+meaningful interface** until necessary long operations finish:
 
-- поиск сети, сервера, устройства или лобби; подключение к хосту;
-- вход в аккаунт, восстановление сессии, получение лицензии или прав доступа;
-- первичная синхронизация, загрузка обязательной конфигурации, обновление клиента;
-- загрузка ассетов игры, уровня или шейдерного кэша.
+- Discovering a network, server, device, or lobby and connecting.
+- Signing in, restoring a session, obtaining a license or access rights.
+- Initial sync, required configuration, or a client update.
+- Loading game assets, a level, or shader cache.
 
-Требования к splash:
+Requirements:
 
-- Показывает **реальные этапы** по порядку: «Поиск сети…», «Вход в аккаунт…»,
-  «Загрузка профиля…». Для долгих шагов — прогресс или счётчик; не фейковый процент.
-- Каждый этап имеет путь при сбое: понятная причина, retry, offline-режим, выход из аккаунта
-  или смена сервера — что применимо. Splash не зависает навсегда: есть таймаут.
-- Никакой искусственной задержки ради логотипа или анимации. Как только данные готовы —
-  переход в интерфейс.
-- Если есть кэш сессии и данных — пропусти splash, покажи интерфейс и обновляй в фоне.
-- Внешне это часть art direction продукта, а не стоковый spinner по центру; при этом
-  текст этапа читаем, анимация уважает reduced motion.
-- Не использовать для: переходов между экранами, загрузки обычного списка,
-  web-страницы с серверным рендером (splash поверх готового HTML ухудшает LCP),
-  коротких операций, которые помещаются в skeleton или pending.
+- Show **real stages** in order, such as finding a network, signing in, and loading a profile.
+  Long stages get real progress or counts; never invent a percentage.
+- Each stage has applicable recovery: a clear reason, retry, offline mode, sign-out,
+  or another server. Include a timeout rather than hanging indefinitely.
+- Add no delay for a logo or animation. Show the interface once required data is ready.
+- With sufficient cached session/data, skip the splash and refresh in the background.
+- Follow the product's art direction; keep stage text readable and respect reduced motion.
+- Do not use it for screen navigation, ordinary list loads, ready server-rendered HTML,
+  or short operations that fit local pending/skeleton states.
 
-Системный launch screen ОС (iOS launch screen, Android 12+ `SplashScreen`) — другое:
-он закрывает только холодный старт процесса, должен быть коротким и не является местом
-для долгой загрузки данных или рекламы бренда. Долгий bootstrap показывай уже своим экраном
-с этапами. Ссылки — [sources.md](sources.md).
+An OS launch screen (iOS or Android 12+ `SplashScreen`) covers process startup and should
+be brief. Long data bootstrap belongs in the app's own staged screen, not an extended
+branding launch screen. See [sources.md](sources.md).
 
-## Ошибки и последствия
+## Errors and consequences
 
-При невалидном вводе опиши поле и способ исправления; для длинной формы свяжи error summary
-с полями и перенеси focus в подходящую точку. Не очищай остальные ответы. Не отключай submit
-так, что пользователь не может узнать причину запрета. Важное объяснение должно быть доступно
-без hover над disabled control.
+For invalid input, name the field and correction. In a long form, connect an error summary
+to the fields and move focus appropriately. Preserve other answers. Do not disable submit
+in a way that conceals the reason; essential help must not require hovering a disabled control.
 
-Сервисная ошибка, отсутствие разрешений, offline и пустой ответ — разные причины.
-Показывай только применимые к продукту варианты с реальным следующим шагом, а не raw exception.
-При повторе операции сохрани запрос и контекст, предотвращай дубликаты; не обещай undo,
-если система не умеет возвращать состояние.
+Service failure, missing permission, offline state, and an empty response have different
+causes. Show applicable reasons and real next steps rather than raw exceptions. Retrying
+preserves request/context and prevents duplicates. Do not promise undo if it cannot work.
 
-Для high-consequence операции выбери реальный механизм reversibility, checking или review:
-назови объект, объём воздействия и действие. Удалить одну строку с undo и удалить аккаунт
-требуют разной UX-защиты. Это продуктовый UX, не новый запрос разрешения агенту.
+For high-consequence actions, use actual reversibility, checking, or review. Name the object,
+scope, and action. Deleting a row with undo and deleting an account need different protection.
+This is product UX guidance, not a new approval requirement for the agent.
 
-## Copy и данные
+## Copy and data
 
-- Кнопка называет действие и при необходимости объект: «Сохранить изменения», «Удалить счёт».
-  В контекстном многошаговом потоке «Продолжить» может быть понятным; оцени результат.
-- Ошибка объясняет проблему и восстановление: «Введите адрес в формате name@company.ru».
-  «Произошла ошибка» без причины/следующего шага недостаточно, но не выдумывай причину.
-- Удали рекламные штампы, повторение заголовков и описание очевидного layout.
-  Сохрани полезные hints, units, constraints, tooltip, shortcut и пояснение незнакомого действия.
-- Краткость — эвристика: 1–4 слова на button, около 120 символов на hint/tooltip могут помочь
-  ревью. Не обрезай необходимый смысл и перевод ради лимита.
-- Используй достоверный content. Fixtures помечай в прототипе; не выдавай sample revenue,
-  отзывы, avatars или отправку сообщения за реальные данные/результат.
-- Проверь 0/1/many, длинное имя, длинное непрерывное слово, большие числа и пустые поля.
-  Валидный длинный пример даты: «30 сентября 2026 г., 23:59:59»; невалидная дата — тест ошибки.
+- Buttons name the action and, where necessary, its object: "Save changes," "Delete invoice."
+  "Continue" can be clear within a contextual multistep flow; evaluate its outcome.
+- Errors explain the problem and recovery, such as a valid email format. A generic failure
+  message without a next step is insufficient, but do not invent a cause.
+- Apply the **Copy** rules and information test in [ai-slop.md](ai-slop.md), the canonical
+  source for page narration, label paraphrases, redundant copy, and default helper text.
+  A description slot is optional. Keep useful limits, units, formats, shortcuts, consequences,
+  and explanations of unfamiliar actions.
+- Brevity is a heuristic: 1–4 words for a button and roughly 120 characters for a hint can
+  aid review. Do not cut necessary meaning or translations to meet a quota.
+- Use truthful content. Label prototype fixtures; do not present sample revenue, testimonials,
+  avatars, or message delivery as real results.
+- Check zero/one/many, long names, unbroken strings, large numbers, and empty fields.
+  Use valid long dates, such as "September 30, 2026, 11:59:59 PM"; invalid dates test errors.
 
-## Локализация и движение
+## Localization and motion
 
-Используй существующий message-level i18n, placeholders/plurals и locale formatters;
-не собирай предложение из грамматических фрагментов. Не добавляй новую i18n-библиотеку
-для правки кнопки. Не вставляй пользовательские данные как markup.
+Use existing message-level i18n, placeholders/plurals, and locale formatters rather than
+assembling grammatical fragments. Do not add an i18n library for a button fix or interpolate
+user data as markup.
 
-Проверь расширенный перевод и long data без потери текста/действия. Ellipsis допустим
-для вторичных данных при доступном способе увидеть полное значение, не для критичной ошибки.
-Для поддержанного RTL используй base direction и logical layout, зеркаль только направленную
-семантику; цифры, графики, медиа controls и brand marks не требуют бездумного отражения.
+Test expanded translations and long data without losing content/actions. Ellipsis is suitable
+for secondary data only with a way to reveal the complete value, never for a critical error.
+For supported RTL, use base direction and logical layout; mirror directional semantics,
+not every number, chart, media control, or brand mark.
 
-Движение — обязательная часть поведения, а не финальная полировка: каждое состояние из
-таблицы компонентов выше получает свой переход, каждое нажатие — мгновенный отклик.
-Функции, токены, хореография, каталог переходов по компонентам и проверка — в
-[motion.md](motion.md). Используй существующие duration/easing tokens и сохраняй отклик и
-состояние при reduced motion. Не анимируй каждую строку/scroll по умолчанию. Долгая операция
-требует правдивого статуса, а не искусственной паузы ради красивого spinner; выбор
-индикатора — в разделе «Загрузка».
+Motion belongs to behavior. Give applicable component states a transition and each press
+immediate feedback. Use [motion.md](motion.md) for functions, tokens, choreography, and checks.
+Inherit existing duration/easing values and preserve feedback/state under reduced motion.
+Do not animate every row or scroll event by default. Long operations need truthful status;
+use the loading guidance above rather than delaying work for an animation.

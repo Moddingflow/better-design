@@ -78,6 +78,19 @@ acceptance checks that need the actual game runtime.
 
 Expected work: a scoped plan and acceptance criteria. A web mockup does not prove gamepad focus or behavior in the game.
 
+## Remove redundant UI copy
+
+```text
+Use better-design to review the notification settings page's copy.
+Remove introductions that restate the page title and descriptions that only
+paraphrase toggle labels. Compare meaning, not just identical words.
+Keep real delivery rules, required alerts, privacy consequences, and error
+recovery. Verify those facts against the implementation. Do not invent
+explanations or change setting behavior. Omit empty description wrappers.
+```
+
+Expected work: concise labels with supporting text only where it supplies a useful new fact. A clear label does not need a subtitle. Necessary accessible instructions and consequences must survive the edit.
+
 ## Useful context to provide
 
 - **Task:** what the user needs to accomplish.

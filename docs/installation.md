@@ -52,7 +52,7 @@ For example, Claude Code supports a project-local `.claude/skills/better-design/
 For a stable copy you can inspect before installing:
 
 ```sh
-git clone --branch v1.0.0 --depth 1 https://github.com/Moddingflow/better-design.git
+git clone --branch v1.1.0 --depth 1 https://github.com/Moddingflow/better-design.git
 npx skills add ./better-design --skill better-design --agent codex
 ```
 
@@ -95,6 +95,6 @@ Use `--global` when managing a global installation. Review changes before upgrad
 | Unexpected duplicate skills | Check both project and global installations and remove the obsolete copy deliberately. |
 | Validator rejects existing design tokens | It accepts a limited custom format. Use your native validator or an explicit projection; do not migrate your design system just for this tool. |
 | Agent cannot preview the app | Provide access to the project's preview tools or current captures. Runtime checks must remain unverified until actually performed. |
-| Agent answers in the wrong language | Specify your preferred output language. Some bundled reference text is Russian. |
+| Agent answers in the wrong language | Specify your preferred output language. The skill is written in English; generated UI copy should follow your product's language. |
 
 Installability does not demonstrate output quality on every model. File discovery and installation checks are separate from evaluating the agent on real UI tasks.

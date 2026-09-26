@@ -1,104 +1,97 @@
-# DESIGN.md: единый источник интерфейса
+# DESIGN.md: the shared source for the interface
 
-DESIGN.md — файл в репозитории, где записано всё, из чего собирается интерфейс проекта:
-направление, шрифты, шкала кегля, цветовые токены, отступы, радиусы, размеры компонентов,
-иконки, движение и запрещённые паттерны. Его задача — чтобы каждый экран, сделанный в любой
-сессии любым агентом или человеком, был собран из одних и тех же значений. Без него через
-десять правок у одной кнопки высота 40, у другой 44, заголовки набраны тремя шрифтами, а
-радиусы — 6, 8, 10 и 12.
+DESIGN.md records the project's direction, fonts, type scale, colors, spacing, radii,
+component sizes, icons, motion, and prohibited patterns. Screens made in different sessions
+by different agents or people should use the same values. Otherwise, repeated changes can
+produce 40px and 44px versions of the same button, three heading fonts, and arbitrary radii.
 
-## 1. Найти и прочитать — всегда первым делом
+## 1. Find and read it first
 
-- Перед любой UI-работой ищи файл: `DESIGN.md` в корне, затем `docs/DESIGN.md`,
-  `design/DESIGN.md`, путь из CLAUDE.md/AGENTS.md/README; регистр имени не важен.
-  В монорепо может быть общий файл и файлы пакетов: пакетный уточняет общий.
-- Если файл есть — **прочитай его целиком до того, как смотреть компоненты и писать код**.
-  Это не справочник «на всякий случай», а обязательные входные данные.
-- Все значения в новом и изменённом коде берутся **из DESIGN.md по имени токена/роли**:
-  шрифт, размер, вес, line-height, цвет, отступ, радиус, высота контрола, размер иконки,
-  длительность и кривая анимации. Не подбирай значение «на глаз», не округляй, не вводи
-  соседнее («тут 14 смотрится лучше, чем 13»).
-- Нужного значения нет — это решение о системе, а не о компоненте: сначала проверь, не
-  подходит ли существующая роль; если нет — добавь новую роль в DESIGN.md и в код-токены
-  **в том же изменении** и упомяни это в отчёте. Одноразовое значение без записи — дефект.
-- Для компонента ищи существующий вариант (size, intent, density) в DESIGN.md и в коде.
-  Новый вариант кнопки/поля/карточки добавляется в раздел компонентов, а не рисуется локально.
+- Before any UI work, look for `DESIGN.md` at the root, then `docs/DESIGN.md`,
+  `design/DESIGN.md`, and paths named in CLAUDE.md/AGENTS.md/README. Match filenames
+  case-insensitively. A monorepo may have a shared file and package-specific refinements.
+- **Read the whole file before inspecting components or writing code.** It is required input.
+- Take new or changed values **from DESIGN.md by token/role name**: family, size, weight,
+  line height, color, spacing, radius, control height, icon size, duration, and easing.
+  Do not eyeball, round, or introduce a nearby value because it seems slightly better.
+- A missing value is a system decision. First check whether an existing role fits. Otherwise,
+  add the role to DESIGN.md and code tokens **in the same change**, and report it.
+  An undocumented one-off value is a defect.
+- Find existing component variants by size, intent, and density. Record a new button, field,
+  or card variant in the component section rather than styling it locally.
 
-## 2. Когда создавать
+## 2. When to create it
 
-| Ситуация | Действие |
+| Situation | Action |
 | --- | --- |
-| Новый проект или создание интерфейса с нуля (`mode: create`) | Создай DESIGN.md из выбранного направления и токенов до вёрстки экранов |
-| Редизайн или изменение нескольких компонентов, а файла нет | Создай DESIGN.md, **выведя значения из живого кода** (CSS variables, theme-файлы, tokens), а не придумав новые. Противоречия в коде запиши в раздел «Расхождения», не исправляй молча |
-| Точечная правка одного элемента, файла нет | Не создавай без запроса; работай по существующим токенам и предложи в отчёте одной строкой |
-| Пользователь просит зафиксировать систему | Создай, даже если правка мала |
-| Аудит | Не создавай и не меняй; отметь отсутствие/устаревание файла как finding |
+| New project/interface (`mode: create`) | Create DESIGN.md from the chosen direction and tokens before laying out screens |
+| Redesign or changes to several components without a file | Derive it **from live code**: CSS variables, themes, and tokens. Record contradictions under Discrepancies rather than silently fixing them |
+| One-element fix without a file | Use existing tokens; do not create the file unless requested. Offer it in one line in the report |
+| User asks to document the system | Create it even for a small change |
+| Audit | Do not create/edit it; report absence or staleness as a finding |
 
-Шаблон — [DESIGN.template.md](../assets/DESIGN.template.md). Заполняй только реально
-используемые роли; пустые разделы удаляй, а не оставляй с «TBD». Файл пишется на языке
-документации проекта.
+Use [DESIGN.template.md](../assets/DESIGN.template.md). Include only roles actually used;
+remove empty sections instead of leaving TBD. Use the project's documentation language.
 
-Если в проекте есть файл инструкций для агентов (CLAUDE.md, AGENTS.md и т. п.), предложи
-добавить в него одну строку: «Перед любой UI-работой прочитай DESIGN.md и используй только
-его значения». Меняй чужие инструкции только с согласия пользователя.
+If the project has agent instructions, suggest a line saying:
+"Before any UI work, read DESIGN.md and use its values."
+Change another instruction file only with the user's authorization.
 
-## 3. Что в нём должно быть
+## 3. Required contents
 
-Главное свойство — **закрытые наборы**. Файл перечисляет всё допустимое; то, чего в нём нет,
-не используется.
+Use **closed sets**: list the permitted values; do not introduce unlisted values.
 
-- **Направление** — концепция одной фразой, качества/анти-качества, motion-характер
-  (из контракта `direction`).
-- **Шрифты** — 1–2 семейства (редко 3: data/mono) с ролями, fallback-стеком, весами, способом
-  подключения и glyph coverage. Никаких других семейств.
-- **Типографическая шкала** — таблица ролей (display, h1, h2, h3, body, body-small, caption,
-  label, mono…) → размер, line-height, вес, tracking, где используется. Не больше 6–8 ступеней.
-- **Цвет** — роли (canvas, surface, surface-raised, text, text-muted, border, action,
-  on-action, focus, selection, status: success/warning/danger/info) → значение для каждой темы
-  и имя токена в коде. Разрешённые пары фон/текст с измеренным контрастом.
-- **Отступы** — шкала (например 0/4/8/12/16/24/32/48/64) и правила: внутри группы, между
-  группами, padding контейнеров.
-- **Радиусы** — 2–4 значения с назначением (control, card, overlay, pill) и правило вложенности.
-- **Границы и глубина** — толщина hairline, уровни elevation и где они разрешены.
-- **Иконки** — один набор, размеры (обычно 2–3), stroke, выравнивание с текстом.
-- **Компоненты** — размеры вариантов: высота кнопки sm/md/lg, padding, кегль, радиус,
-  icon-size; поле ввода; строка списка; карточка; целевые размеры касания.
-- **Layout** — сетка, max-width контента, breakpoints, safe areas, плотность.
-- **Движение** — токены длительностей, кривые/springs, press-отклик, reduced-motion правило
-  (см. [motion.md](motion.md)).
-- **Голос и текст** — тон, запреты, формат чисел/дат, пунктуация.
-- **Запрещено в этом проекте** — ID из [ai-slop.md](ai-slop.md), которые особенно легко
-  внести сюда, и явно разрешённые исключения (например: «Geist — выбран, не слоп»).
-- **Соответствие коду** — где лежат канонические токены для каждой платформы (например
-  `desktop/src/app.css` и `android/.../Theme.kt`) и соответствие имён.
-- **Расхождения и исключения** — `rule, scope, reason, source`; известные отступления кода.
+- **Direction:** one-sentence concept, target/avoided qualities, and motion character from
+  the contract's `direction`.
+- **Fonts:** 1–2 families, rarely a third data/mono family; roles, fallbacks, weights,
+  loading method, and glyph coverage.
+- **Type scale:** display, h1/h2/h3, body, small body, caption, label, mono as needed;
+  size, line height, weight, tracking, and usage. Prefer no more than 6–8 steps.
+- **Color:** canvas, surface, raised surface, text, muted text, border, action/on-action,
+  focus, selection, and status roles; values per theme and code token names.
+  Record permitted foreground/background pairs with measured contrast.
+- **Spacing:** a scale such as 0/4/8/12/16/24/32/48/64; within-group, between-group,
+  and container-padding rules.
+- **Radii:** 2–4 values with control/card/overlay/pill roles and a nesting rule.
+- **Borders and depth:** hairline width, elevation levels, and permitted usage.
+- **Icons:** one set, usually 2–3 sizes, stroke, and alignment with text.
+- **Components:** button sm/md/lg height, padding, type, radius, icon size; input, list row,
+  card, and target sizes.
+- **Layout:** grid, maximum width, breakpoints, safe areas, and density.
+- **Motion:** durations, curves/springs, press response, and reduced-motion behavior;
+  see [motion.md](motion.md).
+- **Voice and copy:** tone, prohibited patterns, number/date formats, punctuation, and
+  when helper text adds information; use the copy rules in [ai-slop.md](ai-slop.md).
+- **Project-specific prohibitions:** relevant catalog IDs and explicit visual brand exceptions.
+- **Code mapping:** canonical token locations per platform and name mappings.
+- **Discrepancies and exceptions:** `rule, scope, reason, source` for known departures.
 
-## 4. DESIGN.md и код-токены
+## 4. Keep DESIGN.md and code tokens aligned
 
-- Рендерится код, поэтому значения живут в код-токенах (CSS variables, theme-объект,
-  Kotlin/Swift константы), а DESIGN.md — их **нормативное описание с ролями и правилами**.
-  Они обязаны совпадать. Компоненты ссылаются на токены, а не на литералы.
-- Меняешь токен — меняй DESIGN.md в том же изменении, и наоборот. Несинхронная правка — дефект.
-- Нашёл расхождение между DESIGN.md и кодом — не выбирай молча и не вводи третье значение.
-  Если причина очевидна из текущей задачи (ты только что осознанно поменял токен), синхронизируй;
-  иначе назови расхождение в отчёте и спроси, что верно.
-- Несколько платформ с общим видом (web + Android, desktop + mobile) держат одни значения;
-  DESIGN.md указывает единицы и маппинг (px → dp/pt) один раз.
-- DESIGN.md не заменяет контракт задачи: контракт описывает конкретный поток, DESIGN.md —
-  систему, на которую поток опирается (`system.tokenSource` в контракте ссылается на него).
+- Code renders the UI, so values live in CSS variables, theme objects, or Kotlin/Swift
+  constants. DESIGN.md is their **normative description of roles and rules**.
+  They must agree. Components reference tokens instead of literals.
+- Change a token and its documentation together. Unsynchronized edits are defects.
+- If code and DESIGN.md disagree, do not silently choose or add a third value. Synchronize
+  when the task establishes the intended change; otherwise identify the discrepancy and
+  ask which value is authoritative.
+- Platforms sharing a visual system retain consistent values; document units and px/dp/pt
+  mappings explicitly.
+- A task contract describes a particular flow. DESIGN.md describes the shared system;
+  the contract's `system.tokenSource` references it.
 
-## 5. Проверка соблюдения
+## 5. Check conformance
 
-После изменения и до приёмки:
+After editing and before acceptance:
 
-1. Найди в изменённом коде литералы стиля: hex/rgb/hsl, px/rem/dp/pt, `font-family`,
-   `font-size`, `border-radius`, `box-shadow`, `transition`/duration. Каждый должен быть
-   токеном из DESIGN.md или легитимной layout-величиной (0, 1px hairline, %, fr, calc,
-   aspect-ratio, размеры медиа) — см. SKILL.md, раздел 4.
-2. На рендере собери фактические значения (computed styles / layout inspector): множество
-   `font-family`, `font-size`, высот кнопок и полей, радиусов, цветов текста. Каждое значение
-   входит в набор DESIGN.md; одинаковые роли имеют одинаковые значения на разных экранах.
-3. Сравни одинаковые компоненты на соседних экранах: primary-кнопка везде одной высоты,
-   заголовок одного уровня везде одного размера, отступ группы везде один.
-4. Результат — check `tokens` в контракте: что сверено, найденные внесистемные значения и
-   что исправлено. Счётчик уникальных значений — кандидат на review, не автоматический FAIL.
+1. Inspect style literals in changed code: hex/rgb/hsl, px/rem/dp/pt, font family/size,
+   radius, shadow, and transition/duration. Each is a documented token or legitimate
+   layout value such as 0, a 1px hairline, %, fr, calc, aspect ratio, or media dimensions.
+   See SKILL.md section 4.
+2. Collect actual rendered values with computed styles or a layout inspector: families,
+   font sizes, button/input heights, radii, and text colors. They stay within the documented
+   sets; the same role uses the same value across screens.
+3. Compare matching components on neighboring screens: primary-button height, heading
+   level, and group spacing.
+4. Record a `tokens` check: values compared, out-of-system findings, and fixes.
+   A count of unique values is a review signal, not an automatic failure.

@@ -1,58 +1,157 @@
 {
   "format": "better-design-contract-v1",
   "mode": "refine",
-  "scope": "Изменение имени проекта в существующих настройках",
-  "assumptions": ["Сохранение проверяется на локальной fixture без внешней записи"],
+  "scope": "Rename a project in its existing settings",
+  "assumptions": [
+    "Saving is tested with a local fixture without external writes"
+  ],
   "platform": {
-    "kind": "web", "units": "css-px", "inputs": ["pointer", "keyboard", "touch"],
-    "locales": ["ru"], "directions": ["ltr"], "themes": ["light"]
+    "kind": "web",
+    "units": "css-px",
+    "inputs": [
+      "pointer",
+      "keyboard",
+      "touch"
+    ],
+    "locales": [
+      "en"
+    ],
+    "directions": [
+      "ltr"
+    ],
+    "themes": [
+      "light"
+    ]
   },
   "system": {
-    "authority": "Существующая страница настроек и её FormField/Button",
-    "tokenSource": "Проектный theme; пример токенов скилла не заменяет его",
-    "density": "comfortable", "expression": "Сохранить бренд и оформление настроек",
-    "rationale": "Одно редкое действие, постоянный label и явный результат"
+    "authority": "Existing settings page and its FormField/Button",
+    "tokenSource": "Project theme; the skill's example tokens do not replace it",
+    "density": "comfortable",
+    "expression": "Preserve the brand and settings presentation",
+    "rationale": "One infrequent action, a persistent label, and an explicit outcome"
   },
-  "tasks": [{
-    "id": "rename", "scenario": "Изменить имя проекта и исправить ошибку сохранения",
-    "outcome": "Заголовок и поле показывают сохранённое имя", "priority": "primary",
-    "recovery": "При ошибке сохранить введённое имя, показать причину и разрешить повтор"
-  }],
-  "components": [{
-    "id": "project-name", "kind": "input", "taskIds": ["rename"],
-    "states": ["default", "focus-visible", "error", "readOnly"],
-    "responsive": "Label над полем, длинное значение доступно внутри input",
-    "actions": [{
-      "id": "edit-name", "kind": "edit", "label": "Название проекта", "taskId": "rename",
-      "outcome": "Изменён draft имени", "risk": "normal", "protection": "none",
-      "recovery": "До отправки можно исправить draft или отменить редактирование"
-    }]
-  }, {
-    "id": "save-name", "kind": "button", "taskIds": ["rename"],
-    "states": ["default", "hover", "focus-visible", "active", "disabled", "pending"],
-    "responsive": "Кнопка остаётся видимой, label переносится без потери текста",
-    "actions": [{
-      "id": "save", "kind": "submit", "label": "Сохранить изменения", "taskId": "rename",
-      "outcome": "После подтверждённого ответа сохранено новое имя и объявлен результат",
-      "risk": "normal", "protection": "none",
-      "recovery": "При сбое draft сохранён, pending завершён, повтор доступен"
-    }]
-  }],
+  "tasks": [
+    {
+      "id": "rename",
+      "scenario": "Change the project name and recover from a save failure",
+      "outcome": "The heading and field show the saved name",
+      "priority": "primary",
+      "recovery": "Preserve the entered name on failure, show the reason, and allow retry"
+    }
+  ],
+  "components": [
+    {
+      "id": "project-name",
+      "kind": "input",
+      "taskIds": [
+        "rename"
+      ],
+      "states": [
+        "default",
+        "focus-visible",
+        "error",
+        "readOnly"
+      ],
+      "responsive": "Label above the field; long values remain accessible inside the input",
+      "actions": [
+        {
+          "id": "edit-name",
+          "kind": "edit",
+          "label": "Project name",
+          "taskId": "rename",
+          "outcome": "The draft name changes",
+          "risk": "normal",
+          "protection": "none",
+          "recovery": "Correct the draft or cancel editing before submission"
+        }
+      ]
+    },
+    {
+      "id": "save-name",
+      "kind": "button",
+      "taskIds": [
+        "rename"
+      ],
+      "states": [
+        "default",
+        "hover",
+        "focus-visible",
+        "active",
+        "disabled",
+        "pending"
+      ],
+      "responsive": "The button remains visible and its label wraps without losing text",
+      "actions": [
+        {
+          "id": "save",
+          "kind": "submit",
+          "label": "Save changes",
+          "taskId": "rename",
+          "outcome": "The new name is saved after a confirmed response and the outcome is announced",
+          "risk": "normal",
+          "protection": "none",
+          "recovery": "Preserve the draft on failure, end pending, and allow retry"
+        }
+      ]
+    }
+  ],
   "verification": {
-    "viewports": [{"width": 320, "height": 800, "unit": "css-px"}, {"width": 1440, "height": 900, "unit": "css-px"}],
-    "checks": [{
-      "id": "rename-recovery", "taskIds": ["rename"], "componentIds": ["project-name", "save-name"],
-      "kind": "interaction", "scenario": "Изменить имя, получить fixture failure, повторить; draft сохраняется и результат правдив",
-      "status": "planned", "evidence": []
-    }, {
-      "id": "rename-keyboard", "taskIds": ["rename"], "componentIds": ["project-name", "save-name"],
-      "kind": "keyboard", "scenario": "Tab до поля и submit, Enter отправляет форму, focus видим и результат доступен AT",
-      "status": "planned", "evidence": []
-    }, {
-      "id": "rename-layout", "taskIds": ["rename"], "componentIds": ["project-name", "save-name"],
-      "kind": "render", "scenario": "Проверить длинное имя, 320 и 1440, pending/error и 200% текст без перекрытий",
-      "status": "planned", "evidence": []
-    }]
+    "viewports": [
+      {
+        "width": 320,
+        "height": 800,
+        "unit": "css-px"
+      },
+      {
+        "width": 1440,
+        "height": 900,
+        "unit": "css-px"
+      }
+    ],
+    "checks": [
+      {
+        "id": "rename-recovery",
+        "taskIds": [
+          "rename"
+        ],
+        "componentIds": [
+          "project-name",
+          "save-name"
+        ],
+        "kind": "interaction",
+        "scenario": "Edit the name, trigger fixture failure, and retry; preserve the draft and report a truthful result",
+        "status": "planned",
+        "evidence": []
+      },
+      {
+        "id": "rename-keyboard",
+        "taskIds": [
+          "rename"
+        ],
+        "componentIds": [
+          "project-name",
+          "save-name"
+        ],
+        "kind": "keyboard",
+        "scenario": "Tab to the field and submit; Enter submits, focus is visible, and assistive technology can access the result",
+        "status": "planned",
+        "evidence": []
+      },
+      {
+        "id": "rename-layout",
+        "taskIds": [
+          "rename"
+        ],
+        "componentIds": [
+          "project-name",
+          "save-name"
+        ],
+        "kind": "render",
+        "scenario": "Check a long name at 320 and 1440, pending/error states, and 200% text without overlap",
+        "status": "planned",
+        "evidence": []
+      }
+    ]
   },
   "exceptions": []
 }

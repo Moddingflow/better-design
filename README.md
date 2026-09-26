@@ -41,6 +41,7 @@ The skill itself needs no API key, MCP server, or runtime package. The installer
 | Accessibility | Check keyboard access, names, focus, contrast, text scaling, and alternatives to drag gestures. |
 | File uploads | Include a visible drop zone, a file picker, rejection feedback, progress, preview, and retry. |
 | AI design patterns | Review recurring generic compositions using a catalog of signals, replacements, and legitimate exceptions. |
+| UI copy | Remove page narration, descriptions that repeat labels, and default filler; keep facts that help people choose, act, or recover. |
 | Evidence | Inspect current renders and real interactions; distinguish completed checks from plans and unavailable checks. |
 
 ## Installation
@@ -120,7 +121,13 @@ skills/better-design/
 | [Evaluation](skills/better-design/references/evaluations.md) | Evaluating agent output against tasks and evidence |
 | [Sources](skills/better-design/references/sources.md) | Attribution, standards, and limits of claims |
 
-**Language:** the core `SKILL.md` and this getting-started documentation are in English. Detailed reference guides and some template annotations are currently in Russian. A multilingual agent can use them; ask it to respond in your preferred language. A complete English reference translation is not included in v1.0.0.
+**Language:** the entire installable skill is in English, including all 11 reference guides, templates, contract examples, and agent metadata. The Russian README is a separate guide for readers. Unicode literals in the Python regression tests intentionally test multilingual input and file paths. Ask your agent to produce interface copy in your product's language.
+
+### Useful copy, without a running commentary
+
+A settings page should open on its settings. A toggle labeled “Dark mode” does not need “Turn dark mode on or off” beneath it. Better Design asks what specific information each explanation adds, and removes semantic repetition even when the wording differs.
+
+Keep verified limits, consequences, prerequisites, unfamiliar concepts, and recovery steps. For example, an actual auto-save interval or a deletion's effect on other members can change a user's decision. Do not invent details just to fill a description slot. See the [copy rules and examples](skills/better-design/references/ai-slop.md#copy).
 
 ## Optional offline validation
 

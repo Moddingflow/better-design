@@ -41,6 +41,15 @@ def main():
         except (ValueError, OSError) as error:
             errors.append(f"{path.relative_to(ROOT)}: {error}")
 
+    # The installable instructions, examples, and metadata are maintained in English.
+    # Unicode literals in the Python regression tests intentionally exercise language/path support.
+    # This detects leftover Cyrillic prose; it does not assess translation fidelity or other languages.
+    english_files = [p for p in SKILL.rglob("*") if p.suffix in {".md", ".json", ".yaml", ".yml"}]
+    for path in english_files:
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if re.search(r"[\u0400-\u04ff]", line):
+                errors.append(f"{path.relative_to(ROOT)}:{number}: Cyrillic text in the English skill package")
+
     files = [p for p in ROOT.rglob("*.md") if ".git" not in p.relative_to(ROOT).parts]
     for path in files:
         content = path.read_text(encoding="utf-8")
@@ -56,8 +65,8 @@ def main():
     if errors:
         print("\n".join(errors), file=sys.stderr)
         return 1
-    print(f"PASS: distribution files, entry-point metadata, JSON syntax, and local file links in {len(files)} Markdown files.")
-    print("Scope excludes external links, anchors, YAML beyond the two checked fields, and agent/runtime quality.")
+    print(f"PASS: distribution files, entry-point metadata, JSON syntax, English-package Cyrillic scan, and local file links in {len(files)} Markdown files.")
+    print("Scope excludes translation fidelity, external links, anchors, YAML beyond the two checked fields, and agent/runtime quality.")
     return 0
 
 

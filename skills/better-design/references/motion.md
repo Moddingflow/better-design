@@ -1,260 +1,243 @@
-# Motion: живой интерфейс
+# Motion: a responsive interface
 
-Читай при создании и редизайне любой поверхности и при правке, которая добавляет, убирает
-или меняет элементы, состояния, переходы или обратную связь. Для точечной правки внутри
-действующей системы достаточно разделов «Motion-язык» (унаследовать), «Каталог» (нужная
-строка) и «Доступность».
+Read this when creating/redesigning a surface or changing elements, states, transitions,
+or feedback. For a focused change inside an existing system, use Motion language
+(inherit it), the relevant Catalog row, and Accessibility.
 
-Интерфейс без движения ощущается мёртвым: кнопка не отвечает на палец, панель возникает
-из ниоткуда, число подменяется без следа, список перескакивает. Человек теряет причинно-
-следственную связь и перестаёт доверять тому, что действие сработало. Движение — такая же
-часть системы, как палитра и шрифт: у него есть характер, токены, иерархия и правила.
-Цель не «побольше анимаций», а **ни одного мёртвого момента и ни одного лишнего движения**.
+A button that does not respond, a panel appearing without an origin, a silently replaced
+number, and a jumping list make causality hard to follow. Motion is part of the system
+alongside color and type, with character, tokens, hierarchy, and rules.
+The goal is **no dead moment and no unnecessary movement**.
 
-## 1. Зачем двигаться: пять функций
+## 1. Five functions of motion
 
-Каждое движение выполняет хотя бы одну функцию. Если функцию нельзя назвать — движения нет.
+Every movement serves at least one named function. Without one, remove the movement.
 
-| Функция | Что даёт | Пример |
+| Function | Purpose | Example |
 | --- | --- | --- |
-| **Отклик** | Подтверждает, что ввод принят, раньше, чем придёт результат | Кнопка сжимается на pointerdown; toggle переезжает под пальцем |
-| **Причинность** | Показывает, откуда элемент пришёл и куда ушёл | Меню раскрывается из своей кнопки; удалённая строка схлопывается, соседи съезжают |
-| **Ориентация** | Объясняет пространственную модель: вперёд/назад, глубже/выше, поверх | Push вправо — вглубь, Back — обратно; sheet выезжает снизу и уходит туда же |
-| **Изменение значения** | Делает дельту видимой, а не только новое значение | Баланс докатывается до новой суммы; полоса прогресса растёт; награда летит в счётчик |
-| **Жизнь** | Сообщает, что система работает и слушает, когда ничего не нажато | Одиночный импульс точки «подключено» при смене статуса; живое обновление графика |
+| **Feedback** | Confirms input before the result arrives | Button compresses on pointerdown; toggle travels under the finger |
+| **Causality** | Shows where an element came from or went | Menu expands from its trigger; removed row collapses and neighbors move |
+| **Orientation** | Explains forward/back, deeper/higher, and overlay relationships | Forward and Back use opposite directions; a sheet returns to its edge |
+| **Value change** | Makes the delta visible | Balance rolls to a new value; progress grows; reward travels to its counter |
+| **Signs of life** | Shows real activity when no control is being pressed | A single pulse when connection status changes; a live chart updates |
 
-Функция «жизнь» — самая дорогая и самая редкая: она расходует внимание, не отвечая на действие.
+Signs of life consume attention without responding to input, so use them rarely.
 
-## 2. Motion-язык из концепции
+## 2. Motion language from the concept
 
-Движение выводится из того же предмета, что палитра и шрифт (см. [art-direction.md](art-direction.md)).
-Одна фраза: **как ведут себя вещи в мире продукта**. Затем — физика, темп и одна фирменная деталь.
+Use the same subject as the palette and typography; see [art-direction.md](art-direction.md).
+Write one sentence about **how objects behave in the product's world**, then define physics,
+tempo, and a signature detail.
 
-| Концепция | Характер движения | Фирменная деталь |
+| Concept | Motion character | Signature detail |
 | --- | --- | --- |
-| Табло вокзала | Дискретное, ступенчатое, механическое; без плавных наездов | Split-flap перелистывание цифр времени |
-| Этикетка винного погреба | Медленное, тяжёлое, с долгим замедлением; появления через проявку, не наезд | Тиснение «проявляется» светом при hover |
-| Бортовой компьютер грузового корабля | Сухое, линейное с резкой фиксацией; служебные сдвиги по сетке | Строки статуса печатаются посимвольно при реальном событии |
-| Карманный пульт / физическая кнопка | Короткий ход, упругий возврат, ноль задержки | Клавиша «проседает» и отпружинивает; сигнал уходит в момент касания |
-| Грифельная доска пекарни | Рукотворное: мел дорисовывается, но быстро | Подчёркивание мелом прорисовывается при hover/focus |
+| Station departure board | Discrete, stepped, mechanical; no smooth zooming | Split-flap time digits |
+| Cellar label | Slow, weighty, long deceleration; reveals rather than zooms | Embossing appears through light on hover |
+| Cargo-ship computer | Dry, linear, sharply settled; grid-aligned service movements | Status characters appear for a real event |
+| Pocket remote / physical button | Short travel, elastic return, immediate feedback | Key depresses and returns; activation follows the control's semantics without animation delay |
+| Bakery chalkboard | Handcrafted but quick | A chalk underline draws on hover/focus |
 
-Зафиксируй в контракте (`direction.motion`): характер (1 фраза), темп (быстрый/сдержанный/
-тяжёлый), физику (кривые или springs, есть ли overshoot) и 1 фирменную motion-деталь.
-Внутри действующей системы язык унаследован: найди существующие duration/easing/spring
-tokens и живые примеры, опиши их одной фразой и не вводи параллельную систему.
+Record `direction.motion`: character, tempo (fast/restrained/heavy), physics (curves/springs
+and overshoot), and one signature detail. In an existing system, find its tokens and live
+examples, describe them briefly, and inherit them.
 
-**Гармония** — это единство параметров, а не одинаковость: все движения берутся из одного
-набора токенов, одна физика на весь продукт, одно направление для одной пространственной
-модели. Кнопка с упругим отскоком рядом с модалкой на линейной кривой — два разных продукта.
+Harmony means related parameters, not identical animations: one token set, consistent
+physics, and a consistent spatial model. An elastic button beside an unrelated linear modal
+can feel like two different products.
 
-## 3. Токены движения
+## 3. Motion tokens
 
-Задай небольшой набор ролей и используй только его. Значения ниже — стартовые для нейтральной
-системы, не стандарт; концепция сдвигает их (тяжёлый язык — длиннее и мягче, механический —
-короче и резче).
+Use a small role set. These are neutral starting values, not standards; a weighty or
+mechanical concept can change them.
 
-| Роль | Duration | Для чего |
+| Role | Duration | Purpose |
 | --- | --- | --- |
-| `instant` | 0–50 ms | Смена цвета при нажатии, выделение текста, курсор |
-| `press` | 60–100 ms вниз, 150–250 ms возврат | Отклик на касание/клик |
-| `micro` | 100–150 ms | Hover, focus ring, иконка-состояние, чекбокс |
-| `small` | 150–220 ms | Tooltip, dropdown, toast, раскрытие строки |
-| `medium` | 220–320 ms | Dialog, sheet, drawer, смена вкладки с контентом |
-| `large` | 300–450 ms | Переход между экранами, shared element, перестройка layout |
-| `expressive` | 450–800 ms | Редкие события: успех, награда, онбординг, игра. Никогда для частых действий |
+| `instant` | 0–50 ms | Press color, text selection, cursor |
+| `press` | 60–100 ms down, 150–250 ms return | Touch/click feedback |
+| `micro` | 100–150 ms | Hover, focus ring, state icon, checkbox |
+| `small` | 150–220 ms | Tooltip, dropdown, toast, row expansion |
+| `medium` | 220–320 ms | Dialog, sheet, drawer, tab content |
+| `large` | 300–450 ms | Screen transition, shared element, layout rearrangement |
+| `expressive` | 450–800 ms | Rare success/reward/onboarding/game events; never frequent actions |
 
-| Easing | Кривая (CSS) | Когда |
+| Easing | CSS curve or parameters | Use |
 | --- | --- | --- |
-| `standard` | `cubic-bezier(0.2, 0, 0, 1)` | Перемещение и изменение внутри экрана |
-| `enter` (decelerate) | `cubic-bezier(0, 0, 0, 1)` | Появление: быстро вошёл, мягко встал |
-| `exit` (accelerate) | `cubic-bezier(0.3, 0, 1, 1)` | Уход: мягко тронулся, быстро исчез |
-| `emphasized-enter` | `cubic-bezier(0.05, 0.7, 0.1, 1)` | Крупные появления и переходы на `large`: шаг вперёд в потоке |
-| `emphasized-exit` | `cubic-bezier(0.3, 0, 0.8, 0.15)` | Уход крупного элемента или экрана |
-| `linear` | `linear` | Только прогресс, вращение spinner, непрерывные циклы, цвет |
-| `spring` | stiffness/damping; damping ratio 0.7–1 | Жесты, drag, отпускание, прерываемые переходы |
+| `standard` | `cubic-bezier(0.2, 0, 0, 1)` | Movement/change within a screen |
+| `enter` | `cubic-bezier(0, 0, 0, 1)` | Fast arrival, gentle settling |
+| `exit` | `cubic-bezier(0.3, 0, 1, 1)` | Gentle departure, fast disappearance |
+| `emphasized-enter` | `cubic-bezier(0.05, 0.7, 0.1, 1)` | Large entrances and forward transitions |
+| `emphasized-exit` | `cubic-bezier(0.3, 0, 0.8, 0.15)` | Large element/screen exits |
+| `linear` | `linear` | Progress, spinner rotation, continuous cycles, color |
+| `spring` | stiffness/damping; damping ratio 0.7–1 | Gestures, drag, release, interruptible transitions |
 
-Правила масштабирования:
+Scaling rules:
 
-- **Частота обратно пропорциональна длительности.** Действие, которое делают сотни раз в день
-  (переключение вкладки, command palette, горячая клавиша), анимируется коротко или никак.
-  Экспрессивное — только для редкого.
-- **Расстояние и площадь увеличивают длительность.** Элемент, который пролетает весь экран,
-  получает `large`; сдвиг на 8 px — `micro`. Не ставь одну длительность на всё.
-- **Уход короче входа** примерно на треть: пользователь уже решил, его не держат.
-- **Overshoot/bounce** — только если концепция физическая и игровая, и только для объектов,
-  которые «имеют массу» (кнопка, карточка в руке, награда). Текст и модалки не пружинят.
-- CSS-дефолты `ease` и `transition: all 300ms` — это отсутствие решения: перечисляй свойства
-  и бери токен.
+- **Higher frequency means shorter duration.** Tabs, command palettes, and shortcuts used
+  hundreds of times daily need brief or no animation. Expression belongs to rare events.
+- **Greater distance/area means longer duration.** A full-screen movement can use large;
+  an 8px shift can use micro. Do not assign one duration to everything.
+- **Exits are roughly one-third shorter than entrances.** Do not hold users after their decision.
+- **Overshoot/bounce** needs a physical/playful concept and an object with implied mass, such
+  as a pressed button, held card, or reward. Do not bounce text and modals.
+- Untuned `ease` and `transition: all 300ms` avoid a real decision. List properties and use tokens.
 
-## 4. Хореография: одно главное движение
+## 4. Choreography: one leading movement
 
-- **Одна доминанта на событие.** Как на экране один главный элемент, так у события одно главное
-  движение; остальные подчинены ему по амплитуде и стартуют вместе или чуть позже.
-- **Origin из причины.** Popover и меню растут из своего trigger (`transform-origin` у кнопки),
-  sheet — от края, к которому привязан; детали открываются из карточки, в которую нажали.
-- **Направление = пространственная модель.** Вперёд — от конца строки, назад — обратно
-  (зеркалится при RTL); глубже — масштаб/наезд, выше по иерархии — отъезд. Одна модель на продукт.
-- **Малые амплитуды.** Появление: сдвиг 4–24 px и/или scale 0.95–0.98 плюс opacity. Не с нуля,
-  не из-за края экрана без причины. Большое перемещение — только когда объект реально туда уходит.
-- **Stagger** 20–40 ms между элементами, не больше 5–8 анимируемых элементов, суммарно не дольше
-  `medium`–`large`. Остальные появляются сразу вместе с последним.
-- **Continuity.** Элемент, который существует в обоих состояниях (выбранная карточка → экран
-  деталей, аватар → профиль), переезжает, а не исчезает и появляется заново (shared element).
-- **Layout не прыгает.** Вставка, удаление, раскрытие и сортировка анимируют позиции соседей
-  (FLIP, layout animation), чтобы глаз видел, куда что сдвинулось.
-- **Интерфейс не ждёт анимацию.** Ввод доступен во время перехода; следующий экран становится
-  интерактивным сразу; exit не задерживает enter дольше, чем на пару кадров.
+- **One dominant movement per event.** Others have smaller amplitudes and start with it or
+  slightly afterward.
+- **Origin follows cause.** Popovers/menus grow from the trigger; sheets come from their
+  anchored edge; details expand from the selected card.
+- **Direction follows the spatial model.** Forward comes from the inline end, Back reverses
+  it (mirrored for RTL); depth and hierarchy use consistent scaling/movement.
+- **Small amplitudes.** Entrances use 4–24px and/or scale 0.95–0.98 plus opacity, not scale
+  from zero or unexplained travel across the screen. Large travel needs a real destination.
+- **Stagger:** 20–40ms between at most 5–8 animated items, total no longer than medium–large.
+  Remaining items appear with the last animated item.
+- **Continuity:** elements shared between states move between them instead of disappearing
+  and being recreated.
+- **Stable layout:** insertion, removal, expansion, and sorting move neighboring elements
+  using FLIP or framework layout animation.
+- **Input stays available.** The next screen is immediately interactive; an exit delays
+  an entrance by no more than a couple of frames.
 
-## 5. Каталог: что анимировать и как
+## 5. Catalog: what moves and how
 
-| Событие | Движение | Ошибка |
+| Event | Motion | Mistake |
 | --- | --- | --- |
-| Касание / клик кнопки | На pointerdown **сразу**: scale 0.96–0.98 или сдвиг 1–2 px и затемнение; на release — возврат `press` (spring без overshoot или standard). Действие срабатывает по своему правилу, отклик его не задерживает | Отклик только на click/release; действие ждёт окончания анимации |
-| Hover (только `hover: hover`) | `micro`: смена фона/подчёркивания/иконки; только у того, что кликабельно | Подъём с тенью у каждой карточки; hover-эффект у неинтерактивного |
-| Focus-visible | Кольцо появляется `instant`–`micro`, без растягивания от нуля | Анимация, из-за которой focus на мгновение невидим |
-| Toggle / checkbox / radio | Бегунок переезжает, галочка прорисовывается `micro`; значение меняется мгновенно | Состояние видно только по окончании анимации |
-| Tabs / segmented | Индикатор выбора переезжает между пунктами; контент — crossfade или короткий сдвиг по направлению | Индикатор исчезает и возникает на новом месте |
-| Dropdown / popover / tooltip | Scale 0.96→1 + opacity от trigger, `small` enter; exit короче. Tooltip — с задержкой показа ~300–500 ms, без задержки при переходе между соседними | Падение сверху экрана; одинаковая длительность входа и выхода |
-| Dialog | Backdrop fade; панель scale 0.96→1 + opacity, `medium`; на закрытие обратно быстрее | Модалка вылетает сбоку без пространственной причины |
-| Sheet / drawer | Выезд от своего края `medium` enter; жест тянет за палец и отпускается spring с сохранением скорости | Sheet выезжает, но свайп вниз не работает |
-| Навигация между экранами | Push/pop по направлению модели, `large`; соседние вкладки верхнего уровня — crossfade без сдвига | Слайд для вкладок одного уровня; разный переход на каждом экране |
-| Список: вставка / удаление / reorder | Новая строка раскрывается по высоте и проявляется; удалённая схлопывается; соседи съезжают | Строка исчезает, всё под ней прыгает вверх |
-| Раскрытие секции / accordion | Высота анимируется (grid-rows 0fr→1fr, `interpolate-size`, `animateContentSize`), шеврон поворачивается | Мгновенный скачок высоты с прыгающим скроллом |
-| Skeleton → контент | Crossfade `small` без сдвига, по регионам по мере готовности | Весь экран вспыхивает сразу; контент «въезжает» и сдвигает layout |
-| Pending в кнопке | Label → spinner/progress внутри кнопки crossfade `micro`, ширина сохранена | Кнопка меняет ширину; спиннер мигает на 100 ms |
-| Изменение числа / баланса | Докат или roll цифр `small`–`medium` с `tabular-nums`; дельта (+120) кратко всплывает | Мгновенная подмена; анимация на каждом тике live-данных |
-| Результат, уходящий в итог | Объект летит к месту, где учитывается (корзина, счётчик), счётчик реагирует импульсом | Иконка улетает, а счётчик не меняется |
-| Успех | Одна короткая акцентная реакция: галочка прорисовывается, кнопка → «Сохранено» | Конфетти на каждое сохранение |
-| Ошибка валидации | Поле получает состояние ошибки и текст; допустим один короткий shake ±4–6 px ≤300 ms | Shake без текста ошибки; shake всей формы |
-| Toast / status | Въезд от своего края `small`, авто-скрытие ставится на паузу при hover/focus | Toast перекрывает primary action; исчезает до прочтения ошибки |
-| Drag | Объект следует за указателем без задержки, «поднимается» (тень/scale 1.02), цель подсвечивается, остальные раздвигаются | Объект догоняет палец с запаздыванием |
-| Drop zone (файл) | На dragenter рамка и фон переходят `micro`, иконка приподнимается на 2–4 px; после drop файлы вставляются в список как новые строки, превью проявляется crossfade, progress растёт плавно; reject — один короткий shake иконки с текстом причины | Подсветка мигает над дочерними элементами; зона не реагирует на файл над ней; файл после drop исчезает без следа в списке |
-| Pull-to-refresh / overscroll | Следует за пальцем, упругий возврат по платформе | Собственная физика, спорящая с системной |
+| Button touch/click | Immediate pointerdown scale 0.96–0.98 or 1–2px travel and darkening; release returns with press timing using standard or a non-overshooting spring. Activation follows its own semantics without waiting | Feedback only on release; action waits for the animation |
+| Hover, only with `hover: hover` | Micro background/underline/icon change on interactive targets | Every card lifts and casts a shadow; noninteractive content implies an action |
+| Focus-visible | Ring appears instant–micro without expanding from zero | Focus becomes temporarily invisible |
+| Toggle/checkbox/radio | Thumb travels or checkmark draws at micro timing; value updates immediately | State is available only after animation |
+| Tabs/segmented control | Selection indicator moves; content crossfades or shifts briefly in a meaningful direction | Indicator disappears and respawns |
+| Dropdown/popover/tooltip | Scale 0.96→1 and opacity from trigger, small entrance, shorter exit. Tooltip delay about 300–500ms, without repeated delay between neighbors | Falling from the screen top; equal enter/exit timing |
+| Dialog | Backdrop fade; panel scale 0.96→1 and opacity at medium timing; reverse faster | Unmotivated sideways flight |
+| Sheet/drawer | Arrives from its edge at medium timing; gesture follows the finger and releases with velocity-preserving spring | A draggable-looking sheet cannot be swiped back |
+| Screen navigation | Model-consistent push/pop at large timing; peer top-level tabs crossfade | Sliding between peer tabs; unrelated transition per screen |
+| List insert/remove/reorder | New row expands/fades; removed row collapses; neighbors move | Row vanishes and everything below jumps |
+| Accordion/section | Animate height via grid rows, interpolate-size, or animateContentSize; rotate chevron | Height and scroll position jump |
+| Skeleton to content | Small crossfade without layout shift, independently as regions become ready | Whole-screen flash or sliding content that changes layout |
+| Button pending | Micro crossfade between label and progress; preserve width | Resizing button or a 100ms spinner flash |
+| Number/balance change | Small–medium roll using tabular numerals; brief delta where useful | Instant replacement or animation on every live-data tick |
+| Result contributing to a total | Item travels to basket/counter; counter responds and updates | Item flies away but the total stays unchanged |
+| Success | One short accent, such as a checkmark or Saved label | Confetti on every save |
+| Validation error | Visible field error and text; optional single ±4–6px shake ≤300ms | Shake without explanation or shaking the whole form |
+| Toast/status | Small entrance from its edge; pause auto-hide on hover/focus | Covers the primary action or removes an error before it can be read |
+| Drag | Object follows immediately, with lift/shadow/scale 1.02; target highlights and neighbors make room | Object lags behind the finger |
+| File drop zone | Micro border/background on dragenter; icon lifts 2–4px; dropped rows insert, previews crossfade, progress grows; rejection may shake the icon once with its reason | Flicker over children, no drag-over response, or dropped file disappears without feedback |
+| Pull-to-refresh/overscroll | Follows the finger with the platform's elastic return | Custom physics conflict with the system |
 
-## 6. Живость без шума
+## 6. Life without noise
 
-Интерфейс «живой», когда он **реагирует**, а не когда он **постоянно шевелится**.
+An interface feels alive through **responses**, not constant movement.
 
-- **Отклик на всё интерактивное.** Каждая нажимаемая вещь отвечает на pointerdown/touch-down
-  и на focus. Каждая смена состояния, которую пользователь вызвал, переходит, а не щёлкает.
-- **Смена данных видна.** Новые элементы в ленте, обновлённые значения, изменившийся статус
-  коротко отмечаются (проявка, импульс, подсветка, которая гаснет за ~1 s), не только цветом.
-- **Ambient-движение** — только из концепции и только одно на экран: медленное (период ≥ 2 s),
-  малой амплитуды, на периферии, не рядом с текстом, который читают. Останавливается на
-  фоновой вкладке/свёрнутом окне, вне viewport и при reduced motion. Бесконечный pulse на CTA,
-  плавающие orbs и переливающийся градиент — шум, а не жизнь.
-- **Idle-состояние** (пусто, ждём подключения, ждём первого события) может дышать одним
-  медленным мотивом из концепции — это лучше мёртвого пустого экрана, но не заменяет текст
-  о том, что происходит, и путь к действию.
-- **Звук и haptics** — часть motion-языка на мобильных и в играх: короткий haptic на
-  подтверждённое нажатие и на успех/ошибку, по платформенным API и с учётом системных настроек.
-  Не вибрируй на каждый скролл и hover.
+- Every interactive target responds to press and focus. User-caused state changes transition.
+- Briefly mark new content, changed values, and status with reveal/pulse/highlight fading in
+  about one second, with information beyond color.
+- Ambient motion comes from the concept: at most one per screen, slow (period ≥2s), low
+  amplitude, peripheral, away from reading text. Stop it when hidden, offscreen, or under
+  reduced motion. Infinite CTA pulses, orbs, and shifting gradients are noise.
+- An empty/waiting state may use one slow concept-derived motif, but still needs truthful
+  status and a path to act.
+- Sound/haptics can support mobile/game feedback through platform APIs and system settings.
+  Use brief meaningful responses; do not vibrate on every scroll or hover.
 
-## 7. Физика и прерываемость
+## 7. Physics and interruption
 
-- Любая анимация **прерываема и перенацеливаема**: новый ввод стартует от текущего значения,
-  а не от конца предыдущей анимации. Быстрые повторные клики не выстраивают очередь.
-- Жест передаёт скорость: отпущенный sheet/карточка продолжает движение со скоростью пальца
-  (spring с initial velocity), а не стартует с нуля.
-- Springs предпочтительнее кривых для всего, что можно прервать жестом. Задавай их через
-  damping ratio/stiffness (или bounce/duration), без overshoot там, где его не было в языке.
-- Анимация не меняет исход: если действие отменено посреди перехода, UI возвращается в
-  правдивое состояние. Состояние в модели меняется мгновенно; анимируется только представление.
+- Animations are **interruptible and retargetable** from the current value. Repeated input
+  does not build a queue.
+- Preserve gesture velocity: a released sheet/card continues with initial velocity rather
+  than restarting from zero.
+- Prefer springs for gesture-interruptible motion, with explicit damping/stiffness or
+  bounce/duration; avoid overshoot if it is absent from the established language.
+- Animation does not change the outcome. Cancellation returns to truthful state.
+  The model updates immediately; its presentation animates.
 
-## 8. Производительность
+## 8. Performance
 
-Анимация, которая дёргается, хуже отсутствующей: джанк читается как поломка.
+Jank reads as malfunction.
 
-- Анимируй composited-свойства: `transform`, `opacity` (и `filter` на малых площадях).
-  Ширину/высоту/top/left/margin — только через FLIP или layout-анимацию фреймворка;
-  `box-shadow` и `blur` на больших площадях — через заранее отрисованный слой и opacity.
-- Бюджет кадра: 16.7 ms на 60 Hz, 8.3 ms на 120 Hz. Отклик на нажатие — в следующий кадр.
-- `will-change` — точечно и на время анимации, не на всём дереве. Не держи десятки
-  бесконечных анимаций одновременно; длинные списки не анимируют каждую строку при скролле.
-- Не блокируй main thread во время перехода (тяжёлый рендер, парсинг) — начни переход,
-  а работу отложи/разбей, или покажи skeleton.
-- Проверяй на слабом устройстве или с CPU throttling 4–6×. Если язык не выдерживает бюджет —
-  упрости движение, а не отключай отклик.
+- Prefer composited transform/opacity, and filter only over small areas. Use FLIP or
+  framework layout animation for size/position/margins; use a pre-rendered layer and opacity
+  for large shadows/blur.
+- Frame budgets: 16.7ms at 60Hz, 8.3ms at 120Hz. Press feedback appears by the next frame.
+- Apply will-change selectively during animation, not across the whole tree. Avoid dozens
+  of infinite animations and animating every row during scrolling.
+- Do not block the main thread with heavy rendering/parsing during transitions. Defer,
+  split work, or show the appropriate skeleton.
+- Check a weak device or 4–6× CPU throttling. Simplify movement when over budget; preserve feedback.
 
-## 9. Доступность и настройки
+## 9. Accessibility and settings
 
-- **Reduced motion ≠ ноль отклика.** При `prefers-reduced-motion: reduce` (Android: «Убрать
-  анимации», iOS: Reduce Motion, Windows: «Эффекты анимации» выкл.) убери перемещение,
-  масштаб, параллакс, zoom и вращение; замени их crossfade или мгновенной сменой. Отклик на
-  нажатие (цвет/яркость), видимость состояния и progress остаются.
-- Вестибулярные триггеры — большие наезды/zoom на весь экран, параллакс, scroll-jacking,
-  вращение пространства — избегай вообще; под reduced motion — обязательно убери.
-- **WCAG 2.3.1 (A):** ничего не вспыхивает чаще трёх раз в секунду (кроме порогов малой площади).
-- **WCAG 2.2.2 (A):** автоматически начинающееся движение/мигание/автопрокрутка дольше 5 s,
-  идущее параллельно с другим контентом, получает pause/stop/hide — кроме essential.
-  Бесконечный ambient-мотив — первый кандидат на нарушение.
-- **WCAG 2.3.3 (AAA):** анимация, вызванная взаимодействием, отключаема — полезное усиление.
-- Анимация никогда не единственный носитель важного состояния: результат виден и в
-  конечном кадре, и доступен AT текстом/ролью/live region.
-- Не двигай то, что человек читает или на что целится: target не уезжает из-под указателя
-  во время нажатия; текст не анимируется посимвольно, если его нужно прочитать сразу.
+- **Reduced motion preserves feedback.** Under prefers-reduced-motion, Android Remove
+  animations, iOS Reduce Motion, or disabled Windows animation effects, remove movement,
+  scale, parallax, zoom, and rotation. Use crossfades or instant changes; retain press
+  color/brightness, visible state, and progress.
+- Avoid large full-screen zoom, parallax, scroll-jacking, and spatial rotation as vestibular
+  triggers; remove them under reduced motion.
+- **WCAG 2.3.1 (A):** no more than three flashes per second unless below applicable thresholds.
+- **WCAG 2.2.2 (A):** automatic motion/blinking/scrolling longer than 5 seconds alongside other
+  content needs pause/stop/hide unless essential. Infinite ambient motion is a common risk.
+- **WCAG 2.3.3 (AAA):** interaction-triggered animation can be disabled.
+- Important state must remain visible in the final frame and accessible through text, roles,
+  or live regions; animation cannot be its only carrier.
+- Do not move text being read or targets being pressed. Avoid typewriter effects on text
+  that must be read immediately.
 
-## 10. Motion-slop: шаблон → решение
+## 10. Motion slop: patterns and replacements
 
-Часть общего каталога [ai-slop.md](ai-slop.md); ID используются в отчётах.
+Part of [ai-slop.md](ai-slop.md); use its IDs in findings.
 
-| Вместо | Делай |
+| Pattern | Replacement |
 | --- | --- |
-| `scroll-reveal-all` — всё «fade-up» при скролле (AOS), каждая секция въезжает | Reveal только там, где появление несёт смысл; то, что видно при загрузке, не анимируется |
-| `intro-cascade` — каскадная intro-анимация на 1–2 s до первого клика | Первый полезный экран интерактивен сразу; хореография загрузки ≤ `large`, один раз |
-| `bounce-everything` — одинаковый bounce/overshoot на всём | Физика из motion-языка; пружинит только то, у чего есть «масса» |
-| `attention-everywhere` — кнопки подпрыгивают, иконки покачиваются, бейджи плавают, всё одновременно | Одна подсказка в нужный момент; остальное неподвижно, пока не нажато |
-| `pulsing-status-dot` — точка статуса пульсирует, хотя ничего не меняется | Статичный статус неподвижен; один импульс при смене; непрерывное движение — только для реальной активности (идёт запись, передача) |
-| Подъём и тень у каждой карточки на hover | Hover соответствует affordance; реагирует только кликабельное |
-| Бесконечный pulse/glow у CTA, переливающийся градиент, orbs, частицы | Ambient — мотив концепции или покой |
-| Параллакс, scroll-jacking, sticky-сцены ради «вау» | Нативный скролл; scroll-driven анимация только когда объясняет (прогресс чтения, связь секций) |
-| Typewriter/«печать» готового текста, фейковая задержка «думает…» | Потоковая выдача реальных данных; правдивый статус |
-| `transition: all 0.3s ease` везде | Перечисленные свойства и токены по роли |
-| Spinner, мигающий на 150 ms | Правила задержки индикатора из раздела «Загрузка» [behavior-and-content.md](behavior-and-content.md) |
-| Анимация как украшение пустоты | Движение только с названной функцией из раздела 1 |
+| `scroll-reveal-all` — fade-up/AOS on every section | Reveal only when it explains appearance; initially visible content does not need an entrance |
+| `intro-cascade` — 1–2 seconds before the first click | Make the first useful screen immediately interactive; loading choreography at most large, once |
+| `bounce-everything` — identical overshoot everywhere | Concept-derived physics; only objects with implied mass can spring |
+| `attention-everywhere` — bouncing buttons, wiggling icons, floating badges | One cue at the right time; other elements stay still until interaction |
+| `pulsing-status-dot` — motion despite unchanged status | Static status stays still; one pulse on change; continuous movement only for real recording/transfer/activity |
+| Every card lifts and shadows on hover | Feedback matches actual interactivity |
+| Infinite CTA pulse/glow, gradients, orbs, particles | Concept-derived ambient detail or stillness |
+| Parallax, scroll-jacking, sticky scenes for spectacle | Native scrolling; scroll-driven motion only for meaningful relationships or reading progress |
+| Typewriter on ready text or fake thinking delay | Real streaming data and truthful status |
+| `transition: all 0.3s ease` everywhere | Listed properties and role-based tokens |
+| A spinner flashes for 150ms | Loading-indicator timing in [behavior-and-content.md](behavior-and-content.md) |
+| Animation decorates emptiness | A named function from section 1 |
 
-## 11. Реализация по платформам
+## 11. Platform implementation
 
-- **Web.** CSS transitions для состояний, `@keyframes` для циклов, Web Animations API для
-  прерываемого/программного, View Transitions API (`document.startViewTransition`,
-  cross-document `@view-transition`) для смены экранов и shared element при поддержке, с
-  fallback. `@media (prefers-reduced-motion: reduce)` и `(hover: hover)` обязательны.
-  Высоту — `grid-template-rows` или `interpolate-size: allow-keywords`, где поддержано.
-  Scroll-driven animations — только с fallback и под reduced motion выключены.
-  Библиотеку анимаций не добавляй, если платформенных средств и существующего стека хватает.
-- **Svelte/React/Vue.** Используй встроенные механизмы стека (`transition:`/`animate:flip` в
-  Svelte, layout-анимации уже подключённой библиотеки), а не новую зависимость ради одного эффекта.
-- **Android / Compose.** `animate*AsState`, `updateTransition`, `AnimatedVisibility`,
-  `AnimatedContent`, `animateContentSize`, `spring()`; значения читай в `graphicsLayer {}`
-  lambda, чтобы анимация шла без recomposition. Системный «Убрать анимации» Compose учитывает
-  через animator duration scale — не обходи его. Predictive Back — системная анимация возврата.
-- **iOS / SwiftUI.** `withAnimation`, `.animation(_:value:)`, spring по умолчанию,
-  `matchedGeometryEffect` для continuity, `@Environment(\.accessibilityReduceMotion)`.
-- **Desktop.** Системные анимации окон не дублируй; учитывай системную настройку эффектов
-  анимации; в embedded web (Tauri/Electron/WebView2) она приходит как `prefers-reduced-motion`.
-- **Игры / Unity.** «Juice» — законная часть языка (hit-stop, squash-and-stretch, камера,
-  частицы, звук), но UI-движение не мешает чтению HUD, не задерживает ввод и имеет
-  опцию уменьшения тряски/вспышек в настройках. Tween-библиотеку бери из существующего проекта.
+- **Web:** CSS transitions for states, keyframes for cycles, Web Animations API for programmatic
+  or interruptible motion, and supported View Transitions for screens/shared elements with
+  fallback. Include prefers-reduced-motion and hover capability queries. Animate height
+  through grid-template-rows or supported interpolate-size. Scroll-driven animation needs
+  fallback and reduced-motion handling. Avoid a new library when existing tools suffice.
+- **Svelte/React/Vue:** use the stack's existing mechanisms, such as Svelte transition/animate:flip
+  or an already installed library's layout animation.
+- **Android/Compose:** animate*AsState, updateTransition, AnimatedVisibility, AnimatedContent,
+  animateContentSize, spring. Read animation values in graphicsLayer lambdas to avoid
+  recomposition. Respect animator duration scale and system Predictive Back.
+- **iOS/SwiftUI:** withAnimation, animation(_:value:), springs, matchedGeometryEffect,
+  and the accessibilityReduceMotion environment value.
+- **Desktop:** do not duplicate OS window animations. Respect system settings, exposed in
+  embedded web through prefers-reduced-motion.
+- **Games/Unity:** hit-stop, squash/stretch, camera effects, particles, and sound can belong to
+  the language. Preserve HUD readability and immediate input; provide reduced shake/flashing.
+  Use the project's existing tween system.
 
-## 12. Проверка движения
+## 12. Verify motion
 
-Motion не проверяется по коду и по статичному скриншоту.
+Code and still screenshots do not prove motion quality.
 
-1. Запиши видео или покадровую ленту ключевых переходов; просмотри на замедлении
-   (DevTools Animations 10–25%, Android «Масштаб длительности анимации» 5×, Simulator Slow Animations).
-2. На замедлении проверь: origin и направление, отсутствие рывков и перескоков layout,
-   одну доминанту, отсутствие мгновенных «щелчков» у изменённых состояний.
-3. **Спам-тест:** быстрые повторные нажатия, открыть-закрыть-открыть, свайп и отмена
-   посреди перехода — нет очереди, залипших промежуточных состояний и ложного результата.
-4. **Мёртвые моменты:** пройди primary flow и отметь каждое место, где действие не дало
-   видимого отклика в пределах ~100 ms или состояние сменилось скачком.
-5. **Шум:** что двигается, когда никто ничего не делает? У каждого такого движения есть функция
-   и пауза/стоп?
-6. Reduced motion и системное отключение анимаций: всё работает, отклик и состояние видны,
-   нет перемещения и параллакса.
-7. Производительность: trace или frame timing на слабом профиле; нет long frames во время переходов.
-8. Гармония: все длительности и кривые берутся из токенов; соседние компоненты используют
-   одну физику; фирменная motion-деталь есть и не мешает задаче.
+1. Record video or frames of key transitions. Review slowly: DevTools at 10–25%, Android
+   animator duration scale 5×, or Simulator Slow Animations.
+2. Check origins/directions, jerks, layout jumps, one dominant movement, and abrupt state cuts.
+3. **Repeated-input test:** rapid clicks, open-close-open, swipe, and cancellation midway
+   through a transition must not queue, stick, or report false outcomes.
+4. **Dead moments:** walk the primary flow and identify input with no visible response within
+   roughly 100ms or state changes that abruptly cut.
+5. **Noise:** list motion while idle and its function and pause/stop behavior.
+6. With reduced motion/system animations off, preserve functionality, feedback, and state
+   without spatial movement or parallax.
+7. Capture traces/frame timing under a weak-device profile; check long frames.
+8. Confirm shared tokens/physics and a signature detail that supports the task.
 
-Запиши результат check `motion` в контракте: сценарии, скорость просмотра, найденные
-мёртвые моменты/шум и что исправлено. Статичные скриншоты не evidence для motion.
+Record a motion check: scenarios, review speed, dead moments/noise, and corrections.
+Still screenshots alone are not motion evidence.

@@ -1,6 +1,9 @@
 ---
 name: better-design
-description: "Design, improve, and validate UI/UX for applications, websites, native interfaces, and games: an art direction derived from the product, a coherent visual system kept in the project's DESIGN.md (read first, created when missing, the single source of fonts, type scale, colors, spacing, radii, and sizes), a catalog of AI-slop patterns with replacements, a living motion language (press feedback, transitions, choreography, reduced motion), clear actions, accessibility, drag and drop anticipated from the start (visible drop zones for every file or image upload), and real states (including skeleton loaders and loading splash) without AI slop. Use for interface creation, redesigns, focused UI changes, animation and interaction polish, design plans, and UX audits; not for backend-only tasks."
+description: "Design, improve, and validate UI/UX for applications, websites, native interfaces, and games: an art direction derived from the product, a coherent visual system kept in the project's DESIGN.md (read first, created when missing, the single source of fonts, type scale, colors, spacing, radii, and sizes), a catalog of AI-slop patterns that rejects page narration and redundant helper text, a living motion language (press feedback, transitions, choreography, reduced motion), clear actions, accessibility, drag and drop anticipated from the start (visible drop zones for every file or image upload), and real states (including skeleton loaders and loading splash) without AI slop. Use for interface creation, redesigns, focused UI changes, animation and interaction polish, design plans, and UX audits; not for backend-only tasks."
+license: MIT
+metadata:
+  version: "1.1.0"
 ---
 
 # Better Design
@@ -196,7 +199,9 @@ only produces a blander template. The catalog groups, by ID:
   on every section (details in motion.md).
 - **Imagery**: rough hand-drawn SVG scenes and mascots, stock imagery and mixed icon sets,
   sparkles as the only AI marker.
-- **Copy and behavior**: the same text repeated within one container or field, generic
+- **Copy and behavior**: page introductions that narrate an obvious purpose, toggle descriptions
+  that paraphrase their labels, helper text added to every row by default, the same meaning
+  repeated within one task region, generic
   marketing claims, forced "Not X. Y." contrasts, a dash in every sentence, fake content,
   dead controls and fake success.
 
@@ -206,10 +211,21 @@ Try hierarchy, alignment, and spacing first. Verify that removing decoration doe
 destroy useful grouping. Do not use “minimalism” as a reason to hide an action
 or remove a needed hint, label, shortcut, error, or explanation of an unfamiliar concept.
 
+Treat interface copy as part of this review. Apply the information test in the catalog's
+Copy section to every introduction, subtitle, hint, and tooltip: what specific fact would
+the user lose if it disappeared? If it only restates the heading, label, or visible state,
+remove it, even when reworded. Do not add a description just because a component has a slot.
+Keep verified consequences, constraints, requirements, recovery, and necessary accessible
+instructions; never invent facts to replace filler. This applies to ordinary working UI as
+well as expressive pages. Documentation may explain features when that is its actual purpose.
+
 ## 7. Implement behavior together with appearance
 
 - Read the applicable sections of [behavior-and-content.md](references/behavior-and-content.md).
   Give every action an observable result and every risk a recovery path.
+- Make supporting descriptions optional in components and remove their wrappers/spacing when
+  unused. Start a working page with its task, data, or controls; add orientation only when it
+  supplies information users need beyond the title. Use the catalog's copy rules as the source.
 - Populate the required states of affected components. Hover applies to a pointer;
   selected/checked/expanded apply to their respective semantics; pending/error/retry
   apply to asynchronous operations. Do not invent loading/error states for a static section.
@@ -258,6 +274,11 @@ or remove a needed hint, label, shortcut, error, or explanation of an unfamiliar
   across screens. Procedure is in design-md.md; record it as a `tokens` check.
 - Inspect current renders at the required states and sizes: hierarchy, legibility,
   focus, overflow, overlaps, and missing actions. Do not infer correctness from JSX.
+- Review visible copy and accessible names/descriptions across each affected task region.
+  Run the catalog's information test against headings, labels, states, and neighboring text;
+  include semantic paraphrases, not just exact duplicates. After removal, verify that necessary
+  instructions and consequences remain, accessible relationships still resolve, and the layout
+  has no empty description gaps. Report representative removals and justified retained help.
 - Validate every viewport and browser-zoom target in the defined platform matrix, including
   the smallest and widest supported surfaces. Confirm that composition, touch targets,
   controls, imagery, text wrapping, safe areas, scrolling, and state feedback adapt without
@@ -304,7 +325,10 @@ or remove a needed hint, label, shortcut, error, or explanation of an unfamiliar
   dead (controls without press feedback, overlays and list changes that hard-cut); motion
   blocks input, queues on repeated input, janks, or disappears entirely under reduced motion
   together with the feedback; or anything flashes or loops without a pause path.
-  Warning: a taste heuristic, excess cards/pills/shadows, suspicious density, or copy;
+  Newly authored page narration, label paraphrases, or repeated helper text without new
+  information are errors even in dense tools; removing necessary instructions or inventing
+  product claims to replace filler is also an error. Apply these checks within the task scope.
+  Warning: a taste heuristic, excess cards/pills/shadows, suspicious density, or subjective tone;
   motion off-token or with an unnamed function, decorative scroll reveals, idle noise;
   for dense working tools a generic look is a warning, not an error.
   Confirm the context before changing it. Do not present a counter as an assessment of beauty.

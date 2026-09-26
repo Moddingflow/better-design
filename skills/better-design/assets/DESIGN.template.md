@@ -1,138 +1,139 @@
-# DESIGN.md — <Название продукта>
+# DESIGN.md — <Product name>
 
-> Единственный источник значений интерфейса. Перед любой UI-работой прочитай файл целиком.
-> Используй только значения отсюда по имени роли/токена. Нужного нет — добавь роль сюда и в
-> код-токены в одном изменении. Чего здесь нет, того в интерфейсе нет.
+> The shared source of interface values. Read this whole file before UI work.
+> Use values by role/token name. Add a missing role here and in code tokens together.
+> Do not introduce undocumented interface values.
 >
-> Удали разделы, которые проекту не нужны; не оставляй «TBD».
+> Remove sections the project does not need; do not leave TBD.
 
-Обновлено: <YYYY-MM-DD>
+Updated: <YYYY-MM-DD>
 
-## Направление
+## Direction
 
-- **Концепция:** <одна фраза: какой объект/место/ремесло из мира продукта задаёт язык>
-- **Качества:** <3 штуки>
-- **Анти-качества:** <3 конкретные штуки>
-- **Движение:** <характер, темп, физика, фирменная motion-деталь>
-- **Фирменные детали:** <1–2>
+- **Concept:** <one sentence naming the object/place/craft that defines the language>
+- **Qualities:** <three>
+- **Avoid:** <three concrete qualities>
+- **Motion:** <character, tempo, physics, signature motion detail>
+- **Signature details:** <one or two>
 
-## Код-токены
+## Code tokens
 
-| Платформа | Файл | Формат имён |
+| Platform | File | Naming |
 | --- | --- | --- |
 | <web> | <src/styles/tokens.css> | `--color-text`, `--space-4` |
 | <android> | <app/.../Theme.kt> | `AppColors.text`, `Space.s4` |
 
-Единицы: <css px ↔ dp/pt 1:1>.
+Units: <document CSS px / dp / pt mapping>.
 
-## Шрифты
+## Fonts
 
-| Роль | Семейство | Fallback | Веса | Подключение | Примечание |
+| Role | Family | Fallback | Weights | Loading | Notes |
 | --- | --- | --- | --- | --- | --- |
-| UI / текст | <Family> | <system-ui, sans-serif> | <400, 500, 600> | <bundled / @fontsource / res/font> | <кириллица: да> |
-| Моно / цифры | <Family Mono> | <ui-monospace, monospace> | <400, 500> | <…> | <tabular-nums> |
+| UI / text | <Family> | <system-ui, sans-serif> | <400, 500, 600> | <bundled / @fontsource / res/font> | <required language coverage> |
+| Mono / numerals | <Family Mono> | <ui-monospace, monospace> | <400, 500> | <method> | <tabular-nums> |
 
-Других семейств нет. Числа, которые сравнивают, — `tabular-nums`.
+No other families. Use tabular numerals for comparisons.
 
-## Типографическая шкала
+## Type scale
 
-| Роль | Токен | Размер | Line-height | Вес | Tracking | Где |
+| Role | Token | Size | Line height | Weight | Tracking | Usage |
 | --- | --- | --- | --- | --- | --- | --- |
-| display | `type-display` | <40> | <1.1> | <600> | <-0.02em> | <один раз на экране> |
-| h1 | `type-h1` | <28> | <1.2> | <600> | <-0.01em> | <заголовок экрана> |
-| h2 | `type-h2` | <20> | <1.3> | <600> | <0> | <секция> |
-| body | `type-body` | <16> | <1.5> | <400> | <0> | <основной текст> |
-| body-small | `type-small` | <14> | <1.45> | <400> | <0> | <вторичный текст> |
-| label | `type-label` | <13> | <1.2> | <500> | <0.01em> | <кнопки, поля> |
-| caption | `type-caption` | <12> | <1.4> | <400> | <0> | <метаданные> |
+| display | `type-display` | <40> | <1.1> | <600> | <-0.02em> | <once per screen> |
+| h1 | `type-h1` | <28> | <1.2> | <600> | <-0.01em> | <screen title> |
+| h2 | `type-h2` | <20> | <1.3> | <600> | <0> | <section> |
+| body | `type-body` | <16> | <1.5> | <400> | <0> | <main text> |
+| body-small | `type-small` | <14> | <1.45> | <400> | <0> | <secondary text> |
+| label | `type-label` | <13> | <1.2> | <500> | <0.01em> | <buttons, fields> |
+| caption | `type-caption` | <12> | <1.4> | <400> | <0> | <metadata> |
 
-## Цвет
+## Color
 
-| Роль | Токен | Светлая | Тёмная | Использование |
+| Role | Token | Light | Dark | Usage |
 | --- | --- | --- | --- | --- |
-| canvas | `color-canvas` | <#…> | <#…> | <фон приложения> |
-| surface | `color-surface` | <#…> | <#…> | <панели, карточки> |
-| text | `color-text` | <#…> | <#…> | <основной текст> |
-| text-muted | `color-text-muted` | <#…> | <#…> | <вторичный текст> |
-| border | `color-border` | <#…> | <#…> | <hairline> |
-| action | `color-action` | <#…> | <#…> | <primary-кнопка, ссылки> |
-| on-action | `color-on-action` | <#…> | <#…> | <текст на action> |
-| focus | `color-focus` | <#…> | <#…> | <кольцо фокуса> |
-| danger | `color-danger` | <#…> | <#…> | <ошибка + иконка/текст> |
+| canvas | `color-canvas` | <value> | <value> | <app background> |
+| surface | `color-surface` | <value> | <value> | <panels, cards> |
+| text | `color-text` | <value> | <value> | <main text> |
+| text-muted | `color-text-muted` | <value> | <value> | <secondary text> |
+| border | `color-border` | <value> | <value> | <hairline> |
+| action | `color-action` | <value> | <value> | <primary button, links> |
+| on-action | `color-on-action` | <value> | <value> | <text on action> |
+| focus | `color-focus` | <value> | <value> | <focus ring> |
+| danger | `color-danger` | <value> | <value> | <error with icon/text> |
 
-Проверенные пары контраста:
+Measured contrast pairs:
 
-| Пара | Тема | Ratio | Требование |
+| Pair | Theme | Ratio | Requirement |
 | --- | --- | --- | --- |
-| text / canvas | <light> | <…:1> | 4.5 |
-| on-action / action | <light> | <…:1> | 4.5 |
-| focus / canvas | <light> | <…:1> | 3 (non-text) |
+| text / canvas | <light> | <measured ratio> | 4.5 |
+| on-action / action | <light> | <measured ratio> | 4.5 |
+| focus / canvas | <light> | <measured ratio> | 3 (non-text) |
 
-Состояние не передаётся только цветом.
+State never relies on color alone.
 
-## Отступы
+## Spacing
 
-Шкала: <0, 4, 8, 12, 16, 24, 32, 48, 64>. Токены: `space-1` = 4 … `space-16` = 64.
+Scale: <0, 4, 8, 12, 16, 24, 32, 48, 64>. Tokens: space-1 = 4 … space-16 = 64.
 
-- Внутри группы (label ↔ поле, иконка ↔ текст): <4–8>
-- Между элементами группы: <12–16>
-- Между группами/секциями: <24–48>
-- Padding контейнеров: <16 телефон / 24 desktop>
+- Within a group (label/field, icon/text): <4–8>
+- Between group items: <12–16>
+- Between groups/sections: <24–48>
+- Container padding: <16 phone / 24 desktop>
 
-## Радиусы
+## Radii
 
-| Роль | Токен | Значение | Где |
+| Role | Token | Value | Usage |
 | --- | --- | --- | --- |
-| control | `radius-control` | <8> | <кнопки, поля> |
-| container | `radius-container` | <12> | <панели, карточки> |
+| control | `radius-control` | <8> | <buttons, fields> |
+| container | `radius-container` | <12> | <panels, cards> |
 | overlay | `radius-overlay` | <16> | <dialog, sheet> |
 | pill | `radius-pill` | <9999> | <chip, avatar> |
 
-Вложенный радиус = внешний − отступ.
+Inner radius = outer radius − inset.
 
-## Границы и глубина
+## Borders and depth
 
-- Hairline: <1px `color-border`>. Толще — только состояния selected/focus/error.
-- Elevation: <flat по умолчанию; 1 — dropdown/popover; 2 — dialog/sheet>. Тени только у слоёв поверх.
+- Hairline: <1px color-border>. Thicker borders identify selected/focus/error states.
+- Elevation: <flat default; 1 dropdown/popover; 2 dialog/sheet>. Shadows belong to overlays.
 
-## Иконки
+## Icons
 
-- Набор: <Lucide / Material Symbols / свой>. Других наборов нет.
-- Размеры: <16 в тексте и плотных списках, 20 в кнопках, 24 в навигации>. Stroke: <1.5>.
-- Иконка стоит рядом с текстом и выровнена по его cap height; без цветной подложки.
+- Set: <Lucide / Material Symbols / custom>. No mixed sets.
+- Sizes: <16 in text/dense lists, 20 in buttons, 24 in navigation>. Stroke: <1.5>.
+- Position next to text, align to cap height, and avoid decorative colored tiles.
 
-## Компоненты
+## Components
 
 ### Button
 
-| Размер | Высота | Padding X | Шрифт | Иконка | Радиус |
+| Size | Height | Horizontal padding | Type | Icon | Radius |
 | --- | --- | --- | --- | --- | --- |
-| sm | <32> | <12> | `type-label` | <16> | `radius-control` |
-| md | <40> | <16> | `type-label` | <20> | `radius-control` |
-| lg | <48> | <20> | `type-body` | <20> | `radius-control` |
+| sm | <32> | <12> | type-label | <16> | radius-control |
+| md | <40> | <16> | type-label | <20> | radius-control |
+| lg | <48> | <20> | type-body | <20> | radius-control |
 
-Варианты: <primary (action), secondary (border), ghost, danger>. Один primary на task region.
-Состояния: default, hover (pointer), pressed, focus-visible, pending, disabled.
+Variants: <primary, secondary, ghost, danger>. One primary per task region.
+States: default, pointer hover, pressed, focus-visible, pending, disabled.
 
 ### Input
 
-Высота <40>, padding <12>, label сверху `type-label`, hint `type-caption`, ошибка текстом под полем.
+Height <40>, padding <12>, label above in type-label, informative hint in type-caption,
+and a textual error below. Descriptions are optional; omit their wrapper when unnecessary.
 
-### <Другие компоненты проекта>
+### <Other project components>
 
-Целевой размер касания: <44×44 pt / 48×48 dp / ≥24 CSS px + 44 на touch>.
+Target size: <44×44 pt / 48×48 dp / ≥24 CSS px with a 44px touch preference>.
 
 ## Layout
 
 - Breakpoints: <360, 768, 1024, 1440>.
-- Max-width контента: <1200>; текст — <60–80 символов>.
-- Сетка: <12 колонок, gutter 24 / 4 колонки, gutter 16>.
+- Content max width: <1200>; reading measure: <60–80 characters>.
+- Grid: <12 columns with 24 gutter / 4 columns with 16 gutter>.
 
-## Движение
+## Motion
 
-| Роль | Токен | Значение |
+| Role | Token | Value |
 | --- | --- | --- |
-| press | `motion-press` | <80ms вниз / 180ms возврат> |
+| press | `motion-press` | <80ms down / 180ms return> |
 | micro | `motion-micro` | <120ms> |
 | small | `motion-small` | <180ms> |
 | medium | `motion-medium` | <260ms> |
@@ -141,21 +142,24 @@
 | enter | `ease-enter` | <cubic-bezier(0, 0, 0, 1)> |
 | exit | `ease-exit` | <cubic-bezier(0.3, 0, 1, 1)> |
 
-Press: <scale 0.97 на pointerdown>. Reduced motion: перемещение → crossfade, отклик сохраняется.
+Press: <scale 0.97 on pointerdown>. Reduced motion replaces movement with crossfade while retaining feedback.
 
-## Голос и текст
+## Voice and copy
 
-- Тон: <…>. Кнопки называют действие: <«Сохранить изменения»>.
-- Числа/даты: <формат>. Пунктуация: <кавычки «», неразрывные пробелы перед единицами>.
-- Запрещено: <«seamless», «world-class», слоганы-противопоставления>.
+- Tone: <voice>. Buttons name actions, for example "Save changes."
+- Numbers/dates: <locale formats>. Punctuation: <language-appropriate quotes and unit spacing>.
+- Avoid: <generic claims, forced contrast slogans, page narration, label paraphrases>.
+- Helper text is optional. Keep only new facts needed to choose, predict consequences,
+  enter valid data, or recover. Preserve necessary accessible instructions.
+- Verified product facts used in explanations: <source of limits, timing, scope, and consequences>.
 
-## Запрещено в этом проекте
+## Prohibited in this project
 
-- <`slop:icon-tile`, `slop:ai-palette`, `slop:lazy-cool` — ID из каталога better-design>
-- Разрешено как фирменное: <например: «Geist выбран по причине X — не считать default-font»>
+- <slop:icon-tile, slop:ai-palette, slop:lazy-cool and applicable copy IDs from the catalog>
+- Deliberate visual brand exceptions: <for example, Geist chosen for a documented reason>
 
-## Расхождения и исключения
+## Discrepancies and exceptions
 
-| Правило | Область | Причина | Источник |
+| Rule | Scope | Reason | Source |
 | --- | --- | --- | --- |
-| <radius 12 у старого Dialog> | <Dialog> | <до миграции> | <issue/коммит> |
+| <12px radius on legacy Dialog> | <Dialog> | <until migration> | <issue/commit> |
