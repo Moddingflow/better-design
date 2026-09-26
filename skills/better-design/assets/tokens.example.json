@@ -1,0 +1,53 @@
+{
+  "format": "better-design-core-v1",
+  "tokens": {
+    "base": {
+      "white": {"$type": "color", "$value": {"colorSpace": "srgb", "components": [1, 1, 1], "alpha": 1}},
+      "ink": {"$type": "color", "$value": {"colorSpace": "srgb", "components": [0.09, 0.11, 0.15]}},
+      "muted": {"$type": "color", "$value": {"colorSpace": "srgb", "components": [0.35, 0.38, 0.43]}},
+      "action": {"$type": "color", "$value": {"colorSpace": "srgb", "components": [0.11, 0.29, 0.67]}},
+      "space4": {"$type": "dimension", "$value": {"value": 4, "unit": "px"}},
+      "space8": {"$type": "dimension", "$value": {"value": 8, "unit": "px"}},
+      "space16": {"$type": "dimension", "$value": {"value": 16, "unit": "px"}}
+    },
+    "surface": {"$type": "color", "$value": "{base.white}"},
+    "text": {
+      "primary": {"$type": "color", "$value": "{base.ink}"},
+      "muted": {"$type": "color", "$value": "{base.muted}"}
+    },
+    "button": {
+      "background": {"$type": "color", "$value": "{base.action}"},
+      "foreground": {"$type": "color", "$value": "{surface}"},
+      "gap": {"$type": "dimension", "$value": "{base.space8}"}
+    },
+    "focus": {"$type": "color", "$value": "{base.action}"},
+    "type": {
+      "family": {"$type": "fontFamily", "$value": ["system-ui", "sans-serif"]},
+      "bodySize": {"$type": "dimension", "$value": {"value": 1, "unit": "rem"}},
+      "bodyWeight": {"$type": "fontWeight", "$value": 400},
+      "bodyLineHeight": {"$type": "number", "$value": 1.5}
+    },
+    "motion": {
+      "duration": {
+        "press": {"$type": "duration", "$value": {"value": 80, "unit": "ms"}},
+        "micro": {"$type": "duration", "$value": {"value": 120, "unit": "ms"}},
+        "small": {"$type": "duration", "$value": {"value": 180, "unit": "ms"}},
+        "medium": {"$type": "duration", "$value": {"value": 260, "unit": "ms"}},
+        "large": {"$type": "duration", "$value": {"value": 380, "unit": "ms"}}
+      },
+      "easing": {
+        "standard": {"$type": "cubicBezier", "$value": [0.2, 0, 0, 1]},
+        "enter": {"$type": "cubicBezier", "$value": [0, 0, 0, 1]},
+        "exit": {"$type": "cubicBezier", "$value": [0.3, 0, 1, 1]}
+      },
+      "feedback": {"$type": "duration", "$value": "{motion.duration.press}"},
+      "pressScale": {"$type": "number", "$value": 0.97}
+    }
+  },
+  "contrastPairs": [
+    {"id": "body", "foreground": "text.primary", "background": "surface", "purpose": "text", "state": "default", "minimum": 4.5},
+    {"id": "secondary", "foreground": "text.muted", "background": "surface", "purpose": "text", "state": "default", "minimum": 4.5},
+    {"id": "primary-button", "foreground": "button.foreground", "background": "button.background", "purpose": "text", "state": "default", "minimum": 4.5},
+    {"id": "focus-on-canvas", "foreground": "focus", "background": "surface", "purpose": "non-text", "state": "focus-visible", "minimum": 3}
+  ]
+}

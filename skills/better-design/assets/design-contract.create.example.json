@@ -1,0 +1,82 @@
+{
+  "format": "better-design-contract-v1",
+  "mode": "create",
+  "scope": "Сайт районной пекарни: меню дня с API и заказ на самовывоз",
+  "assumptions": ["Меню приходит из локальной fixture с настраиваемой задержкой; реальные заказы не отправляются"],
+  "platform": {
+    "kind": "web", "units": "css-px", "inputs": ["pointer", "keyboard", "touch"],
+    "locales": ["ru"], "directions": ["ltr"], "themes": ["light"]
+  },
+  "system": {
+    "authority": "Системы нет; токены выводятся из direction",
+    "tokenSource": "DESIGN.md, создаётся из выбранного направления до вёрстки; код-токены в src/styles/tokens.css",
+    "density": "comfortable", "expression": "Тёплая ремесленная подача без стокового «уюта»",
+    "rationale": "Главное — что испечено сегодня и до скольки можно забрать"
+  },
+  "direction": {
+    "origin": "new",
+    "concept": "Грифельная доска у кассы и крафтовый пакет: меню дня пишется от руки, время выпечки важнее слогана",
+    "qualities": ["тёплый", "честный", "утренний"],
+    "avoid": ["стоковый cozy с круассаном на мраморе", "SaaS-сетка карточек", "пастельный градиент"],
+    "palette": "Графит доски, крафт, мука; один акцент — цвет корочки для времени и действия; нейтрали тёплые",
+    "typography": "Кандидаты: гротеск с узкими цифрами, трафаретный display, рукописный акцент. Выбран узкий гротеск для меню и времени + рукописный акцент только в пометках «из печи в 7:40»",
+    "references": [
+      {"source": "Меловые доски меню в локальных пекарнях (фото пользователя)", "takeaway": "Иерархия: название, время, цена в одну строку; пометки мелом поверх"},
+      {"source": "Этикетки крафтовых пакетов с печатью", "takeaway": "Штамп с датой как графический мотив"},
+      {"source": "Расписания пригородных поездов", "takeaway": "Табличная подача времени с tabular-nums"}
+    ],
+    "alternatives": [
+      {"id": "board", "premise": "Типографическое: весь первый экран — доска меню дня со временем выпечки"},
+      {"id": "photo", "premise": "Образное: крупный кадр печи на рассвете, меню ниже"},
+      {"id": "timeline", "premise": "Структурное: лента дня от первой выпечки до закрытия"}
+    ],
+    "chosen": "board",
+    "signature": ["Штамп «испечено в 7:40» у каждой позиции", "Мел-подчёркивание при hover и focus"],
+    "motion": "Рукотворное, но быстрое: мел дорисовывается, штамп ложится с коротким нажимом без отскока. Темп сдержанный (micro 120, small 180, medium 260 ms), кривые standard/enter/exit, springs без overshoot. Фирменная деталь: при добавлении позиции штамп «в заказе» пришлёпывается и счётчик заказа докатывается. Reduced motion: мел и штамп появляются crossfade, без перемещения"
+  },
+  "tasks": [{
+    "id": "pick-order", "scenario": "Посмотреть меню дня и оформить самовывоз",
+    "outcome": "Пользователь видит номер заказа и время, когда забрать", "priority": "primary",
+    "recovery": "При сбое загрузки меню — причина и повтор; при сбое заказа выбор сохранён"
+  }],
+  "components": [{
+    "id": "menu-board", "kind": "list", "taskIds": ["pick-order"],
+    "states": ["loading-skeleton", "ready", "sold-out-item", "load-error"],
+    "responsive": "Одна колонка на телефоне, две на desktop; skeleton повторяет строки меню",
+    "actions": [{
+      "id": "add-item", "kind": "command", "label": "Добавить в заказ", "taskId": "pick-order",
+      "outcome": "Позиция в заказе, счётчик обновлён", "risk": "normal", "protection": "reversible",
+      "recovery": "Позицию можно убрать из заказа"
+    }]
+  }, {
+    "id": "order-submit", "kind": "button", "taskIds": ["pick-order"],
+    "states": ["default", "hover", "focus-visible", "active", "pending", "disabled"],
+    "responsive": "Кнопка закреплена снизу на телефоне и не перекрывает последнюю позицию",
+    "actions": [{
+      "id": "submit-order", "kind": "submit", "label": "Заказать к 8:30", "taskId": "pick-order",
+      "outcome": "Номер заказа и время самовывоза", "risk": "normal", "protection": "reversible",
+      "recovery": "Pending в кнопке; при сбое выбор сохранён, повтор доступен"
+    }]
+  }],
+  "verification": {
+    "viewports": [{"width": 360, "height": 780, "unit": "css-px"}, {"width": 1440, "height": 900, "unit": "css-px"}],
+    "checks": [{
+      "id": "menu-loading", "taskIds": ["pick-order"], "componentIds": ["menu-board"],
+      "kind": "render", "scenario": "Задержка fixture 2 s: skeleton по раскладке меню, замена без сдвига, таймаут даёт ошибку с повтором",
+      "status": "planned", "evidence": []
+    }, {
+      "id": "order-flow", "taskIds": ["pick-order"], "componentIds": ["menu-board", "order-submit"],
+      "kind": "interaction", "scenario": "Добавить позиции, отправить, получить fixture failure, повторить; выбор сохранён",
+      "status": "planned", "evidence": []
+    }, {
+      "id": "board-distinctiveness", "taskIds": ["pick-order"], "componentIds": ["menu-board"],
+      "kind": "distinctiveness", "scenario": "Тест подмены на другую пекарню и тест прищура по скриншотам 360 и 1440; записать, что изменено",
+      "status": "planned", "evidence": []
+    }, {
+      "id": "order-motion", "taskIds": ["pick-order"], "componentIds": ["menu-board", "order-submit"],
+      "kind": "motion", "scenario": "Видео на 25% скорости: отклик кнопки на нажатие, штамп и докат счётчика, crossfade skeleton→меню без сдвига, pending в кнопке; спам-клик «Добавить» без очереди; reduced motion без перемещения, отклик сохранён",
+      "status": "planned", "evidence": []
+    }]
+  },
+  "exceptions": []
+}

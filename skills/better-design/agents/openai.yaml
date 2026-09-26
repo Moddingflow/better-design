@@ -1,0 +1,6 @@
+interface:
+  display_name: "Better Design"
+  short_description: "Design coherent UI, purposeful motion, and accessible flows"
+  default_prompt: "Use $better-design to improve UI/UX within the task scope and verify the result."
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,29 @@
+name: Bug report
+description: Report a reproducible skill, installation, or validator problem.
+title: "[Bug]: "
+body:
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Agent and version, OS, skill release, and Python or Node.js version when relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include a minimal prompt or input with private data removed.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Relevant output or permitted screenshots. State which checks were actually run.

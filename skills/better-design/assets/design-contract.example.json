@@ -1,0 +1,58 @@
+{
+  "format": "better-design-contract-v1",
+  "mode": "refine",
+  "scope": "Изменение имени проекта в существующих настройках",
+  "assumptions": ["Сохранение проверяется на локальной fixture без внешней записи"],
+  "platform": {
+    "kind": "web", "units": "css-px", "inputs": ["pointer", "keyboard", "touch"],
+    "locales": ["ru"], "directions": ["ltr"], "themes": ["light"]
+  },
+  "system": {
+    "authority": "Существующая страница настроек и её FormField/Button",
+    "tokenSource": "Проектный theme; пример токенов скилла не заменяет его",
+    "density": "comfortable", "expression": "Сохранить бренд и оформление настроек",
+    "rationale": "Одно редкое действие, постоянный label и явный результат"
+  },
+  "tasks": [{
+    "id": "rename", "scenario": "Изменить имя проекта и исправить ошибку сохранения",
+    "outcome": "Заголовок и поле показывают сохранённое имя", "priority": "primary",
+    "recovery": "При ошибке сохранить введённое имя, показать причину и разрешить повтор"
+  }],
+  "components": [{
+    "id": "project-name", "kind": "input", "taskIds": ["rename"],
+    "states": ["default", "focus-visible", "error", "readOnly"],
+    "responsive": "Label над полем, длинное значение доступно внутри input",
+    "actions": [{
+      "id": "edit-name", "kind": "edit", "label": "Название проекта", "taskId": "rename",
+      "outcome": "Изменён draft имени", "risk": "normal", "protection": "none",
+      "recovery": "До отправки можно исправить draft или отменить редактирование"
+    }]
+  }, {
+    "id": "save-name", "kind": "button", "taskIds": ["rename"],
+    "states": ["default", "hover", "focus-visible", "active", "disabled", "pending"],
+    "responsive": "Кнопка остаётся видимой, label переносится без потери текста",
+    "actions": [{
+      "id": "save", "kind": "submit", "label": "Сохранить изменения", "taskId": "rename",
+      "outcome": "После подтверждённого ответа сохранено новое имя и объявлен результат",
+      "risk": "normal", "protection": "none",
+      "recovery": "При сбое draft сохранён, pending завершён, повтор доступен"
+    }]
+  }],
+  "verification": {
+    "viewports": [{"width": 320, "height": 800, "unit": "css-px"}, {"width": 1440, "height": 900, "unit": "css-px"}],
+    "checks": [{
+      "id": "rename-recovery", "taskIds": ["rename"], "componentIds": ["project-name", "save-name"],
+      "kind": "interaction", "scenario": "Изменить имя, получить fixture failure, повторить; draft сохраняется и результат правдив",
+      "status": "planned", "evidence": []
+    }, {
+      "id": "rename-keyboard", "taskIds": ["rename"], "componentIds": ["project-name", "save-name"],
+      "kind": "keyboard", "scenario": "Tab до поля и submit, Enter отправляет форму, focus видим и результат доступен AT",
+      "status": "planned", "evidence": []
+    }, {
+      "id": "rename-layout", "taskIds": ["rename"], "componentIds": ["project-name", "save-name"],
+      "kind": "render", "scenario": "Проверить длинное имя, 320 и 1440, pending/error и 200% текст без перекрытий",
+      "status": "planned", "evidence": []
+    }]
+  },
+  "exceptions": []
+}

@@ -1,0 +1,22 @@
+name: Improve the skill
+description: Propose clearer guidance, a new example, or a translation.
+title: "[Improvement]: "
+body:
+  - type: textarea
+    id: task
+    attributes:
+      label: User task and current gap
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe when it applies, the expected benefit, and legitimate exceptions.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence or references
+      description: Distinguish tested results from a proposal.
