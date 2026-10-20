@@ -52,7 +52,7 @@ For example, Claude Code supports a project-local `.claude/skills/better-design/
 For a stable copy you can inspect before installing:
 
 ```sh
-git clone --branch v1.1.0 --depth 1 https://github.com/Moddingflow/better-design.git
+git clone --branch v1.6.0 --depth 1 https://github.com/Moddingflow/better-design.git
 npx skills add ./better-design --skill better-design --agent codex
 ```
 
