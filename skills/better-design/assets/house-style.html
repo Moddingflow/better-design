@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>House style reference</title>
+<!-- Prototype loading; in a project self-host @fontsource-variable/geologica. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300..600&display=swap&subset=cyrillic" rel="stylesheet">
+<link rel="stylesheet" href="motion/interaction-kit.css">
+<!-- Reference render of references/house-style.md and assets/DESIGN.house-style.md.
+     Placeholder product ("Lumen"): replace copy and imagery with real content. -->
+<style>
+  :root {
+    --color-canvas: #000; --color-surface: #161617; --color-surface-raised: #1d1d1f;
+    --color-text: #f5f5f7; --color-text-secondary: #a1a1a6; --color-hairline: rgb(255 255 255 / 0.1);
+    --color-field-border: #86868b; --color-action: #f5f5f7; --color-on-action: #000;
+    --color-link: #2997ff; --color-focus: #2997ff; --color-danger: #ff453a; --color-success: #30d158;
+    --color-glass: rgb(22 22 23 / 0.8);
+    --font-ui: "Geologica", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+    --ease-standard: cubic-bezier(0.28, 0.11, 0.32, 1); --ease-color: cubic-bezier(0.25, 0.1, 0.25, 1);
+    --radius-tile: 28px; --radius-card: 18px; --radius-field: 12px; --radius-pill: 9999px;
+    color-scheme: dark;
+  }
+  [data-theme="light"] {
+    --color-canvas: #fff; --color-surface: #f5f5f7; --color-surface-raised: #fff;
+    --color-text: #1d1d1f; --color-text-secondary: #6e6e73; --color-hairline: rgb(0 0 0 / 0.1);
+    --color-action: #1d1d1f; --color-on-action: #fff; --color-link: #0066cc; --color-focus: #0071e3;
+    --color-danger: #d70015; --color-success: #1a7f37; --color-glass: rgb(255 255 255 / 0.72);
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--color-canvas); color: var(--color-text); font: 340 17px/1.5 var(--font-ui); letter-spacing: 0; font-variation-settings: "CRSV" 0, "SHRP" 0, "slnt" 0; -webkit-font-smoothing: antialiased; }
+  a { color: var(--color-link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  :root { --ui-focus-ring: var(--color-focus); }
+  .wrap { max-width: 980px; margin-inline: auto; padding-inline: 24px; }
+  .wide { max-width: 1440px; margin-inline: auto; padding-inline: 24px; }
+
+  /* nav */
+  .nav { position: sticky; top: 0; z-index: 10; background: var(--color-glass); -webkit-backdrop-filter: blur(20px) saturate(1.8); backdrop-filter: blur(20px) saturate(1.8); border-bottom: 1px solid var(--color-hairline); }
+  .nav .wrap { height: 52px; display: flex; align-items: center; gap: 24px; }
+  .nav b { font-size: 21px; font-weight: 500; letter-spacing: -0.02em; margin-right: auto; }
+  .nav a.l { color: var(--color-text-secondary); font-size: 14px; font-weight: 400; letter-spacing: 0.005em; }
+  .nav a.l:hover { color: var(--color-text); text-decoration: none; }
+
+  /* buttons */
+  .btn { font: inherit; font-weight: 400; display: inline-flex; align-items: center; justify-content: center; height: 44px; padding-inline: 22px; border-radius: var(--radius-pill); border: 0; cursor: pointer; text-decoration: none; }
+  .btn:hover { text-decoration: none; }
+  .btn-primary { background: var(--color-action); color: var(--color-on-action); }
+  .btn-sm { height: 32px; padding-inline: 16px; font-size: 14px; }
+  /* The nav action stays hidden while the hero's own Buy is on screen: one action, shown once. */
+  .nav-cta { opacity: 0; visibility: hidden; transform: translateY(4px); transition: opacity 300ms var(--ease-standard), transform 300ms var(--ease-standard), visibility 0s linear 300ms; }
+  .nav[data-cta] .nav-cta { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+
+  /* type */
+  .hero { font-size: clamp(48px, 7vw, 80px); line-height: 1.05; font-weight: 500; letter-spacing: -0.035em; margin: 0; }
+  .headline { font-size: clamp(40px, 5vw, 56px); line-height: 1.07; font-weight: 500; letter-spacing: -0.03em; margin: 0; }
+  .title { font-size: clamp(32px, 3.5vw, 40px); line-height: 1.1; font-weight: 500; letter-spacing: -0.025em; margin: 0; }
+  .intro { font-size: clamp(21px, 2.4vw, 28px); line-height: 1.18; letter-spacing: -0.01em; color: var(--color-text-secondary); margin: 14px 0 0; }
+  .lead { font-size: 21px; line-height: 1.4; letter-spacing: 0; color: var(--color-text-secondary); margin: 12px 0 0; }
+  .muted { color: var(--color-text-secondary); }
+
+  /* sections */
+  section { padding-block: 120px; }
+  .hero-sec { text-align: center; padding-top: 88px; padding-bottom: 0; }
+  .actions { display: flex; gap: 24px; justify-content: center; align-items: center; margin-top: 28px; flex-wrap: wrap; }
+  .product { margin-top: 56px; height: clamp(260px, 42vw, 560px); border-radius: var(--radius-tile); background: var(--color-surface); display: grid; place-items: center; color: var(--color-text-secondary); font-size: 14px; }
+  .split { display: grid; grid-template-columns: 1fr 1.2fr; gap: 64px; align-items: center; }
+  .shot { aspect-ratio: 4 / 3; border-radius: var(--radius-tile); background: var(--color-surface); display: grid; place-items: center; color: var(--color-text-secondary); font-size: 14px; }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .tile { background: var(--color-surface); border-radius: var(--radius-tile); padding: 48px; min-height: 420px; display: flex; flex-direction: column; overflow: hidden; }
+  .tile .img { margin-top: auto; height: 160px; border-radius: var(--radius-card); background: var(--color-surface-raised); }
+  .light { background: var(--color-canvas); color: var(--color-text); }
+
+  /* app screen */
+  .app { max-width: 420px; margin-inline: auto; background: var(--color-canvas); border-radius: 36px; padding: 24px 16px 32px; outline: 1px solid var(--color-hairline); }
+  .app h3 { font-size: 34px; line-height: 41px; font-weight: 500; margin: 8px 16px 20px; letter-spacing: -0.025em; }
+  .group { background: var(--color-surface-raised); border-radius: 12px; overflow: hidden; margin-bottom: 32px; }
+  .row { min-height: 44px; display: flex; align-items: center; gap: 12px; padding-inline: 16px; position: relative; }
+  .row + .row::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; height: 1px; background: var(--color-hairline); }
+  .row .v { margin-left: auto; color: var(--color-text-secondary); }
+  .row .v::after { content: "›"; margin-left: 8px; }
+  .row .ui-switch { margin-left: auto; }
+  .field { display: grid; gap: 6px; margin: 0 4px 24px; }
+  .field label { font-size: 14px; font-weight: 400; color: var(--color-text-secondary); }
+  .field input { height: 44px; padding-inline: 14px; border-radius: var(--radius-field); border: 1px solid var(--color-field-border); background: var(--color-surface-raised); color: var(--color-text); font: inherit; outline: none; }
+  .err { color: var(--color-danger); font-size: 14px; font-weight: 400; }
+  .foot { padding-block: 40px; border-top: 1px solid var(--color-hairline); font-size: 12px; font-weight: 400; letter-spacing: 0.01em; line-height: 1.33; color: var(--color-text-secondary); }
+
+  @media (max-width: 734px) {
+    section { padding-block: 80px; }
+    .split, .tiles { grid-template-columns: 1fr; gap: 32px; }
+    .tile { padding: 32px; min-height: 360px; }
+    .nav a.l { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .nav-cta { transition: none; } }
+</style>
+</head>
+<body>
+<nav class="nav" aria-label="Main"><div class="wrap"><b>Lumen</b><a class="l ui-dim ui-focus" href="#">Overview</a><a class="l ui-dim ui-focus" href="#">Specs</a><a class="l ui-dim ui-focus" href="#">Compare</a><a class="btn btn-primary btn-sm nav-cta ui-press ui-focus" href="#" tabindex="-1" aria-hidden="true">Buy</a></div></nav>
+
+<main>
+  <section class="hero-sec">
+    <div class="wrap">
+      <h1 class="hero">Light, measured.</h1>
+      <p class="intro">A desk lamp that reads the room and sets itself.</p>
+      <div class="actions" id="heroActions"><a class="btn btn-primary ui-press ui-focus" href="#">Buy</a><a class="ui-dim ui-focus" href="#">Learn more <span class="ui-icon-nudge" aria-hidden="true">›</span></a></div>
+    </div>
+    <div class="wide"><div class="product">Product render (real image goes here)</div></div>
+  </section>
+
+  <section>
+    <div class="wide split">
+      <div>
+        <h2 class="headline">Adapts in silence.</h2>
+        <p class="lead">A light sensor checks the room 60 times a minute and shifts the colour temperature in steps you never notice.</p>
+        <p style="margin-top:24px"><a class="ui-dim ui-focus" href="#">How the sensor works <span class="ui-icon-nudge" aria-hidden="true">›</span></a></p>
+      </div>
+      <div class="shot">Screenshot or close-up</div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wide tiles">
+      <article class="tile"><h3 class="title">Battery</h3><p class="lead">Up to 40 hours at reading brightness.</p><p style="margin-top:16px"><a class="ui-dim ui-focus" href="#">Battery details <span class="ui-icon-nudge" aria-hidden="true">›</span></a></p><div class="img" aria-hidden="true"></div></article>
+      <article class="tile"><h3 class="title">Materials</h3><p class="lead">Recycled aluminium, one screw.</p><p style="margin-top:16px"><a class="ui-dim ui-focus" href="#">Environment <span class="ui-icon-nudge" aria-hidden="true">›</span></a></p><div class="img" aria-hidden="true"></div></article>
+    </div>
+  </section>
+
+  <section class="light" data-theme="light">
+    <div class="wrap" style="text-align:center">
+      <h2 class="headline">The app, same quiet.</h2>
+      <p class="intro">Light theme section, used as a chapter break.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="app" role="group" aria-label="App settings example">
+      <h3>Settings</h3>
+      <div class="group">
+        <div class="row">Auto brightness <button class="ui-switch ui-focus" type="button" role="switch" aria-checked="true" aria-label="Auto brightness"></button></div>
+        <div class="row">Schedule <span class="v">22:00–07:00</span></div>
+        <div class="row">Colour temperature <span class="v">Warm</span></div>
+      </div>
+      <div class="field"><label for="nm">Lamp name</label><input id="nm" class="ui-field" value="Desk"><span class="err">⚠ Name is already used by another lamp.</span></div>
+      <div style="padding-inline:4px"><button class="btn btn-primary ui-press ui-focus" type="button" style="width:100%">Save</button></div>
+    </div>
+  </section>
+</main>
+<footer class="foot"><div class="wrap">Placeholder product and copy for the house-style reference.</div></footer>
+<script src="motion/interaction-kit.js"></script>
+<script>
+  BetterUI.init(document);
+  var nav = document.querySelector('.nav'), cta = nav.querySelector('.nav-cta');
+  new IntersectionObserver(function (es) {
+    var gone = !es[0].isIntersecting;
+    nav.toggleAttribute('data-cta', gone);
+    cta.tabIndex = gone ? 0 : -1;
+    if (gone) cta.removeAttribute('aria-hidden'); else cta.setAttribute('aria-hidden', 'true');
+  }, { rootMargin: '-52px 0px 0px 0px' }).observe(document.getElementById('heroActions'));
+  document.querySelectorAll('.ui-switch').forEach(function (s) { s.addEventListener('click', function () { s.setAttribute('aria-checked', String(s.getAttribute('aria-checked') !== 'true')); }); });
+</script>
+</body>
+</html>

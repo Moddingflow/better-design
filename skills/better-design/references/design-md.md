@@ -30,7 +30,7 @@ produce 40px and 44px versions of the same button, three heading fonts, and arbi
 | User asks to document the system | Create it even for a small change |
 | Audit | Do not create/edit it; report absence or staleness as a finding |
 
-Use [DESIGN.template.md](../assets/DESIGN.template.md). Include only roles actually used;
+Use [DESIGN.template.md](../assets/DESIGN.template.md) (or [DESIGN.house-style.md](../assets/DESIGN.house-style.md) when the house style applies). Include only roles actually used;
 remove empty sections instead of leaving TBD. Use the project's documentation language.
 
 If the project has agent instructions, suggest a line saying:
@@ -51,7 +51,9 @@ Use **closed sets**: list the permitted values; do not introduce unlisted values
   focus, selection, and status roles; values per theme and code token names.
   Record permitted foreground/background pairs with measured contrast.
 - **Spacing:** a scale such as 0/4/8/12/16/24/32/48/64; within-group, between-group,
-  and container-padding rules.
+  container-padding, and screen-edge rules (padding ≥ inner gaps).
+- **Alignment:** keylines for lists/settings, row alignment, text centering method in
+  controls, and declared optical offsets; see [layout-geometry.md](layout-geometry.md).
 - **Radii:** 2–4 values with control/card/overlay/pill roles and a nesting rule.
 - **Borders and depth:** hairline width, elevation levels, and permitted usage.
 - **Icons:** one set, usually 2–3 sizes, stroke, and alignment with text.

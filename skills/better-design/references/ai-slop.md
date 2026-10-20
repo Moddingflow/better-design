@@ -19,6 +19,15 @@ the sentence is the correct replacement when the existing label already does its
 - Use entry IDs (such as `slop:icon-tile`) in findings and `distinctiveness` evidence.
 - An exception must follow from the product, content, or DESIGN.md, not "it looks nice."
   An intentional visual brand pattern recorded in DESIGN.md is not slop.
+- The [house style](house-style.md), when DESIGN.md records it, is an intentional choice: its
+  centered hero and monochrome palette are not `centered-everything` or a generic palette;
+  its font (Geologica, tuned light and tight) is a recorded choice, not `default-font`. Its swap test judges content, imagery, composition,
+  and the signature detail instead; copy and behavior entries apply in full.
+- Effects from [effects-library.md](effects-library.md) are exceptions only inside their
+  card's scope and the page budget, and only when DESIGN.md records their IDs. Used outside
+  that scope they match the entries below (`fx:metal-sheen` → `gradient-text`,
+  `fx:ring-orbit` on many elements → `lazy-cool`, misaligned rails or a dot field with
+  nothing on the page made of dots → `decorative-grid-bg`).
 - Visual severity: on an expressive surface, three or more unjustified matches, or any
   match in the first viewport, are an error (failed swap test); an isolated match elsewhere
   is a warning. In dense working tools, visual genericness is a warning.

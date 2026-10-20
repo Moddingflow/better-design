@@ -66,6 +66,26 @@ transitions and frame timing; explain any idle animation that remains.
 
 Expected work: purposeful feedback using shared motion values, with repeat-input and reduced-motion checks.
 
+## Make controls feel alive
+
+```text
+Use better-design to fix the dead buttons in this app. Adopt the interaction
+kit in our Button, IconButton, and Switch components instead of per-page CSS.
+Keep our tokens and the existing look. Run the motion probe on the settings
+and checkout pages, in normal and reduced-motion mode, until it reports zero errors.
+```
+
+Expected work: a three-layer press, hover, focus, and state transitions moved into shared components, a clean probe run in both modes, and any remaining warnings explained.
+
+## Start without a style brief
+
+```text
+Use better-design to build a landing page and a settings screen for a sleep
+tracker. No brand exists yet. Put the design system in DESIGN.md.
+```
+
+Expected work: the default style from its DESIGN.md preset, a concept that still chooses imagery and one signature detail, the interaction kit on every control, measured layout, and a probe run. Add any visual preference ("warm and playful", "light theme", a reference site) and the agent follows it instead.
+
 ## Plan game UI
 
 ```text

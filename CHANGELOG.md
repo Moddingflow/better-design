@@ -1,5 +1,55 @@
 # Changelog
 
+## 1.6.0 — 2026-10-20
+
+### Added
+
+- **Interaction kit** (`assets/motion/`): framework-free CSS and JavaScript that every created or redesigned UI adopts before building components. A three-layer press (compress by ~4 px of perimeter within 90 ms with size-aware depth, a fill step, a bloom from the touch point, a spring release with ~1% overshoot), a 90 ms minimum press so quick taps are visible, keyboard press, hover without lift, a focus ring that grows into place, switches, checkboxes, a sliding segmented indicator, pending/done/error button states, icon swaps, a toggle pop, an error shake, popovers and dialogs that grow from their trigger, and height-animated disclosures. Includes a bench page and an adoption guide with React, Vue, Svelte, SwiftUI, and Compose notes.
+- **Motion probe** (`scripts/motion_probe.mjs`): a dependency-free Node.js 22+ script that drives headless Chrome, Chromium, or Edge over the DevTools protocol. It hovers, presses (releasing outside the element, so nothing activates), and keyboard-focuses every interactive element; errors on missing press feedback, missing focus, or stuck states, and warns on weak 1–2 px presses, instant returns, missing hover, and `transition: all`. Supports `--reduced-motion`, viewport size, selectors, and JSON output.
+
+### Changed
+
+- The press model in `motion.md` no longer accepts a lone 1–2 px move or a 0.97 scale with an instant return. Controls spring back after a press in every direction; surfaces, text, and sheets still never overshoot.
+- Adopting the kit and a zero-error probe run are now part of the workflow and of acceptance in `SKILL.md`.
+
+## 1.5.0 — 2026-10-20
+
+### Added
+
+- **Default style** (`references/house-style.md`): when the user gives no visual direction and nothing exists to inherit, the agent builds in a premium ultra-minimal style — black canvas, near-white Geologica type, two grays, one blue for links and focus, real content as the only color. A user's visual cue always replaces it; existing products are never restyled into it unless asked; games keep their own art direction.
+- A filled `DESIGN.house-style.md` preset, a reference render (`house-style.html`), and `house-style.tokens.json`, whose 44 dark and light contrast pairs pass the bundled validator.
+- Rule: each fact once per viewport (product name in the nav or above the headline, never both; a nav action appears only after the hero action scrolls away).
+
+### Changed
+
+- Art direction, contract, DESIGN.md, and AI-pattern guidance now state when the default style applies and how its swap test judges content, imagery, and the signature detail instead of the shared palette.
+
+## 1.4.0 — 2026-10-20
+
+### Added
+
+- A dot language for the effects pool: dot-grid fields with a pointer spotlight, any image or text rebuilt from dots, a dotted globe with arcs and HTML markers, pulsing dot bands, data as dot columns, 5×5 LED status icons, bolted plates, dashed seams, corner brackets, a comet on the active card, edge fades on overflow rows, a rotating inline phrase, timed dot navigation, media that settles into a frame on scroll, and section theme flips.
+- Composition notes for Cloudflare-, Linear-, and Apple-like stacks, and the rule that dots are a material: a bare dot wallpaper with nothing made of dots remains a generic pattern.
+
+## 1.3.0 — 2026-10-20
+
+### Added
+
+- **Optional effects pool** (`references/effects-library.md`, `assets/effects/`): a live WebGL ordered-dither field, a baked halftone for card sets, film grain, a light orbiting the primary button, brushed-metal words, blueprint rails, hover responses that are not lift-and-scale, a header that morphs into a capsule, a distance-driven coverflow, a barcode ruler scrubber, a swipe story stack, and packets on routing wires. Every effect has budgets, fallbacks, reduced-motion behavior, and a gallery bench page. Nothing in the pool is a default.
+
+## 1.2.0 — 2026-10-07
+
+### Added
+
+- **Layout geometry** (`references/layout-geometry.md`): equal gaps from layout containers, shared alignment lines and keylines, content centered by its visible ink, padding that is never smaller than the gaps it contains, and safe-area reserve.
+- `scripts/check_layout.py` with regression tests: an offline, standard-library checker for `better-design-layout-v1` dumps that reports uneven gaps, misaligned rows, columns, and keylines, off-center content, overflow, tight edges, and overlaps.
+- Layout dumpers for the web (`dump-dom.js`), Unity (`LayoutDump.cs`), and Godot (`layout_dump.gd`), plus an example dump.
+- A `layout` evidence check in the contract validator.
+
+### Changed
+
+- Platform guidance for games now asks for layout containers, TMP cap-line centering, and measured dumps at every supported resolution.
+
 ## 1.1.0 — 2026-09-26
 
 ### Changed

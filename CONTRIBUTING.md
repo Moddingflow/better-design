@@ -24,7 +24,14 @@ python -B -X utf8 skills/better-design/scripts/test_validate_design.py
 python -B -X utf8 skills/better-design/scripts/validate_design.py contract skills/better-design/assets/design-contract.example.json --json
 python -B -X utf8 skills/better-design/scripts/validate_design.py contract skills/better-design/assets/design-contract.create.example.json --json
 python -B -X utf8 skills/better-design/scripts/validate_design.py tokens skills/better-design/assets/tokens.example.json --require-contrast --json
+python -B -X utf8 skills/better-design/scripts/validate_design.py tokens skills/better-design/assets/house-style.tokens.json --require-contrast --json
+python -B -X utf8 skills/better-design/scripts/test_check_layout.py
+python -B -X utf8 skills/better-design/scripts/check_layout.py skills/better-design/assets/layout.example.json
+node skills/better-design/scripts/motion_probe.mjs skills/better-design/assets/motion/kit.html
+node skills/better-design/scripts/motion_probe.mjs skills/better-design/assets/motion/kit.html --reduced-motion
 ```
+
+For interaction-kit or effect changes, run the motion probe on the bench pages in both modes and attach the before/after output.
 
 For validator changes, add regression coverage for observable behavior and invalid inputs. Do not silently broaden the accepted token format or present a structural pass as a UI audit.
 

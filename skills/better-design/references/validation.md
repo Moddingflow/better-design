@@ -83,6 +83,80 @@ an empty list fails. A non-empty list still needs review for coverage.
 Luminance uses the sRGB breakpoint 0.04045 and unrounded comparison.
 Ratios exclude font rendering, background images, transparency, gradients, and UI context.
 
+## Layout geometry: `check_layout.py`
+
+`scripts/check_layout.py` is read-only, stdlib-only, offline. It reads one
+`better-design-layout-v1` JSON dump of a rendered screen and measures spacing, alignment,
+centering, and containment. Dumpers live in [assets/layout-dump](../assets/layout-dump/);
+the rules behind the checks are in [layout-geometry.md](layout-geometry.md).
+
+```sh
+python -B -X utf8 scripts/check_layout.py assets/layout.example.json
+python -B -X utf8 scripts/check_layout.py path/to/dump.json --json
+python -B -X utf8 scripts/test_check_layout.py
+```
+
+| Exit | Meaning |
+| --- | --- |
+| 0 | No geometry errors on the dumped nodes (warnings may remain) |
+| 1 | At least one geometry error |
+| 2 | Unreadable or invalid input; no assessment |
+
+Root: `format`, `viewport {width, height}`, `nodes`, and optional `tolerance` (px, default 1),
+`minEdgeMargin` (default 16, for windows and root panels), `minControlInset` (default 4),
+`nearMiss` (default 8: stacked edges closer than this must match exactly), `spacing`
+(the DESIGN.md scale; enables `off-scale` warnings), `note`.
+
+Node: `id`, `parent` (id or null), `role`, `rect [x, y, w, h]` in screen px with y down, and
+optional fields:
+
+| Field | Meaning |
+| --- | --- |
+| `role` | `window` (padded surface), `container` (group/row), `control`, `text`, `icon`, `image`, `decor` (backgrounds, glows, dividers; ignored) |
+| `ink` | Visible bounds. For text: glyph extent × cap band (baseline to cap height), so descenders do not shift the center. For icons: non-transparent pixels |
+| `padding` | Number or `[top, right, bottom, left]`; required inset for children |
+| `align` | `center`/`start`/`end`: content alignment of a control, or text alignment (text defaults to `start`) |
+| `optical` | `[dx, dy]` intended offset of content from geometric center |
+| `group` | Separates rhythm groups whose gaps may differ |
+| `overlap` / `edge` | Allowed to overlap siblings / intentionally docked to an edge |
+| `scroll` | `x`, `y`, `both`: children may overflow along that axis |
+
+Errors: `overflow`, `tight-edge`, `overlap`, `uneven-gap`, `misaligned-row`,
+`misaligned-column`, `misaligned-keyline`, `misaligned-edge`, `off-center`,
+`inconsistent-inset`. Warnings: `off-scale`, `size-mismatch`, `icon-size-mismatch`,
+`inset-below-gap`, `cannot-measure`.
+
+Rows, columns, and repeated row structures are inferred; ambiguous groupings are skipped,
+not guessed. A clean result covers geometry of the dumped nodes at that resolution only:
+not unlisted elements, other resolutions, color, type, motion, or whether the layout suits
+the task. Centering of text and icons is exact only with `ink`.
+
+## Motion probe: `motion_probe.mjs`
+
+```bash
+node scripts/motion_probe.mjs http://localhost:5173/settings
+node scripts/motion_probe.mjs path/to/page.html --width 390 --height 844 --reduced-motion
+node scripts/motion_probe.mjs <url> --json --selector "#checkout button, #checkout a"
+```
+
+Needs Node ≥ 22 and Chrome, Chromium, or Edge (found automatically, or `--chrome PATH` /
+`CHROME_PATH`). It hovers, presses, and keyboard-focuses up to `--max` (60) visible
+interactive elements, comparing computed styles (element, `::before`, `::after`, first
+children) before and after each input. The press is released outside the element, so no
+click is dispatched; still prefer fixtures over a live account.
+
+| Result | Meaning |
+| --- | --- |
+| error: no press feedback within 60 ms | The control does not change on pointer-down |
+| error: no visible focus style | Keyboard focus is invisible |
+| error: did not return to rest | A pressed/hovered state sticks |
+| warning: weak press | Only a 1–2 px move or a tiny scale, no fill step or bloom |
+| warning: release snaps back instantly | No spring/transition on release, often a second `transition` shorthand overriding it |
+| warning: no hover / transition: all / no transitions | Missing pointer response or untuned timing |
+
+Exit code 1 when any error exists. The probe proves that states change, not that the motion
+is beautiful: still review key transitions slowed down (motion.md section 12).
+
 ## Use each validation layer for its actual purpose
 
 | Layer | Perform | Still required |
@@ -92,6 +166,7 @@ Ratios exclude font rendering, background images, transparency, gradients, and U
 | Interaction | Safe fixture, action, observed outcome and recovery | Other states and real users |
 | Accessibility | Engine, keyboard, applicable assistive technology | Complete normative/expert audit |
 | Render | Inspect current frames at required states/viewports/themes | Behavior outside those frames |
+| Layout | Dump + check_layout.py per resolution, then zoomed crops | Unlisted nodes, aesthetics, other resolutions |
 | Performance | Recorded conditions, lab trace/regression or actual field/RUM | One local run cannot establish field p75 |
 
 Do not simulate AST/style lint with regex or infer missing handlers by searching for onClick.

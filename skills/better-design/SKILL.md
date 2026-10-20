@@ -1,9 +1,9 @@
 ---
 name: better-design
-description: "Design, improve, and validate UI/UX for applications, websites, native interfaces, and games: an art direction derived from the product, a coherent visual system kept in the project's DESIGN.md (read first, created when missing, the single source of fonts, type scale, colors, spacing, radii, and sizes), a catalog of AI-slop patterns that rejects page narration and redundant helper text, a living motion language (press feedback, transitions, choreography, reduced motion), clear actions, accessibility, drag and drop anticipated from the start (visible drop zones for every file or image upload), and real states (including skeleton loaders and loading splash) without AI slop. Use for interface creation, redesigns, focused UI changes, animation and interaction polish, design plans, and UX audits; not for backend-only tasks."
+description: "Design, improve, and validate UI/UX for applications, websites, native interfaces, and games: an art direction derived from the product, a coherent visual system kept in the project's DESIGN.md (read first, created when missing, the single source of interface values), measured layout geometry (equal spacing, shared alignment lines, content centered inside small controls, nothing clipped or touching its container edge), a catalog of AI-slop patterns that rejects page narration and redundant helper text, a living motion language (press feedback, transitions, choreography, reduced motion), an Apple-like ultra-minimal default style, an opt-in pool of signature effects, clear actions, accessibility, drag and drop anticipated from the start (drop zones for every upload), and real states (including skeleton loaders and loading splash) without AI slop. Use for interface creation, redesigns, focused UI changes, animation and interaction polish, design plans, and UX audits; not for backend-only tasks."
 license: MIT
 metadata:
-  version: "1.1.0"
+  version: "1.6.0"
 ---
 
 # Better Design
@@ -38,6 +38,14 @@ Evaluate coherence, expressiveness, and accessibility separately. Do not promise
 - Make decisions in this order: explicit task and constraints → DESIGN.md and the existing system →
   platform conventions → domain tasks → this skill's configurable baseline.
   Functionality and applicable accessibility requirements apply at every level.
+- **Default visual direction.** When the user names no visual style and the project has no
+  DESIGN.md, brand, code tokens, or live UI to inherit, build in the house style: premium
+  ultra-minimal in the spirit of Apple (black canvas, near-white type, two grays, one blue for
+  links and focus, real content as the only color). Rules and the ready DESIGN.md preset are
+  in [house-style.md](references/house-style.md). Any visual cue from the user (colors, mood,
+  theme, reference, brand, audience style) overrides it: follow the request, and apply only
+  the parts of the house style the request leaves open and does not contradict. Never
+  restyle an existing product into it unless asked. Games keep their own art direction.
 - Preserve the established brand, density, game-like, editorial, or expressive composition.
   Do not replace them with a generic gray CRM. For a real conflict, choose the smallest
   accessible adjustment and explain the specific deviation.
@@ -66,7 +74,10 @@ Evaluate coherence, expressiveness, and accessibility separately. Do not promise
 Negative rules only move output to the next most common template; character comes from a
 process. When creating or redesigning a surface whose identity is part of the task (brand,
 landing, portfolio, consumer app, game, editorial, launcher), follow
-[art-direction.md](references/art-direction.md) before choosing tokens:
+[art-direction.md](references/art-direction.md) before choosing tokens. When the house style
+applies (section 1), palette, type, shape, and motion tokens come from its preset; still write
+the concept, and let it choose the imagery, each section's leading element, and one signature
+detail (house-style.md section 10). Otherwise:
 
 - Derive a one-sentence concept from the product's domain, audience, and content — an object,
   place, or craft from that world — not from adjectives such as "modern, clean, minimal".
@@ -76,13 +87,15 @@ landing, portfolio, consumer app, game, editorial, launcher), follow
 - Sketch 2–3 directions that differ by their leading device (typographic, image-led,
   structural), then choose one with a reason tied to the task and audience.
 - Derive palette and type from the concept: a palette with a stated origin and tinted
-  neutrals; three type candidates and a reasoned choice. Plan one or two signature details.
+  neutrals; three type candidates and a reasoned choice. Plan one or two signature details;
+  the optional pool in [effects-library.md](references/effects-library.md) holds tested ones.
 - Derive the motion character from the same concept: how things in that world move (tempo,
   weight, physics, whether anything springs) plus one signature motion detail. Palette, type,
   and motion must read as one voice; see [motion.md](references/motion.md).
 - Within DESIGN.md, an existing brand, or a design system the direction is inherited: take it
   from DESIGN.md or state it in one sentence from the live surface, and work inside it. Dense working tools express character
-  through precision and data typography; the neutral fallback is appropriate there.
+  through precision and data typography; with no system and no user cue they take the house
+  style's app scale and palette with the neutral fallback's density.
 - Record the direction in the contract (`direction`, including `direction.motion`) and plan
   `distinctiveness` and `motion` checks. Write the chosen direction and its tokens into
   DESIGN.md so later screens and sessions build from the same values.
@@ -97,7 +110,8 @@ landing, portfolio, consumer app, game, editorial, launcher), follow
   sizes (for example button sm/md/lg). Same role, same value on every screen. A missing value
   is a system decision: add the role to DESIGN.md and the code tokens in the same change.
 - Create DESIGN.md from the [template](assets/DESIGN.template.md) when creating an interface
-  from scratch, or when a redesign or multi-component change finds none; derive it from the
+  from scratch (from the [house-style preset](assets/DESIGN.house-style.md) when the house
+  style applies), or when a redesign or multi-component change finds none; derive it from the
   live code tokens rather than inventing values, and record contradictions instead of silently
   fixing them. Do not create it for a one-element fix unless asked; offer it in one line.
   Keep DESIGN.md and code tokens in sync within every change that touches either.
@@ -106,8 +120,26 @@ landing, portfolio, consumer app, game, editorial, launcher), follow
 - Do not tune every element with its own hex, gap, shadow, and radius. Change a shared token
   or variant when the cause is shared. Layout math, a 1px border, 0, fr, %, calc,
   aspect-ratio, and allowed project values are not violations by themselves.
-- Align related elements on shared lines. Indicate internal relationships with smaller
-  spacing, and groups with larger spacing. Choose text size by role and container.
+- Choose text size by role and container.
+- Construct geometry; never place it by eye. Follow [layout-geometry.md](references/layout-geometry.md)
+  for every screen, panel, and game menu, and measure the result (section 8). Fix a
+  misalignment at its cause (pivots, anchors, a missing layout group, sprite padding, font
+  metrics), never by nudging one element:
+  - **Equal intervals.** Siblings of one kind sit in a layout container (flex/grid `gap`,
+    Unity layout groups, Godot box containers, UMG boxes) with one spacing token, so every gap
+    between them is identical. A different gap must mean a new group and a clear step up the
+    scale. Proximity ladder: inside a control < between items < between groups ≤ padding.
+  - **Shared lines.** Items in a row share their top/center/bottom (mixed heights share
+    centers); items in a column and every label in a settings list start on one vertical
+    keyline, with controls on a second keyline. Use a grid or a fixed label column, never
+    per-row offsets. Sets of buttons share one size.
+  - **Content inside small controls** is centered by its visible ink (cap height, trimmed
+    icon pixels), not by the font line box or a padded sprite rect; asymmetric icons get a
+    declared optical offset baked into the component. Icon + label pairs use one gap token.
+  - **Breathing room.** Nothing overflows or sits on its container's edge: padding is at
+    least the gaps it contains, with reserve for the longest localization, hover scale, and
+    focus rings; interactive UI stays inside the safe area at every supported aspect ratio.
+    When content does not fit, change the layout, not the margins.
 - Select typography through a process, not a blacklist: shortlist three families derived from
   the concept (era, material, voice, data density), then choose with a stated reason. The
   family must be legible at its real sizes and languages and provide the weights, styles,
@@ -160,6 +192,16 @@ change that adds, removes, or transitions elements or states, follow
 - Every interactive element answers input immediately, on pointer/touch-down, before the
   result arrives: a button compresses and springs back, a toggle travels, a tab indicator
   slides. Feedback never delays the action itself or the interface's readiness for input.
+- **Interaction baseline (required, not polish).** Models skip this unless it is built in, so
+  for any UI you create or redesign, adopt the [interaction kit](assets/motion/) before
+  building components: `interaction-kit.css` + `interaction-kit.js` (or their port into the
+  stack's Button/Link/Switch components), mapped to DESIGN.md motion tokens. It gives every
+  control the three-layer press (compress by ~4 px of perimeter in ≤ 90 ms with a fill step,
+  a bloom from the touch point, a spring release with ~1% overshoot), hover and focus
+  transitions, a 90 ms minimum press so quick taps are visible, keyboard press, switches,
+  checkboxes, sliding segmented indicators, pending/done/error button states, icon swaps,
+  menus that grow from their trigger, and height-animated disclosures. A lone 1–2 px nudge or
+  a 0.97 scale with an instant return is not press feedback; see motion.md section 5.
 - Every user-caused state change transitions instead of cutting: overlays grow from their
   trigger, inserted and removed rows push their neighbours, sections expand in height,
   skeletons crossfade into content, and changed numbers roll to the new value. A visible
@@ -177,6 +219,32 @@ change that adds, removes, or transitions elements or states, follow
 - Reduced motion replaces spatial movement with crossfades or instant changes; it never
   removes feedback or state. Respect flashing and pause/stop/hide limits, and never make an
   animation the sole carrier of important state.
+
+### Optional effects pool
+
+When an expressive surface needs a signature detail and the habitual answer (a card that
+lifts, a button that grows) would read as a template, choose from
+[effects-library.md](references/effects-library.md): live and baked ordered dither, film
+grain, a light orbiting the primary button, brushed-metal words, blueprint section rails,
+hover responses that are not lift-and-scale, a header that morphs into a capsule, a
+distance-driven coverflow, a barcode ruler scrubber, a swipe story stack, and packets on
+routing wires; a dot language (dot-grid fields with a pointer spotlight, images and text
+rebuilt from dots, a dotted globe with routes, pulsing dot bands, dot-column data, 5×5 LED
+status icons, bolted plates and corner brackets, a comet on the active card); and
+scroll-linked scenes (edge fades on overflow rows, timed dot navigation, media that settles
+into a frame, section theme flips). Tested code is in [assets/effects/](assets/effects/)
+with a bench page.
+
+- The pool is opt-in. Pick by concept and named function, never by default; a surface
+  without any pool effect is complete. In the house style, use the effects its section 9
+  marks as fitting, in monochrome variants unless the product brings a color. Dense tools take only hover responses, the header
+  morph, and a scrubber over real data.
+- Keep the page budget (one live field and one globe per page, one ring and one sheen per
+  viewport, two to four pool effects in total) and record the chosen IDs in DESIGN.md and
+  `direction.motion`. Dots are a material: one pitch on the spacing scale, faint tinted
+  dots, and something on the page actually made of dots; a bare dot wallpaper is slop.
+- Adopt the selected block with its fallback, reduced-motion, offscreen-pause, and
+  accessibility parts; map `--fx-*` tokens to DESIGN.md roles; never import the whole file.
 
 ## 6. Replace AI slop with decisions
 
@@ -274,6 +342,13 @@ well as expressive pages. Documentation may explain features when that is its ac
   across screens. Procedure is in design-md.md; record it as a `tokens` check.
 - Inspect current renders at the required states and sizes: hierarchy, legibility,
   focus, overflow, overlaps, and missing actions. Do not infer correctness from JSX.
+- Measure layout geometry instead of eyeballing it: dump the rendered layout with the
+  dumper for the stack ([web, Unity, Godot](assets/layout-dump/)) and run
+  [check_layout.py](scripts/check_layout.py) at every resolution in the matrix; fix each
+  `uneven-gap`, `misaligned-*`, `off-center`, `overflow`, `tight-edge`, and `overlap` at its
+  cause and re-run until clean. Then inspect 1:1 or zoomed crops of every button row, list
+  start edge, and small control; a full-screen thumbnail cannot show a 2px error. Record a
+  `layout` check. Procedure and annotations are in layout-geometry.md section 6.
 - Review visible copy and accessible names/descriptions across each affected task region.
   Run the catalog's information test against headings, labels, states, and neighboring text;
   include semantic paraphrases, not just exact duplicates. After removal, verify that necessary
@@ -295,6 +370,12 @@ well as expressive pages. Documentation may explain features when that is its ac
   several files at once, a drop beside the zone that neither opens the file nor clears the
   form, and the button, keyboard, and paste paths still working. On touch, the zone reads as a
   picker without "drag" wording.
+- Run the motion probe on every created or changed page:
+  `node scripts/motion_probe.mjs <url-or-file>` (headless Chrome, no dependencies). It hovers,
+  presses (releasing outside, so nothing activates), and keyboard-focuses each interactive
+  element and fails on missing press feedback, missing focus, or a stuck state; it warns on
+  weak presses, instant returns, missing hover, and `transition: all`. Fix until it reports
+  zero errors, rerun with `--reduced-motion`, and record the result in the `motion` check.
 - Check motion in motion, not in stills: record or step through key transitions at slowed
   speed; walk the primary flow for dead moments (input without visible response within about
   100 ms, state that cuts); spam-click and cancel mid-transition to catch queues and stuck
@@ -318,11 +399,17 @@ well as expressive pages. Documentation may explain features when that is its ac
   code uses a value outside DESIGN.md without adding the role, or leaves DESIGN.md and code
   tokens out of sync; the slop scan finds unjustified patterns at error severity; an
   asynchronous region has no loading state or shows a failure as empty; a splash is used
-  without a genuine bootstrap need; a file or image upload has no drop zone, its drop zone
+  without a genuine bootstrap need; any element overflows or touches its container or the
+  safe area, sibling gaps of one kind differ, a row, column, or settings keyline is off by
+  more than the tolerance, or text/icons sit off-center in their controls without a declared
+  optical offset; a file or image upload has no drop zone, its drop zone
   has no visible drag-over state, or drag is the only way to add or reorder;
   or, when identity is part of the task, the result fails
   the swap test or contradicts the recorded direction; a created or redesigned surface is
-  dead (controls without press feedback, overlays and list changes that hard-cut); motion
+  dead (controls without press feedback, overlays and list changes that hard-cut), or the
+  motion probe reports errors or was not run on a created/changed page; a pool
+  effect is adopted without its fallback, reduced-motion, or pause path, or exceeds the page
+  budget without a recorded reason; motion
   blocks input, queues on repeated input, janks, or disappears entirely under reduced motion
   together with the feedback; or anything flashes or loops without a pause path.
   Newly authored page narration, label paraphrases, or repeated helper text without new

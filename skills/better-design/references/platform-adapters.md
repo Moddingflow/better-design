@@ -65,6 +65,12 @@ state and action remain readable against the real world, at viewing distance and
 - Motion and game feel can include hit-stop, squash/stretch, camera shake, particles, and
   sound. Preserve immediate input and readable HUD; offer reduced shake/flashing.
   Use the existing animation/tween system.
+- Build menus, settings, inventories, and dialogs from layout containers (uGUI layout
+  groups, UI Toolkit flex, Godot containers, UMG boxes) with spacing tokens; free anchors
+  and hand offsets only for world-space or diegetic UI. Use TMP `Midline`/`Capline` for
+  single-line labels in controls and trim or measure icon sprite padding. Dump the running
+  UI with the Unity or Godot dumper and run `check_layout.py` at 16:9, 16:10, 21:9, and the
+  smallest supported resolution; see [layout-geometry.md](layout-geometry.md).
 - Consider remapping and hold/repeat/timing when part of the flow; do not add a new
   accessibility subsystem for an alignment fix.
 - Measure engine CPU/GPU/layout/allocations against the game budget. Core Web Vitals do

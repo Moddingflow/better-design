@@ -1,0 +1,651 @@
+{
+ "format": "better-design-core-v1",
+ "tokens": {
+  "dark": {
+   "canvas": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "alpha": 1
+    }
+   },
+   "surface": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.086275,
+      0.086275,
+      0.090196
+     ],
+     "alpha": 1
+    }
+   },
+   "surfaceRaised": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.113725,
+      0.113725,
+      0.121569
+     ],
+     "alpha": 1
+    }
+   },
+   "text": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.960784,
+      0.960784,
+      0.968627
+     ],
+     "alpha": 1
+    }
+   },
+   "textSecondary": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.631373,
+      0.631373,
+      0.65098
+     ],
+     "alpha": 1
+    }
+   },
+   "fieldBorder": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.52549,
+      0.52549,
+      0.545098
+     ],
+     "alpha": 1
+    }
+   },
+   "action": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.960784,
+      0.960784,
+      0.968627
+     ],
+     "alpha": 1
+    }
+   },
+   "onAction": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "alpha": 1
+    }
+   },
+   "link": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.160784,
+      0.592157,
+      1.0
+     ],
+     "alpha": 1
+    }
+   },
+   "focus": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.160784,
+      0.592157,
+      1.0
+     ],
+     "alpha": 1
+    }
+   },
+   "danger": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      1.0,
+      0.270588,
+      0.227451
+     ],
+     "alpha": 1
+    }
+   },
+   "success": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.188235,
+      0.819608,
+      0.345098
+     ],
+     "alpha": 1
+    }
+   }
+  },
+  "light": {
+   "canvas": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "alpha": 1
+    }
+   },
+   "surface": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.960784,
+      0.960784,
+      0.968627
+     ],
+     "alpha": 1
+    }
+   },
+   "surfaceRaised": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "alpha": 1
+    }
+   },
+   "text": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.113725,
+      0.113725,
+      0.121569
+     ],
+     "alpha": 1
+    }
+   },
+   "textSecondary": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.431373,
+      0.431373,
+      0.45098
+     ],
+     "alpha": 1
+    }
+   },
+   "fieldBorder": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.52549,
+      0.52549,
+      0.545098
+     ],
+     "alpha": 1
+    }
+   },
+   "action": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.113725,
+      0.113725,
+      0.121569
+     ],
+     "alpha": 1
+    }
+   },
+   "onAction": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "alpha": 1
+    }
+   },
+   "link": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.0,
+      0.4,
+      0.8
+     ],
+     "alpha": 1
+    }
+   },
+   "focus": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.0,
+      0.443137,
+      0.890196
+     ],
+     "alpha": 1
+    }
+   },
+   "danger": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.843137,
+      0.0,
+      0.082353
+     ],
+     "alpha": 1
+    }
+   },
+   "success": {
+    "$type": "color",
+    "$value": {
+     "colorSpace": "srgb",
+     "components": [
+      0.101961,
+      0.498039,
+      0.215686
+     ],
+     "alpha": 1
+    }
+   }
+  }
+ },
+ "contrastPairs": [
+  {
+   "id": "dark-text-on-canvas",
+   "foreground": "dark.text",
+   "background": "dark.canvas",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-text-on-surface",
+   "foreground": "dark.text",
+   "background": "dark.surface",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-text-on-surfaceRaised",
+   "foreground": "dark.text",
+   "background": "dark.surfaceRaised",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-textSecondary-on-canvas",
+   "foreground": "dark.textSecondary",
+   "background": "dark.canvas",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-textSecondary-on-surface",
+   "foreground": "dark.textSecondary",
+   "background": "dark.surface",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-textSecondary-on-surfaceRaised",
+   "foreground": "dark.textSecondary",
+   "background": "dark.surfaceRaised",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-link-on-canvas",
+   "foreground": "dark.link",
+   "background": "dark.canvas",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-link-on-surface",
+   "foreground": "dark.link",
+   "background": "dark.surface",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-link-on-surfaceRaised",
+   "foreground": "dark.link",
+   "background": "dark.surfaceRaised",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-danger-on-canvas",
+   "foreground": "dark.danger",
+   "background": "dark.canvas",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-danger-on-surface",
+   "foreground": "dark.danger",
+   "background": "dark.surface",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-danger-on-surfaceRaised",
+   "foreground": "dark.danger",
+   "background": "dark.surfaceRaised",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-success-on-canvas",
+   "foreground": "dark.success",
+   "background": "dark.canvas",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-success-on-surface",
+   "foreground": "dark.success",
+   "background": "dark.surface",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-success-on-surfaceRaised",
+   "foreground": "dark.success",
+   "background": "dark.surfaceRaised",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-onAction-on-action",
+   "foreground": "dark.onAction",
+   "background": "dark.action",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "dark-focus-on-canvas",
+   "foreground": "dark.focus",
+   "background": "dark.canvas",
+   "purpose": "non-text",
+   "state": "focus-visible",
+   "minimum": 3
+  },
+  {
+   "id": "dark-focus-on-surface",
+   "foreground": "dark.focus",
+   "background": "dark.surface",
+   "purpose": "non-text",
+   "state": "focus-visible",
+   "minimum": 3
+  },
+  {
+   "id": "dark-focus-on-surfaceRaised",
+   "foreground": "dark.focus",
+   "background": "dark.surfaceRaised",
+   "purpose": "non-text",
+   "state": "focus-visible",
+   "minimum": 3
+  },
+  {
+   "id": "dark-fieldBorder-on-canvas",
+   "foreground": "dark.fieldBorder",
+   "background": "dark.canvas",
+   "purpose": "non-text",
+   "state": "default",
+   "minimum": 3
+  },
+  {
+   "id": "dark-fieldBorder-on-surface",
+   "foreground": "dark.fieldBorder",
+   "background": "dark.surface",
+   "purpose": "non-text",
+   "state": "default",
+   "minimum": 3
+  },
+  {
+   "id": "dark-fieldBorder-on-surfaceRaised",
+   "foreground": "dark.fieldBorder",
+   "background": "dark.surfaceRaised",
+   "purpose": "non-text",
+   "state": "default",
+   "minimum": 3
+  },
+  {
+   "id": "light-text-on-canvas",
+   "foreground": "light.text",
+   "background": "light.canvas",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-text-on-surface",
+   "foreground": "light.text",
+   "background": "light.surface",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-text-on-surfaceRaised",
+   "foreground": "light.text",
+   "background": "light.surfaceRaised",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-textSecondary-on-canvas",
+   "foreground": "light.textSecondary",
+   "background": "light.canvas",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-textSecondary-on-surface",
+   "foreground": "light.textSecondary",
+   "background": "light.surface",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-textSecondary-on-surfaceRaised",
+   "foreground": "light.textSecondary",
+   "background": "light.surfaceRaised",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-link-on-canvas",
+   "foreground": "light.link",
+   "background": "light.canvas",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-link-on-surface",
+   "foreground": "light.link",
+   "background": "light.surface",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-link-on-surfaceRaised",
+   "foreground": "light.link",
+   "background": "light.surfaceRaised",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-danger-on-canvas",
+   "foreground": "light.danger",
+   "background": "light.canvas",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-danger-on-surface",
+   "foreground": "light.danger",
+   "background": "light.surface",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-danger-on-surfaceRaised",
+   "foreground": "light.danger",
+   "background": "light.surfaceRaised",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-success-on-canvas",
+   "foreground": "light.success",
+   "background": "light.canvas",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-success-on-surface",
+   "foreground": "light.success",
+   "background": "light.surface",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-success-on-surfaceRaised",
+   "foreground": "light.success",
+   "background": "light.surfaceRaised",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-onAction-on-action",
+   "foreground": "light.onAction",
+   "background": "light.action",
+   "purpose": "text",
+   "state": "default",
+   "minimum": 4.5
+  },
+  {
+   "id": "light-focus-on-canvas",
+   "foreground": "light.focus",
+   "background": "light.canvas",
+   "purpose": "non-text",
+   "state": "focus-visible",
+   "minimum": 3
+  },
+  {
+   "id": "light-focus-on-surface",
+   "foreground": "light.focus",
+   "background": "light.surface",
+   "purpose": "non-text",
+   "state": "focus-visible",
+   "minimum": 3
+  },
+  {
+   "id": "light-focus-on-surfaceRaised",
+   "foreground": "light.focus",
+   "background": "light.surfaceRaised",
+   "purpose": "non-text",
+   "state": "focus-visible",
+   "minimum": 3
+  },
+  {
+   "id": "light-fieldBorder-on-canvas",
+   "foreground": "light.fieldBorder",
+   "background": "light.canvas",
+   "purpose": "non-text",
+   "state": "default",
+   "minimum": 3
+  },
+  {
+   "id": "light-fieldBorder-on-surface",
+   "foreground": "light.fieldBorder",
+   "background": "light.surface",
+   "purpose": "non-text",
+   "state": "default",
+   "minimum": 3
+  },
+  {
+   "id": "light-fieldBorder-on-surfaceRaised",
+   "foreground": "light.fieldBorder",
+   "background": "light.surfaceRaised",
+   "purpose": "non-text",
+   "state": "default",
+   "minimum": 3
+  }
+ ]
+}
