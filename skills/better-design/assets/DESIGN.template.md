@@ -14,7 +14,7 @@ Updated: <YYYY-MM-DD>
 - **Qualities:** <three>
 - **Avoid:** <three concrete qualities>
 - **Motion:** <character, tempo, physics, signature motion detail>
-- **Signature details:** <one or two>
+- **Signature details:** <one or two>; optional pool effects: <fx:… IDs from references/effects-library.md, or none>
 
 ## Code tokens
 
@@ -77,7 +77,18 @@ Scale: <0, 4, 8, 12, 16, 24, 32, 48, 64>. Tokens: space-1 = 4 … space-16 = 64.
 - Within a group (label/field, icon/text): <4–8>
 - Between group items: <12–16>
 - Between groups/sections: <24–48>
-- Container padding: <16 phone / 24 desktop>
+- Container padding: <16 phone / 24 desktop>; never smaller than the gaps it contains.
+- Screen edge margin: <safe area + 16 / 32 at the smallest supported resolution>.
+- Siblings of one kind use one gap token, laid out by a container, never by hand offsets.
+
+## Alignment and keylines
+
+- Rows share top/center/bottom; mixed heights share centers. Sets of buttons share one size.
+- Lists and settings: labels start on keyline <A: content edge + 16>, controls end on
+  keyline <B: content edge − 16>, values align end with tabular numerals.
+- Text in controls is centered by cap height (<text-box trim / TMP Capline / font fix>);
+  icons are trimmed to a shared canvas with <2px> internal margin.
+- Declared optical offsets: <play icon +2px x in icon-button>.
 
 ## Radii
 

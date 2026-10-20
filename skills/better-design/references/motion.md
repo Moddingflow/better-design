@@ -77,8 +77,10 @@ Scaling rules:
 - **Greater distance/area means longer duration.** A full-screen movement can use large;
   an 8px shift can use micro. Do not assign one duration to everything.
 - **Exits are roughly one-third shorter than entrances.** Do not hold users after their decision.
-- **Overshoot/bounce** needs a physical/playful concept and an object with implied mass, such
-  as a pressed button, held card, or reward. Do not bounce text and modals.
+- **Overshoot/bounce** needs an object with implied mass, such as a pressed button, a held
+  card, a switch thumb, or a reward. Controls released after a press get a small spring
+  (≈1% scale overshoot, settled in ~450 ms) in every direction, even calm ones; text,
+  modals, sheets, and page surfaces never bounce.
 - Untuned `ease` and `transition: all 300ms` avoid a real decision. List properties and use tokens.
 
 ## 4. Choreography: one leading movement
@@ -104,8 +106,8 @@ Scaling rules:
 
 | Event | Motion | Mistake |
 | --- | --- | --- |
-| Button touch/click | Immediate pointerdown scale 0.96–0.98 or 1–2px travel and darkening; release returns with press timing using standard or a non-overshooting spring. Activation follows its own semantics without waiting | Feedback only on release; action waits for the animation |
-| Hover, only with `hover: hover` | Micro background/underline/icon change on interactive targets | Every card lifts and casts a shadow; noninteractive content implies an action |
+| Button touch/click | Three layers together: (1) on pointer-down, compress by a constant ~4 px of perimeter (scale = 1 − 8 / (w + h), clamped 0.90–0.985) within 60–90 ms, with a fill step (darker on light fills, brighter on dark); (2) a soft bloom from the touch point; (3) on release, a spring back with ~16% overshoot of the travel (`--ui-spring-pop`, ~450 ms). Hold the pressed state at least 90 ms so fast taps are seen; mirror it for Space/Enter. Activation follows its own semantics without waiting. Recipe: [interaction kit](../assets/motion/) | Feedback only on release; action waits for the animation; a lone 1–2 px nudge or a 0.97 scale that snaps back instantly (reads as dead); a second `transition` declaration that silently overrides the press |
+| Hover, only with `hover: hover` | Micro background/underline/icon change on interactive targets; for expressive surfaces see `fx:hover-set` in [effects-library.md](effects-library.md) (edge brightens, arrow nudges, underline draws, halo ring) | Every card lifts and casts a shadow; noninteractive content implies an action |
 | Focus-visible | Ring appears instant–micro without expanding from zero | Focus becomes temporarily invisible |
 | Toggle/checkbox/radio | Thumb travels or checkmark draws at micro timing; value updates immediately | State is available only after animation |
 | Tabs/segmented control | Selection indicator moves; content crossfades or shifts briefly in a meaningful direction | Indicator disappears and respawns |
@@ -138,6 +140,9 @@ An interface feels alive through **responses**, not constant movement.
   reduced motion. Infinite CTA pulses, orbs, and shifting gradients are noise.
 - An empty/waiting state may use one slow concept-derived motif, but still needs truthful
   status and a path to act.
+- A tested concept-derived ambient detail can come from the optional pool in
+  [effects-library.md](effects-library.md) (`fx:dither-field`, `fx:metal-sheen`,
+  `fx:signal-route`); its budget and pause rules apply on top of this section.
 - Sound/haptics can support mobile/game feedback through platform APIs and system settings.
   Use brief meaningful responses; do not vibrate on every scroll or hover.
 
@@ -225,6 +230,11 @@ Part of [ai-slop.md](ai-slop.md); use its IDs in findings.
 ## 12. Verify motion
 
 Code and still screenshots do not prove motion quality.
+
+0. **Probe first:** `node scripts/motion_probe.mjs <url-or-file>` (and again with
+   `--reduced-motion`) presses, hovers, and focuses every interactive element in headless
+   Chrome and reports what does not answer. Zero errors is the entry ticket; then review the
+   warnings (weak press, instant return, no hover, `transition: all`).
 
 1. Record video or frames of key transitions. Review slowly: DevTools at 10–25%, Android
    animator duration scale 5×, or Simulator Slow Animations.

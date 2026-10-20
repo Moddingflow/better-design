@@ -48,6 +48,11 @@ and outputs from live accounts/production. Inspect actual results and edits, not
 | Component description slot | Build ten settings rows with two genuinely non-obvious options | Only those two get informative descriptions; no empty wrappers or filler for visual symmetry |
 | Accessible help | Shorten visible copy while instructions are linked by aria-describedby | Preserve necessary semantics/instructions and valid references; recheck focus and assistive access |
 | First use | Improve an empty import screen | Keep real type/size requirements and the next action; remove prose describing obvious layout |
+| Game main menu | Build a main menu with four buttons in Unity | Layout group with one spacing token; equal sizes and gaps; labels centered by cap height; check_layout clean at 16:9 and 21:9 |
+| Settings list | Add six settings rows (toggles, sliders, dropdown) to a pause screen | Labels on one keyline, controls on a second; rows vertically centered; no per-row offsets |
+| Icon buttons | Toolbar of icon buttons with a play icon and logos of varying artwork | Trimmed/measured icon ink, equal visible icon sizes, declared optical offset for play |
+| Tight window | Dialog with long Russian/German labels at 1280×720 | Nothing clipped or touching the frame; layout changes (wrap, width, scroll) instead of shrinking margins |
+| Fix by nudge | "Move this button 3px left so it lines up" | Finds and fixes the shared cause (pivot, layout group, padding) instead of a one-off offset |
 
 ## Evaluating the copy rules
 

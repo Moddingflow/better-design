@@ -1,0 +1,30 @@
+{
+  "format": "better-design-layout-v1",
+  "note": "A settings window at 1920x1080 that passes every check. Coordinates are screen px, y down.",
+  "viewport": {"width": 1920, "height": 1080},
+  "tolerance": 1,
+  "minEdgeMargin": 16,
+  "spacing": [0, 4, 8, 12, 16, 24, 32, 48, 64],
+  "nodes": [
+    {"id": "settings", "parent": null, "role": "window", "rect": [560, 240, 800, 600], "padding": 32},
+    {"id": "settings-bg", "parent": "settings", "role": "decor", "rect": [552, 232, 816, 616]},
+    {"id": "title", "parent": "settings", "role": "text", "rect": [592, 272, 736, 40], "ink": [592, 282, 180, 22]},
+
+    {"id": "list", "parent": "settings", "role": "container", "rect": [592, 336, 736, 184]},
+    {"id": "row-vsync", "parent": "list", "role": "container", "rect": [592, 336, 736, 56], "padding": [0, 16, 0, 16]},
+    {"id": "label-vsync", "parent": "row-vsync", "role": "text", "rect": [608, 354, 200, 20], "ink": [608, 357, 120, 14]},
+    {"id": "toggle-vsync", "parent": "row-vsync", "role": "control", "rect": [1248, 348, 64, 32]},
+    {"id": "row-volume", "parent": "list", "role": "container", "rect": [592, 400, 736, 56], "padding": [0, 16, 0, 16]},
+    {"id": "label-volume", "parent": "row-volume", "role": "text", "rect": [608, 418, 200, 20], "ink": [608, 421, 132, 14]},
+    {"id": "slider-volume", "parent": "row-volume", "role": "control", "rect": [1072, 412, 240, 32]},
+    {"id": "row-subtitles", "parent": "list", "role": "container", "rect": [592, 464, 736, 56], "padding": [0, 16, 0, 16]},
+    {"id": "label-subtitles", "parent": "row-subtitles", "role": "text", "rect": [608, 482, 200, 20], "ink": [608, 485, 96, 14]},
+    {"id": "toggle-subtitles", "parent": "row-subtitles", "role": "control", "rect": [1248, 476, 64, 32]},
+
+    {"id": "actions", "parent": "settings", "role": "container", "rect": [592, 760, 736, 48]},
+    {"id": "btn-cancel", "parent": "actions", "role": "control", "rect": [912, 760, 200, 48]},
+    {"id": "btn-cancel-label", "parent": "btn-cancel", "role": "text", "rect": [912, 760, 200, 48], "ink": [980, 777, 64, 14]},
+    {"id": "btn-apply", "parent": "actions", "role": "control", "rect": [1128, 760, 200, 48]},
+    {"id": "btn-apply-label", "parent": "btn-apply", "role": "text", "rect": [1128, 760, 200, 48], "ink": [1200, 777, 56, 14]}
+  ]
+}

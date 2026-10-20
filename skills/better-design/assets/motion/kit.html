@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interaction kit</title>
+<!-- Bench for interaction-kit.css/js. Run the probe against it:
+     node scripts/motion_probe.mjs assets/motion/kit.html -->
+<link rel="stylesheet" href="interaction-kit.css">
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #000; color: #f5f5f7; font: 400 17px/1.5 system-ui, sans-serif; }
+  main { max-width: 760px; margin-inline: auto; padding: 48px 24px 96px; display: grid; gap: 40px; }
+  h2 { font: 500 12px/1 ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; color: #86868b; margin: 0 0 14px; }
+  .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+  .btn { height: 44px; padding-inline: 22px; border-radius: 99px; border: 0; font: inherit; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-primary { background: #f5f5f7; color: #000; }
+  .btn-secondary { background: #1d1d1f; color: #f5f5f7; }
+  .btn-ghost { background: transparent; color: #f5f5f7; box-shadow: inset 0 0 0 1px #86868b; }
+  .icon-btn { width: 44px; height: 44px; border-radius: 50%; border: 0; background: #1d1d1f; color: #f5f5f7; display: grid; place-items: center; cursor: pointer; }
+  .tile { display: block; padding: 28px; border-radius: 22px; background: #161617; color: inherit; text-decoration: none; }
+  .tile b { display: block; font-weight: 500; font-size: 21px; margin-bottom: 4px; }
+  .tile span { color: #a1a1a6; }
+  .list { background: #1d1d1f; border-radius: 14px; overflow: hidden; }
+  .list > * { min-height: 48px; display: flex; align-items: center; gap: 12px; padding-inline: 16px; border: 0; width: 100%; background: transparent; color: inherit; font: inherit; text-align: left; }
+  .list > * + * { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1); }
+  .list .push { margin-left: auto; }
+  label.inline { display: inline-flex; gap: 10px; align-items: center; cursor: pointer; }
+  .field-wrap { display: grid; gap: 6px; max-width: 360px; }
+  .field-wrap label { font-size: 14px; color: #a1a1a6; }
+  input.ui-field { height: 44px; padding-inline: 14px; border-radius: 12px; border: 1px solid #86868b; background: #1d1d1f; color: inherit; font: inherit; }
+  .err { color: #ff453a; font-size: 14px; min-height: 21px; }
+  details { background: #1d1d1f; border-radius: 14px; padding: 0 16px; }
+  summary { min-height: 48px; display: flex; align-items: center; gap: 10px; cursor: pointer; list-style: none; border-radius: 14px; }
+  summary::-webkit-details-marker { display: none; }
+  details p { margin: 0 0 16px; color: #a1a1a6; }
+  [popover] { margin: 0; border: 0; padding: 6px; border-radius: 14px; background: #2c2c2e; color: inherit; min-width: 180px; box-shadow: 0 12px 40px rgb(0 0 0 / 0.5); }
+  [popover] button { display: block; width: 100%; text-align: left; border: 0; background: none; color: inherit; font: inherit; padding: 10px 12px; border-radius: 10px; cursor: pointer; }
+  .p { color: #a1a1a6; margin: 0; }
+</style>
+</head>
+<body>
+<main>
+  <section>
+    <h2>Buttons · press, bloom, spring release, hover, focus</h2>
+    <div class="row">
+      <button class="btn btn-primary ui-press ui-focus" type="button">Buy</button>
+      <button class="btn btn-secondary ui-press ui-press--on-dark ui-focus" type="button">Add to bag</button>
+      <button class="btn btn-ghost ui-press ui-press--on-dark ui-focus" type="button">Learn more <span class="ui-icon-nudge" aria-hidden="true">›</span></button>
+      <button class="icon-btn ui-press ui-press--on-dark ui-focus" type="button" aria-label="Share"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 14v5h14v-5"/></svg></button>
+      <button class="btn btn-primary ui-press ui-focus" type="button" disabled>Disabled</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>States · pending keeps width, done confirms once, error shakes</h2>
+    <div class="row">
+      <button class="btn btn-primary ui-press ui-focus" type="button" id="saveBtn"><span class="ui-btn-state"><span class="ui-state-label">Save changes</span><span class="ui-state-pending"><span class="ui-spinner" aria-hidden="true"></span></span><span class="ui-state-done">Saved ✓</span></span></button>
+      <button class="icon-btn ui-press ui-press--on-dark ui-focus" type="button" id="copyBtn" aria-label="Copy link"><span class="ui-swap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.2" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span></button>
+      <button class="icon-btn ui-press ui-press--on-dark ui-focus" type="button" id="likeBtn" aria-pressed="false" aria-label="Like"><svg class="ui-pop-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Selection · switch, checkbox, segmented control</h2>
+    <div class="row">
+      <label class="inline"><button class="ui-switch ui-focus" type="button" role="switch" aria-checked="true" aria-label="Auto brightness"></button> Auto brightness</label>
+      <label class="inline"><button class="ui-check ui-focus" type="button" role="checkbox" aria-checked="false" aria-label="Remember me"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7.5l3 3 6-7"/></svg></button> Remember me</label>
+      <div id="seg" role="tablist" aria-label="Size"><button type="button" role="tab" aria-selected="true" class="ui-focus">14″</button><button type="button" role="tab" aria-selected="false" class="ui-focus">16″</button><button type="button" role="tab" aria-selected="false" class="ui-focus">Compare</button></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Surfaces · tile, list rows, link</h2>
+    <a class="tile ui-press ui-press--surface ui-press--on-dark ui-focus" href="#battery"><b>Battery</b><span>Up to 40 hours at reading brightness.</span></a>
+    <div class="list" style="margin-top:16px">
+      <button class="ui-press ui-press--surface ui-press--on-dark ui-focus" type="button">Schedule <span class="push" style="color:#a1a1a6">22:00–07:00 ›</span></button>
+      <button class="ui-press ui-press--surface ui-press--on-dark ui-focus" type="button">Colour temperature <span class="push" style="color:#a1a1a6">Warm ›</span></button>
+    </div>
+    <p class="p" style="margin-top:16px">Inline link: read the <a class="ui-link ui-focus" href="#guide" style="color:#2997ff">setup guide</a>.</p>
+  </section>
+
+  <section>
+    <h2>Fields, menus, disclosure</h2>
+    <div class="field-wrap"><label for="nm">Lamp name</label><input id="nm" class="ui-field" value="Desk"><div class="err" id="nmErr" aria-live="polite"></div></div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn btn-secondary ui-press ui-press--on-dark ui-focus" type="button" id="validate">Rename</button>
+      <button class="btn btn-secondary ui-press ui-press--on-dark ui-focus" type="button" popovertarget="menu" id="menuBtn">Options</button>
+    </div>
+    <div popover id="menu" class="ui-pop-in"><button class="ui-press ui-press--surface ui-press--on-dark" type="button">Duplicate</button><button class="ui-press ui-press--surface ui-press--on-dark" type="button">Rename</button></div>
+    <details class="ui-disclosure" style="margin-top:16px"><summary class="ui-focus"><span class="ui-chevron" aria-hidden="true">›</span> What is reading brightness?</summary><p>The level where text on white paper reads without glare, about 500 lux at the desk surface.</p></details>
+  </section>
+</main>
+<script src="interaction-kit.js"></script>
+<script>
+  BetterUI.init(document);
+  BetterUI.segmented(document.getElementById('seg'));
+  document.querySelectorAll('.ui-switch, .ui-check').forEach(function (s) {
+    s.addEventListener('click', function () { s.setAttribute('aria-checked', String(s.getAttribute('aria-checked') !== 'true')); });
+  });
+  document.getElementById('saveBtn').addEventListener('click', function (e) {
+    BetterUI.runWithState(e.currentTarget, function () { return new Promise(function (r) { setTimeout(r, 1200); }); });
+  });
+  document.getElementById('copyBtn').addEventListener('click', function (e) { BetterUI.swap(e.currentTarget.querySelector('.ui-swap'), 1500); });
+  document.getElementById('likeBtn').addEventListener('click', function (e) { var b = e.currentTarget; b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')); });
+  document.getElementById('validate').addEventListener('click', function () {
+    var f = document.getElementById('nm'), err = document.getElementById('nmErr');
+    if (f.value.trim().toLowerCase() === 'desk') { err.textContent = 'Name is already used by another lamp.'; BetterUI.shake(f); f.setAttribute('aria-invalid', 'true'); }
+    else { err.textContent = ''; f.removeAttribute('aria-invalid'); }
+  });
+  document.getElementById('menu').addEventListener('toggle', function (e) { if (e.newState === 'open') BetterUI.originFrom(e.target, document.getElementById('menuBtn')); });
+</script>
+</body>
+</html>

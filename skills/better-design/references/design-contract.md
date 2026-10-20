@@ -23,7 +23,9 @@ assets or fabricating metrics. Preserve existing identity, including appropriate
 serif type, a 12px radius, 2px spacing, or a platform's material language.
 
 For a brand, landing page, portfolio, consumer app, game, editorial product, or launcher with
-no system, use [art-direction.md](art-direction.md): concept, references, 2–3 directions, choice.
+no system and a visual cue from the user, use [art-direction.md](art-direction.md): concept,
+references, 2–3 directions, choice. With no cue, the [house style](house-style.md) supplies
+the direction and its preset supplies the tokens (games excepted).
 Derive tokens from that choice, not the fallback table, and record them in DESIGN.md
 using the [template](../assets/DESIGN.template.md).
 
@@ -31,7 +33,8 @@ using the [template](../assets/DESIGN.template.md).
 
 Use only when no system exists (neither DESIGN.md nor code tokens) and the task is a working
 tool such as CRM, admin, internal forms, or an IDE-like surface, or when the user explicitly
-wants a standard appearance. Expressive surfaces need their own direction.
+wants a standard appearance. Expressive surfaces need their own direction. Without a user cue,
+take colors, type family, and radii from the house style and density from this table.
 These are internal starting values, not standards.
 
 | Area | Starting point | Reconsider for |
@@ -43,7 +46,7 @@ These are internal starting values, not standards.
 | Radius | 0/4/8; capsules for appropriate chips/avatars/controls | Platform, brand, component |
 | Elevation | Flat by default; up to three meaningful levels | Real layering/overlays |
 | Measure | Roughly 60–80 characters for reading text | Do not impose this on tables, code, or tools |
-| Motion | Press 60–100 ms down / 150–250 return; micro 100–150; small 150–220; medium 220–320; large 300–450. Standard cubic-bezier(0.2,0,0,1), enter (0,0,0,1), exit (0.3,0,1,1); springs without overshoot | Named function, frequency, distance, reduced-motion variant; see [motion.md](motion.md) |
+| Motion | Press 60–100 ms down / 150–250 return; micro 100–150; small 150–220; medium 220–320; large 300–450. Standard cubic-bezier(0.2,0,0,1), enter (0,0,0,1), exit (0.3,0,1,1); springs without overshoot for surfaces; control release uses the interaction kit's spring (≈1% overshoot) | Named function, frequency, distance, reduced-motion variant; see [motion.md](motion.md) |
 | Layout | Content-driven wrap/stack/scroll/collapse | Preserve essential content and data comparison |
 
 Assign colors semantic roles first: canvas, surface, text, muted text, action/on-action,
@@ -90,7 +93,7 @@ rules below. Evidence is always an array.
 | Risk and protection | risk normal/high; protection none/reversible/check/review. High cannot use none |
 | `verification.viewports[]` | Positive finite width/height and platform unit. At least one for web; native may use [] |
 | `verification.checks[]` | id, taskIds, componentIds, kind, scenario, status, evidence, optional note |
-| Check kinds | structure/tokens/contrast/render/interaction/keyboard/a11y/assistive/performance/localization/distinctiveness/motion |
+| Check kinds | structure/tokens/contrast/render/layout/interaction/keyboard/a11y/assistive/performance/localization/distinctiveness/motion |
 | Check status | planned/pass/fail/unverified. Pass/fail need evidence; unverified needs note; planned has no evidence |
 | `exceptions[]` | rule, scope, reason, source, impact; may be empty |
 

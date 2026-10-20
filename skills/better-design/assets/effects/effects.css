@@ -1,0 +1,463 @@
+/*
+ * better-design · optional effects pool (CSS part)
+ * Opt-in recipes. Copy only the blocks an effect card in references/effects-library.md
+ * selected, rename the --fx-* tokens to DESIGN.md roles, and keep the reduced-motion block.
+ * Nothing here should be imported wholesale "just in case".
+ */
+
+:root {
+  /* Map these to DESIGN.md roles when adopting. */
+  --fx-ink: #f5f6f8;
+  --fx-hairline: rgb(255 255 255 / 0.08);
+  --fx-hairline-hi: rgb(255 255 255 / 0.2);
+  --fx-silver-hi: #f7f8fa;
+  --fx-silver-mid: #c7ccd6;
+  --fx-silver-low: #8f96a3;
+  --fx-accent: #5ea2ff;
+  --fx-accent-2: #e8915a;
+  --fx-ease-out: cubic-bezier(0.16, 1, 0.3, 1);      /* expo-out: settle, no overshoot */
+  --fx-ease-out-long: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* ── fx:dither-field host ─────────────────────────────────────────────────────
+   <div class="fx-field" style="--fx-field-opacity:.5">
+     <div class="fx-field__fallback"></div>   CSS stand-in, visible until WebGL draws
+   </div>
+   <div class="fx-field-scrim"></div>         keeps text above the field readable   */
+.fx-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: var(--fx-field-opacity, 0.5);
+  mix-blend-mode: screen;               /* light theme: multiply with a dark ink */
+}
+.fx-field__fallback {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(52% 36% at 24% 80%, rgb(255 255 255 / 0.35), transparent 62%),
+    radial-gradient(90% 54% at 44% 64%, rgb(160 175 200 / 0.3), transparent 72%);
+  transition: opacity 500ms var(--fx-ease-out);
+}
+.fx-field .fx-dither-canvas { opacity: 0; transition: opacity 500ms var(--fx-ease-out); }
+.fx-field[data-fx-live] .fx-dither-canvas { opacity: 1; }
+.fx-field[data-fx-live] .fx-field__fallback { opacity: 0; }
+.fx-field-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(70% 64% at 50% 50%, rgb(0 0 0 / 0.89) 0%, rgb(0 0 0 / 0.62) 40%, rgb(0 0 0 / 0.3) 70%, rgb(0 0 0 / 0.1) 100%);
+}
+
+/* ── fx:dither-bake placement ─────────────────────────────────────────────── */
+.fx-dither-bake {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  width: 100%;
+  height: 68%;
+  pointer-events: none;
+}
+
+/* ── fx:grain — film grain over flat dark surfaces ─────────────────────────── */
+.fx-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.45;
+  mix-blend-mode: overlay;
+  background-size: 180px 180px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── fx:ring-orbit — a light that travels around a hairline border ──────────
+   One element per viewport at most: the primary action.                      */
+@property --fx-ring-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes fx-ring-spin { to { --fx-ring-angle: 360deg; } }
+@keyframes fx-sheen { to { background-position: 200% 0; } }
+
+.fx-ring { position: relative; isolation: isolate; }
+.fx-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1.25px;                      /* ring thickness */
+  background: conic-gradient(from var(--fx-ring-angle), var(--fx-accent), var(--fx-accent-2), var(--fx-accent), var(--fx-silver-low), var(--fx-accent));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  animation: fx-ring-spin 6s linear infinite;
+  pointer-events: none;
+}
+/* Sweep variant: the gradient slides along the ring instead of orbiting. */
+.fx-ring--sweep::before {
+  background: linear-gradient(90deg, var(--fx-accent), var(--fx-accent-2) 35%, var(--fx-silver-mid) 70%, var(--fx-accent)) 0 0 / 200% 100%;
+  animation: fx-sheen 5s linear infinite;
+}
+.fx-ring:hover { box-shadow: 0 0 0 4px color-mix(in srgb, var(--fx-accent) 16%, transparent); }
+.fx-ring:active { transform: translateY(0.5px); }
+
+/* ── fx:metal-sheen — brushed-metal text on 1–3 words + a sheen hairline ──── */
+.fx-metal {
+  background-image: linear-gradient(100deg, var(--fx-silver-mid), var(--fx-silver-hi) 28%, var(--fx-silver-low) 52%, var(--fx-silver-hi) 76%, var(--fx-silver-mid));
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  animation: fx-sheen 7s linear infinite;
+}
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .fx-metal { color: var(--fx-silver-mid); background: none; }
+}
+@media (forced-colors: active) { .fx-metal { color: CanvasText; background: none; } }
+.fx-hairline-sheen {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent, rgb(199 204 214 / 0.55), rgb(247 248 250 / 0.75), rgb(143 150 163 / 0.5), transparent) 0 0 / 200% 100%;
+  animation: fx-sheen 8s linear infinite;
+}
+
+/* ── fx:blueprint-rails — section seams with rivets on the content edges ─────
+   Set --fx-rail-x to half the content width (e.g. 680px for a 1360px rail).   */
+.fx-rails { position: relative; --fx-rail-x: 680px; }
+.fx-rails::before,
+.fx-rails::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  height: 11px;
+  z-index: 1;
+  pointer-events: none;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11'%3E%3Crect x='2' y='2' width='7' height='7' fill='%230a0a0a'/%3E%3Crect x='4' y='4' width='3' height='3' fill='%23ffffff' fill-opacity='0.16'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11'%3E%3Crect x='2' y='2' width='7' height='7' fill='%230a0a0a'/%3E%3Crect x='4' y='4' width='3' height='3' fill='%23ffffff' fill-opacity='0.16'/%3E%3C/svg%3E"),
+    linear-gradient(var(--fx-hairline), var(--fx-hairline));
+  background-repeat: no-repeat;
+  background-size: 11px 11px, 11px 11px, 100% 1px;
+  background-position: calc(50% - var(--fx-rail-x)) 0, calc(50% + var(--fx-rail-x)) 0, 0 5px;
+}
+.fx-rails::before { top: -5.5px; }
+.fx-rails::after { bottom: -5.5px; }
+.fx-rails--open-end::after { content: none; }
+
+/* ── fx:hover-set — responses that are not "lift + shadow" ──────────────────── */
+/* Edge: the hairline brightens slowly, as if light found the edge. */
+.fx-edge { position: relative; }
+.fx-edge::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  border: 1px solid var(--fx-hairline);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05), inset 0 -1px 0 rgb(0 0 0 / 0.22);
+  transition: border-color 700ms var(--fx-ease-out);
+}
+/* Nudge: only the arrow travels toward where the link leads. */
+.fx-nudge .fx-nudge__icon { transition: transform 300ms var(--fx-ease-out); }
+/* Draw: an underline grows from the reading start. */
+.fx-draw {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 320ms var(--fx-ease-out);
+  text-decoration: none;
+}
+/* Intensify: baked art on a card brightens with the edge. */
+.fx-intensify .fx-dither-bake { opacity: 0.85; transition: opacity 700ms var(--fx-ease-out); }
+/* Dim siblings: in a list or nav, the others step back while one is hovered. */
+.fx-dim-siblings > * { transition: opacity 150ms var(--fx-ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  .fx-intensify:hover .fx-dither-bake { opacity: 1; }
+  .fx-dim-siblings:has(> :hover) > :not(:hover) { opacity: 0.6; }
+  .fx-edge:hover::after { border-color: var(--fx-hairline-hi); }
+  .fx-nudge:hover .fx-nudge__icon { transform: translateX(4px); }
+  .fx-draw:hover { background-size: 100% 1px; }
+}
+.fx-edge:focus-visible::after { border-color: var(--fx-hairline-hi); }
+.fx-nudge:focus-visible .fx-nudge__icon { transform: translateX(4px); }
+.fx-draw:focus-visible { background-size: 100% 1px; }
+
+/* ── fx:header-morph — full-bleed bar becomes a floating capsule on scroll ──── */
+.fx-header { position: sticky; top: 0; z-index: 50; pointer-events: none; padding-inline: 16px; transition: padding 500ms var(--fx-ease-out); }
+.fx-header__bar {
+  pointer-events: auto;
+  margin-inline: auto;
+  max-width: 1200px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-inline: 24px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  transition:
+    max-width 500ms var(--fx-ease-out), height 500ms var(--fx-ease-out),
+    padding 500ms var(--fx-ease-out), border-radius 500ms var(--fx-ease-out),
+    background-color 500ms var(--fx-ease-out), border-color 500ms var(--fx-ease-out),
+    box-shadow 500ms var(--fx-ease-out);
+}
+.fx-header[data-compact] { padding-top: 10px; }
+.fx-header[data-compact] .fx-header__bar {
+  max-width: 896px;
+  height: 58px;
+  padding-inline: 14px;
+  border-radius: 12px;
+  border-color: var(--fx-hairline);
+  background-color: rgb(16 16 19 / 0.72);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 18px 44px -18px rgb(0 0 0 / 0.65);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+          backdrop-filter: blur(24px) saturate(1.5);
+}
+
+/* ── fx:signal-route — a packet travels a path, its branch lights up ──────────
+   Cycle = n branches × step; each branch gets animation-delay = index × step. */
+@keyframes fx-route-branch { 0%, 30% { opacity: 1; } 34%, 100% { opacity: 0.42; } }
+@keyframes fx-route-packet {
+  0% { opacity: 0; offset-distance: 0%; }
+  3% { opacity: 1; }
+  28% { opacity: 1; offset-distance: 100%; }
+  31%, 100% { opacity: 0; offset-distance: 100%; }
+}
+.fx-route__branch { opacity: 0.42; animation: fx-route-branch var(--fx-route-cycle, 12s) linear infinite; }
+.fx-route__packet { opacity: 0; offset-rotate: 0deg; animation: fx-route-packet var(--fx-route-cycle, 12s) linear infinite; }
+
+/* ── fx:coverflow ─────────────────────────────────────────────────────────── */
+.fx-coverflow { display: flex; gap: 24px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-block: 8px; overscroll-behavior-x: contain; }
+.fx-coverflow::-webkit-scrollbar { display: none; }
+.fx-coverflow > * { flex: 0 0 min(76%, 360px); scroll-snap-align: center; }
+.fx-coverflow__tween { will-change: transform, opacity; transform-origin: 50% 50%; }
+
+/* ── fx:ruler-scrubber ────────────────────────────────────────────────────── */
+.fx-ruler { position: relative; padding-block: 64px 112px; }
+.fx-ruler__track { display: flex; align-items: center; touch-action: pan-y; user-select: none; cursor: grab; border-radius: 6px; outline: none; }
+.fx-ruler__track[data-dragging] { cursor: grabbing; }
+.fx-ruler__track:focus-visible { box-shadow: 0 0 0 2px rgb(255 255 255 / 0.4); }
+.fx-ruler__tick { position: relative; flex: 1 1 0; min-width: 0; height: 56px; display: flex; align-items: center; justify-content: center; }
+.fx-ruler__tick > i {
+  width: 2px; height: 16px; border-radius: 99px;
+  background: linear-gradient(rgb(255 255 255 / 0.45), rgb(255 255 255 / 0.06));
+  transition: height 150ms var(--fx-ease-out), background 150ms var(--fx-ease-out);
+}
+.fx-ruler__tick[data-major] > i { height: 24px; background: linear-gradient(rgb(255 255 255 / 0.8), rgb(255 255 255 / 0.15)); }
+.fx-ruler__tick[data-tone] > i { height: 26px; background: var(--tone); box-shadow: 0 0 8px color-mix(in srgb, var(--tone) 45%, transparent); }
+@media (hover: hover) { .fx-ruler__tick:hover > i { height: 28px; background: linear-gradient(#fff, rgb(255 255 255 / 0.45)); } }
+.fx-ruler__tick[data-current] > i {
+  width: 16px; height: 56px; border-radius: 99px; background: rgb(10 10 10 / 0.8);
+  border: 1px solid rgb(255 255 255 / 0.2); box-shadow: 0 2px 14px rgb(0 0 0 / 0.55);
+  display: flex; align-items: center; justify-content: center;
+}
+.fx-ruler__tick[data-current] > i::before { content: ""; width: 2.5px; height: 40px; border-radius: 99px; background: var(--tone, linear-gradient(#fff, rgb(255 255 255 / 0.35))); }
+.fx-ruler__label { position: absolute; transform: translateX(-50%); text-align: center; pointer-events: none; white-space: nowrap; }
+.fx-ruler__label--top { bottom: calc(100% - 56px); }
+.fx-ruler__label--bottom { top: calc(100% - 92px); }
+
+/* ── fx:story-stack ───────────────────────────────────────────────────────── */
+.fx-stack { position: relative; }
+.fx-stack__card { position: absolute; inset-inline: 0; bottom: 0; transform-origin: 50% 100%; will-change: transform; touch-action: none; }
+.fx-stack__card[data-depth="0"] { cursor: grab; }
+.fx-stack__card[data-depth="0"][data-dragging] { cursor: grabbing; }
+.fx-stack__progress { display: flex; gap: 6px; }
+.fx-stack__seg { position: relative; width: 28px; height: 3px; border-radius: 99px; overflow: hidden; background: rgb(255 255 255 / 0.1); }
+.fx-stack__seg > i { position: absolute; inset: 0; border-radius: inherit; background: var(--fx-ink); transform-origin: 0 50%; transform: scaleX(0); }
+.fx-stack__seg[data-done] > i { transform: scaleX(1); opacity: 0.4; }
+@keyframes fx-stack-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.fx-stack__seg[data-current] > i { animation: fx-stack-fill var(--fx-stack-ms, 7000ms) linear forwards; }
+.fx-stack[data-paused] .fx-stack__seg[data-current] > i { animation-play-state: paused; }
+
+/* ═══ Dot language ═══════════════════════════════════════════════════════════
+   Dots are the surface material of the system, not decoration on top of it.
+   One pitch for the whole page, aligned to the spacing scale (8 / 12 / 16 px).        */
+:root {
+  --fx-dot-pitch: 12px;
+  --fx-dot-r: 0.75px;
+  --fx-dot-color: rgb(240 227 222 / 0.13);      /* warm-tinted, never pure white */
+  --fx-dot-hi: rgb(255 170 120 / 0.55);         /* spotlight color */
+  --fx-spot-r: 180px;
+}
+
+/* ── fx:dot-field — a quiet dot grid behind a page, band or card ─────────────
+   Pair with a mask so it fades where content sits.                             */
+.fx-dots { position: relative; isolation: isolate; }
+.fx-dots::before,
+.fx-dots--spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  background-image: radial-gradient(circle at center, var(--fx-dot-color) var(--fx-dot-r), transparent calc(var(--fx-dot-r) + 0.6px));
+  background-size: var(--fx-dot-pitch) var(--fx-dot-pitch);
+  background-position: calc(50% + var(--fx-dot-pitch) / 2) 0;   /* a dot column on the center line */
+  -webkit-mask-image: var(--fx-dot-mask, none);
+          mask-image: var(--fx-dot-mask, none);
+}
+.fx-dots--fade-center { --fx-dot-mask: radial-gradient(70% 80% at 50% 50%, #000 30%, transparent 80%); }
+.fx-dots--fade-edges  { --fx-dot-mask: linear-gradient(90deg, transparent, #000 12% 88%, transparent); }
+.fx-dots--hole        { --fx-dot-mask: radial-gradient(60% 55% at 50% 50%, transparent 35%, #000 75%); }  /* calm center for text */
+/* Spotlight: a brighter copy of the grid revealed around the pointer. */
+.fx-dots--spotlight::after {
+  background-image: radial-gradient(circle at center, var(--fx-dot-hi) calc(var(--fx-dot-r) + 0.25px), transparent calc(var(--fx-dot-r) + 0.85px));
+  -webkit-mask-image: radial-gradient(var(--fx-spot-r) circle at var(--fx-mx, -999px) var(--fx-my, -999px), #000, transparent);
+          mask-image: radial-gradient(var(--fx-spot-r) circle at var(--fx-mx, -999px) var(--fx-my, -999px), #000, transparent);
+  opacity: 0;
+  transition: opacity 400ms var(--fx-ease-out);
+}
+.fx-dots--spotlight[data-spot]::after { opacity: 1; }
+
+/* ── fx:dot-wave / fx:dot-bars ────────────────────────────────────────────── */
+@keyframes fx-dot-wave {
+  0%, 100% { opacity: 0.28; transform: translate(0, 0); }
+  46% { opacity: 0.9; transform: translate(var(--fx-wave-x, 0), var(--fx-wave-y, 0)); }
+}
+.fx-dot-wave { display: block; width: 100%; height: auto; }
+.fx-dot-wave__dot { opacity: 0.28; animation: fx-dot-wave 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite both; }
+.fx-dot-bars { overflow: hidden; display: flex; align-items: center; }
+.fx-dot-bars__track { display: flex; flex: none; }
+.fx-dot-bars__track > svg { flex: none; display: block; }
+@keyframes fx-dot-bars-scroll { to { transform: translateX(-50%); } }
+.fx-dot-bars--scroll .fx-dot-bars__track { animation: fx-dot-bars-scroll 20s linear infinite; }
+.fx-dot-bars--scroll { -webkit-mask-image: linear-gradient(90deg, transparent, #000 10% 90%, transparent); mask-image: linear-gradient(90deg, transparent, #000 10% 90%, transparent); }
+
+/* ── fx:blueprint-rails additions: bolts, brackets, dashed seams ─────────────── */
+/* Bolts: 14 px squares on the corners of a bordered block, knocking out the border so
+   the block reads as bolted plates. Markup: 4 × <i class="fx-bolt fx-bolt--tl|tr|bl|br">. */
+.fx-bolted { position: relative; border: 1px solid var(--fx-hairline); }
+.fx-bolt {
+  position: absolute; width: 14px; height: 14px; border-radius: 3px; pointer-events: none;
+  border: 1px solid var(--fx-hairline-hi); background: var(--fx-bolt-bg, #191817); z-index: 2;
+}
+.fx-bolt--tl { left: -7px; top: -7px; } .fx-bolt--tr { right: -7px; top: -7px; }
+.fx-bolt--bl { left: -7px; bottom: -7px; } .fx-bolt--br { right: -7px; bottom: -7px; }
+/* Brackets: corner marks around a callout or stat, drawn in currentColor. */
+.fx-bracket {
+  --b: 14px; --t: 1.5px;
+  position: relative; padding: 14px 18px;
+  background:
+    linear-gradient(currentColor, currentColor) 0 0 / var(--b) var(--t),
+    linear-gradient(currentColor, currentColor) 0 0 / var(--t) var(--b),
+    linear-gradient(currentColor, currentColor) 100% 0 / var(--b) var(--t),
+    linear-gradient(currentColor, currentColor) 100% 0 / var(--t) var(--b),
+    linear-gradient(currentColor, currentColor) 0 100% / var(--b) var(--t),
+    linear-gradient(currentColor, currentColor) 0 100% / var(--t) var(--b),
+    linear-gradient(currentColor, currentColor) 100% 100% / var(--b) var(--t),
+    linear-gradient(currentColor, currentColor) 100% 100% / var(--t) var(--b);
+  background-repeat: no-repeat;
+}
+.fx-bracket--dashed { outline: 1px dashed color-mix(in srgb, currentColor 35%, transparent); outline-offset: -6px; }
+/* Dashed seam that runs past the container to the viewport edges (parent clips with overflow-x: clip). */
+.fx-seam-dashed { position: relative; }
+.fx-seam-dashed::after {
+  content: ""; position: absolute; left: 50%; bottom: 0; width: 100vw; height: 1px; transform: translateX(-50%);
+  background: repeating-linear-gradient(90deg, var(--fx-hairline-hi) 0 6px, transparent 6px 12px); pointer-events: none;
+}
+
+/* ── fx:comet-beam — a bright arc with a fading tail travels the border while a card
+   is active (selected, playing, streaming). Set [data-active]; remove to fade out.  */
+@property --fx-comet-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes fx-comet-spin { to { --fx-comet-angle: 360deg; } }
+.fx-comet { position: relative; isolation: isolate; }
+.fx-comet::after {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; padding: 1.5px; pointer-events: none;
+  background: conic-gradient(from var(--fx-comet-angle), transparent 0% 16%, color-mix(in srgb, var(--fx-comet-color, var(--fx-accent)) 14%, transparent) 24%, color-mix(in srgb, var(--fx-comet-color, var(--fx-accent)) 45%, transparent) 32%, var(--fx-comet-color, var(--fx-accent)) 42% 46%, transparent 47%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 500ms ease;
+  animation: fx-comet-spin var(--fx-comet-ms, 4.5s) linear infinite;
+  animation-play-state: paused;
+}
+.fx-comet[data-active]::after { opacity: 1; animation-play-state: running; }
+
+/* ── fx:scroll-fade-edges — a horizontal list fades only at the edge that has more
+   content. Scroll-driven, no JS; without support the edges stay sharp.            */
+@property --fx-fade-l { syntax: "<number>"; inherits: false; initial-value: 0; }
+@property --fx-fade-r { syntax: "<number>"; inherits: false; initial-value: 1; }
+@keyframes fx-fade-l { from { --fx-fade-l: 0; } to { --fx-fade-l: 1; } }
+@keyframes fx-fade-r { from { --fx-fade-r: 1; } to { --fx-fade-r: 0; } }
+@supports (animation-timeline: scroll()) {
+  .fx-scroll-fade {
+    --w: var(--fx-fade-w, 48px);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 calc(var(--fx-fade-l) * var(--w)), #000 calc(100% - var(--fx-fade-r) * var(--w)), transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 calc(var(--fx-fade-l) * var(--w)), #000 calc(100% - var(--fx-fade-r) * var(--w)), transparent);
+    animation: fx-fade-l linear both, fx-fade-r linear both;
+    animation-timeline: scroll(self inline), scroll(self inline);
+    animation-range: 0% 12%, 88% 100%;   /* fade grows over the first and last 12% of the scroll */
+  }
+}
+
+/* ── fx:rotating-phrase — an inline accent chip that cycles phrasings ─────────── */
+.fx-phrase { position: relative; display: inline-flex; align-items: baseline; vertical-align: baseline; overflow: hidden;
+  padding: 0.08em 0.22em; margin: -0.08em 0; border-radius: 0.2em; color: var(--fx-phrase-ink, var(--fx-accent-2));
+  background: color-mix(in srgb, currentColor 12%, transparent); transition: width 450ms var(--fx-ease-out); white-space: nowrap; }
+.fx-phrase__text { display: inline-block; }
+@keyframes fx-phrase-in { from { transform: translateY(110%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes fx-phrase-out { from { transform: none; opacity: 1; } to { transform: translateY(-110%); opacity: 0; } }
+.fx-phrase__text--in { animation: fx-phrase-in 260ms cubic-bezier(0.32, 0.72, 0, 1) both; }
+.fx-phrase__text--out { position: absolute; left: 0.22em; animation: fx-phrase-out 200ms cubic-bezier(0.32, 0.72, 0, 1) both; }
+
+/* ── fx:dotnav-progress — Apple-style timed dots in a glass pill ──────────────── */
+.fx-dotnav { display: inline-flex; align-items: center; gap: 10px; }
+.fx-dotnav__pill { display: inline-flex; align-items: center; gap: 10px; height: 56px; padding-inline: 22px; border-radius: 28px;
+  background: rgb(66 66 69 / 0.7); -webkit-backdrop-filter: blur(20px) saturate(1.8); backdrop-filter: blur(20px) saturate(1.8); }
+.fx-dotnav__dot { position: relative; width: 8px; height: 8px; padding: 0; border: 0; border-radius: 10px; cursor: pointer; overflow: hidden;
+  background: rgb(245 245 247 / 0.45); transition: width 400ms var(--fx-ease-out), background-color 250ms linear; }
+.fx-dotnav__dot::before { content: ""; position: absolute; inset: -12px -2px; }   /* 32 px hit area */
+.fx-dotnav__dot::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: rgb(245 245 247 / 0.95); transform: scaleX(0); transform-origin: 0 50%; }
+.fx-dotnav__dot[aria-selected="true"] { width: 48px; background: rgb(245 245 247 / 0.35); }
+@keyframes fx-dotnav-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.fx-dotnav[data-playing] .fx-dotnav__dot[aria-selected="true"]::after { animation: fx-dotnav-fill var(--fx-dotnav-ms, 6000ms) linear forwards; }
+.fx-dotnav:not([data-playing]) .fx-dotnav__dot[aria-selected="true"]::after { transform: scaleX(1); }
+.fx-dotnav[data-paused] .fx-dotnav__dot::after { animation-play-state: paused; }
+.fx-dotnav__dot:focus-visible, .fx-dotnav__play:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.fx-dotnav__play { width: 56px; height: 56px; border-radius: 50%; border: 0; color: #f5f5f7; cursor: pointer; display: grid; place-items: center;
+  background: rgb(66 66 69 / 0.7); -webkit-backdrop-filter: blur(20px) saturate(1.8); backdrop-filter: blur(20px) saturate(1.8); transition: transform 120ms var(--fx-ease-out); }
+.fx-dotnav__play:active { transform: scale(0.94); }
+
+/* ── fx:scroll-zoom / fx:theme-scrub — Apple-style scroll-linked scenes ─────────
+   Native scroll-driven animations; browsers without them show the final state.   */
+@keyframes fx-zoom-media { from { transform: scale(var(--fx-zoom-from, 1.18)); } to { transform: none; } }
+@keyframes fx-zoom-frame { from { border-radius: 0; clip-path: inset(0 var(--fx-zoom-inset, 0px) round 0); } to { border-radius: var(--fx-zoom-radius, 28px); clip-path: inset(0 0 round var(--fx-zoom-radius, 28px)); } }
+@keyframes fx-theme-in { from { background-color: var(--fx-theme-from, #000); } to { background-color: var(--fx-theme-to, #f5f5f7); } }
+/* Ink flips in one step at the midpoint: a gray-on-gray middle frame is never readable. */
+@keyframes fx-theme-ink { 0%, 49.9% { color: var(--fx-theme-ink-from, #f5f5f7); } 50%, 100% { color: var(--fx-theme-ink-to, #1d1d1f); } }
+.fx-scroll-zoom { overflow: hidden; border-radius: var(--fx-zoom-radius, 28px); }
+.fx-theme-scrub { background-color: var(--fx-theme-to, #f5f5f7); color: var(--fx-theme-ink-to, #1d1d1f); }
+@supports (animation-timeline: view()) {
+  /* The frame clips and rounds; the media inside scales down to rest. Both follow the
+     frame's view timeline, so nothing ever grows past the page width. */
+  .fx-scroll-zoom { view-timeline: --fx-zoom block; animation: fx-zoom-frame linear both; animation-timeline: --fx-zoom; animation-range: entry 0% cover 45%; }
+  .fx-scroll-zoom > * { animation: fx-zoom-media linear both; animation-timeline: --fx-zoom; animation-range: entry 0% cover 45%; }
+  /* Keep the transition inside the entry range and give the section generous top padding
+     (≥ 25vh) so its text reaches reading position after the colors have settled. */
+  .fx-theme-scrub { animation: fx-theme-in linear both, fx-theme-ink linear both; animation-timeline: view(), view(); animation-range: entry 0% entry 70%, entry 0% entry 70%; }
+}
+
+/* ── Reduced motion: keep states and feedback, drop travel and loops ────────── */
+@media (prefers-reduced-motion: reduce) {
+  .fx-ring::before, .fx-metal, .fx-hairline-sheen { animation: none; }
+  .fx-route__packet { animation: none; opacity: 0; }
+  .fx-route__branch { animation: none; opacity: 1; }
+  .fx-header, .fx-header__bar, .fx-nudge .fx-nudge__icon { transition: none; }
+  .fx-stack__seg[data-current] > i { animation: none; transform: scaleX(1); }
+  .fx-dot-wave__dot { animation: none; opacity: 0.5; }
+  .fx-dot-bars--scroll .fx-dot-bars__track { animation: none; }
+  .fx-comet::after { animation: none; --fx-comet-angle: 220deg; }
+  .fx-phrase, .fx-dotnav__dot { transition: none; }
+  .fx-phrase__text--in, .fx-phrase__text--out { animation: none; }
+  .fx-dotnav[data-playing] .fx-dotnav__dot[aria-selected="true"]::after { animation: none; transform: scaleX(1); }
+  .fx-scroll-zoom, .fx-scroll-zoom > *, .fx-theme-scrub { animation: none; }
+  .fx-dots--spotlight::after { transition: none; }
+}

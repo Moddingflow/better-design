@@ -24,7 +24,7 @@ ACTION_COMPONENTS = {
     "menu", "navigation", "search",
 }
 CHECK_KINDS = {
-    "structure", "tokens", "contrast", "render", "interaction", "keyboard",
+    "structure", "tokens", "contrast", "render", "layout", "interaction", "keyboard",
     "a11y", "assistive", "performance", "localization", "distinctiveness", "motion",
 }
 DIRECTION_BASE = {"origin", "concept", "qualities", "avoid", "palette", "typography"}

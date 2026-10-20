@@ -36,3 +36,27 @@ jobs:
         run: python -B -X utf8 skills/better-design/scripts/validate_design.py contract skills/better-design/assets/design-contract.create.example.json --json
       - name: Validate token and contrast example
         run: python -B -X utf8 skills/better-design/scripts/validate_design.py tokens skills/better-design/assets/tokens.example.json --require-contrast --json
+      - name: Validate default-style palette contrast
+        run: python -B -X utf8 skills/better-design/scripts/validate_design.py tokens skills/better-design/assets/house-style.tokens.json --require-contrast --json
+      - name: Run layout checker regression tests
+        run: python -B -X utf8 skills/better-design/scripts/test_check_layout.py
+      - name: Check layout example
+        run: python -B -X utf8 skills/better-design/scripts/check_layout.py skills/better-design/assets/layout.example.json
+
+  motion:
+    name: Motion probe / ubuntu-latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: Probe the interaction-kit bench
+        run: node skills/better-design/scripts/motion_probe.mjs skills/better-design/assets/motion/kit.html
+      - name: Probe the bench with reduced motion
+        run: node skills/better-design/scripts/motion_probe.mjs skills/better-design/assets/motion/kit.html --reduced-motion
+      - name: Probe the default-style reference page
+        run: node skills/better-design/scripts/motion_probe.mjs skills/better-design/assets/house-style.html --width 390 --height 844

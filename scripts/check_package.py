@@ -18,6 +18,16 @@ def main():
         "assets/design-contract.example.json", "assets/design-contract.create.example.json",
         "assets/tokens.example.json", "scripts/validate_design.py",
         "scripts/test_validate_design.py",
+        "assets/DESIGN.house-style.md", "assets/house-style.html", "assets/house-style.tokens.json",
+        "assets/layout.example.json", "assets/layout-dump/dump-dom.js",
+        "assets/layout-dump/LayoutDump.cs", "assets/layout-dump/layout_dump.gd",
+        "assets/motion/interaction-kit.css", "assets/motion/interaction-kit.js",
+        "assets/motion/kit.html", "assets/motion/README.md",
+        "assets/effects/effects.css", "assets/effects/gallery.html",
+        "assets/effects/dither-field.js", "assets/effects/dither-bake.js",
+        "assets/effects/interactions.js", "assets/effects/dots.js",
+        "scripts/check_layout.py", "scripts/test_check_layout.py", "scripts/motion_probe.mjs",
+        "references/house-style.md", "references/effects-library.md", "references/layout-geometry.md",
     ]
     for name in required:
         if not (SKILL / name).is_file():
