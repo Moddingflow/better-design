@@ -11,13 +11,12 @@ and the checks that keep it from turning into noise. The bench page
 [gallery.html](../assets/effects/gallery.html) shows every effect working; serve the folder
 over `http://` (for example `python -m http.server`) and open it before adapting one.
 
-Origin: patterns observed in October 2026 on kumorouter.com (Next.js, Tailwind, Motion,
-Embla Carousel, Paper Shaders), cloudflare.com (Astro, React Flow background, Three.js
-globe), linear.app (5×5 dot-matrix status icons) and apple.com product pages (timed dot
-navigation, scroll-linked scenes). The recipes are rewritten from the observed behaviour,
-not copied from those sites. Paper Shaders (`@paper-design/shaders-react`, Apache-2.0) is
-the library behind the original live dither field; `cobe` (MIT) is a common ready-made dot
-globe for React projects. See the cards for when a library is worth it.
+Origin: patterns observed in October 2026 on cloudflare.com (Astro, React Flow background,
+Three.js globe), linear.app (5×5 dot-matrix status icons) and apple.com product pages
+(timed dot navigation, scroll-linked scenes). The recipes are rewritten from the observed
+behaviour, not copied from those sites. Paper Shaders (`@paper-design/shaders-react`,
+Apache-2.0) renders a comparable live dither field in React; `cobe` (MIT) is a common
+ready-made dot globe for React projects. See the cards for when a library is worth it.
 
 ## 1. Rules of use
 
@@ -376,14 +375,14 @@ does not advance offscreen. The pill floats over the bottom of the media.
 
 ## 4. Compositions that work
 
-### The Kumo stack
+### The print stack
 
 Near-black canvas with tinted panels (`#0a0a0a`, `#0b0b0e`), white ink, silver grays, two
 accents (blue and copper) used only on the primary action ring. One live `fx:dither-field`
 in the closing CTA band; `fx:dither-bake` with `fx:grain` and `fx:edge` on every catalog
-and blog card, colored by vendor; `fx:blueprint-rails` on section seams;
+and blog card, colored by product line; `fx:blueprint-rails` on section seams;
 `fx:metal-sheen` on the last two words of two headings; `fx:header-morph`; `fx:coverflow`
-for the model catalog; `fx:ruler-scrubber` for uptime; `fx:story-stack` for audiences.
+for the product catalog; `fx:ruler-scrubber` for uptime; `fx:story-stack` for audiences.
 What holds it together: one monochrome print language (dither, grain, hairlines), one
 easing family (expo-out, 500–900 ms for surfaces, 150 ms for ticks), and color held back
 for meaning.

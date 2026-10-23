@@ -49,23 +49,23 @@
   .stack-controls { display: flex; gap: 12px; align-items: center; margin-top: 16px; }
   .fx-rails { padding-block: 72px; }
   /* dot language demo layout */
-  .warm { --bg: #141312; background: #141312; }
-  .dot-panel { position: relative; border-radius: 16px; padding: 72px 24px; text-align: center; background: #191817; border: 1px solid rgb(240 227 222 / 0.1); }
+  .warm { --bg: #15130f; background: #15130f; }
+  .dot-panel { position: relative; border-radius: 16px; padding: 72px 24px; text-align: center; background: #1a1814; border: 1px solid rgb(240 230 214 / 0.1); }
   .dot-panel h2 { position: relative; }
   .matrix-host { position: relative; height: 180px; }
-  .globe-wrap { position: relative; height: 420px; overflow: hidden; border-radius: 16px; background: #191817; }
+  .globe-wrap { position: relative; height: 420px; overflow: hidden; border-radius: 16px; background: #1a1814; }
   .globe-host { position: absolute; inset: 0; }
-  .marker { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #f38020; background: rgb(25 24 23 / 0.6); backdrop-filter: blur(6px); display: grid; place-items: center; color: #f38020; font: 600 12px/1 ui-monospace, monospace; pointer-events: none; }
-  .globe-callout { position: absolute; left: 24px; bottom: 24px; color: #f38020; max-width: 260px; text-align: left; background-color: rgb(25 24 23 / 0.7); }
+  .marker { width: 40px; height: 40px; border-radius: 50%; border: 1px solid #f2a93b; background: rgb(26 24 20 / 0.6); backdrop-filter: blur(6px); display: grid; place-items: center; color: #f2a93b; font: 600 12px/1 ui-monospace, monospace; pointer-events: none; }
+  .globe-callout { position: absolute; left: 24px; bottom: 24px; color: #f2a93b; max-width: 260px; text-align: left; background-color: rgb(26 24 20 / 0.7); }
   .globe-callout b { display: block; font-size: 18px; font-weight: 500; margin-bottom: 4px; }
-  .band { color: #f38020; padding: 24px; border-radius: 16px; background: #191817; }
-  .bars { height: 120px; color: rgb(255 255 255 / 0.55); background: #f06a1d; border-radius: 16px; }
+  .band { color: #f2a93b; padding: 24px; border-radius: 16px; background: #1a1814; }
+  .bars { height: 120px; color: rgb(255 255 255 / 0.55); background: #d98f2b; border-radius: 16px; }
   .led-row { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; color: #e4e5e9; }
   .led-row span { display: inline-flex; gap: 10px; align-items: center; font-size: 13px; color: var(--body); }
   .bolt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-  .bolt-grid > div { padding: 28px; border-right: 1px solid rgb(240 227 222 / 0.1); }
+  .bolt-grid > div { padding: 28px; border-right: 1px solid rgb(240 230 214 / 0.1); }
   .bolt-grid > div:last-child { border-right: 0; }
-  .comet-card { padding: 24px; border-radius: 16px; background: #191817; border: 1px solid rgb(240 227 222 / 0.1); max-width: 420px; --fx-comet-color: #f38020; }
+  .comet-card { padding: 24px; border-radius: 16px; background: #1a1814; border: 1px solid rgb(240 230 214 / 0.1); max-width: 420px; --fx-comet-color: #f2a93b; }
   .chips { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding-block: 4px; }
   .chips::-webkit-scrollbar { display: none; }
   .chips > span { flex: none; padding: 8px 14px; border-radius: 99px; border: 1px solid rgb(255 255 255 / 0.14); color: var(--body); font-size: 14px; }
@@ -84,7 +84,7 @@
 
 <header class="fx-header" id="hdr">
   <nav class="fx-header__bar" aria-label="Demo">
-    <a class="logo" href="#">Kumo-like</a><a href="#field">Field</a><a href="#bake">Bake</a><a href="#ruler">Ruler</a><a href="#stack">Stack</a>
+    <a class="logo" href="#">Lumen</a><a href="#field">Field</a><a href="#bake">Bake</a><a href="#ruler">Ruler</a><a href="#stack">Stack</a>
   </nav>
 </header>
 
@@ -98,10 +98,10 @@
       <div class="fx-field" id="fieldHost"><div class="fx-field__fallback"></div></div>
       <div class="fx-field-scrim"></div>
       <div class="fx-hairline-sheen"></div>
-      <h2>Make your first request <span class="fx-metal">today</span></h2>
+      <h2>Light that sets <span class="fx-metal">itself</span></h2>
       <div class="row">
-        <a class="btn fx-ring fx-nudge" href="#">Get an API key <span class="fx-nudge__icon" aria-hidden="true">→</span></a>
-        <a class="btn btn--ghost" href="#">Read the API docs</a>
+        <a class="btn fx-ring fx-nudge" href="#">Find your lamp <span class="fx-nudge__icon" aria-hidden="true">→</span></a>
+        <a class="btn btn--ghost" href="#">Compare models</a>
       </div>
     </div>
   </section>
@@ -115,7 +115,7 @@
   <!-- fx:coverflow -->
   <section class="demo">
     <p class="id">fx:coverflow</p>
-    <div class="fx-coverflow" id="cover" tabindex="0" aria-label="Models"></div>
+    <div class="fx-coverflow" id="cover" tabindex="0" aria-label="Lamps"></div>
   </section>
 
   <!-- fx:hover-set -->
@@ -133,25 +133,25 @@
   <section class="demo route">
     <p class="id">fx:signal-route</p>
     <div class="panel" style="padding:24px">
-      <svg viewBox="0 0 580 380" fill="none" role="img" aria-label="One key routes requests to three providers">
+      <svg viewBox="0 0 580 380" fill="none" role="img" aria-label="One hub sends scenes to three rooms">
         <rect x="18" y="160" width="120" height="60" rx="8" stroke="currentColor" stroke-opacity=".3"/>
-        <text x="30" y="195" fill="currentColor" font-size="13">Your project</text>
+        <text x="30" y="195" fill="currentColor" font-size="13">Your phone</text>
         <rect x="232" y="140" width="140" height="100" rx="10" stroke="currentColor" stroke-opacity=".3"/>
-        <text x="272" y="195" fill="currentColor" font-size="15">Router</text>
+        <text x="287" y="195" fill="currentColor" font-size="15">Hub</text>
         <path d="M138 190 H232" stroke="currentColor" stroke-opacity=".3" stroke-width="1.6"/>
         <g style="color:#709bdc">
           <path d="M372 172 H418 V60 H506" stroke="currentColor" stroke-width="1.6" opacity=".2"/>
-          <g class="fx-route__branch" style="animation-delay:0s"><path d="M372 172 H418 V60 H506" stroke="currentColor" stroke-width="1.6"/><rect x="501" y="55" width="10" height="10" stroke="currentColor" stroke-width="1.6" fill="#0b0b0e"/><text x="506" y="42" fill="currentColor" font-size="13" text-anchor="middle">OpenAI</text></g>
+          <g class="fx-route__branch" style="animation-delay:0s"><path d="M372 172 H418 V60 H506" stroke="currentColor" stroke-width="1.6"/><rect x="501" y="55" width="10" height="10" stroke="currentColor" stroke-width="1.6" fill="#0b0b0e"/><text x="506" y="42" fill="currentColor" font-size="13" text-anchor="middle">Study</text></g>
           <rect class="fx-route__packet" width="7" height="7" x="-3.5" y="-3.5" fill="currentColor" style="offset-path:path('M372 172 H418 V60 H506');animation-delay:0s"/>
         </g>
         <g style="color:#bd9172">
           <path d="M372 190 H506" stroke="currentColor" stroke-width="1.6" opacity=".2"/>
-          <g class="fx-route__branch" style="animation-delay:4s"><path d="M372 190 H506" stroke="currentColor" stroke-width="1.6"/><rect x="501" y="185" width="10" height="10" stroke="currentColor" stroke-width="1.6" fill="#0b0b0e"/><text x="506" y="172" fill="currentColor" font-size="13" text-anchor="middle">Anthropic</text></g>
+          <g class="fx-route__branch" style="animation-delay:4s"><path d="M372 190 H506" stroke="currentColor" stroke-width="1.6"/><rect x="501" y="185" width="10" height="10" stroke="currentColor" stroke-width="1.6" fill="#0b0b0e"/><text x="506" y="172" fill="currentColor" font-size="13" text-anchor="middle">Hallway</text></g>
           <rect class="fx-route__packet" width="7" height="7" x="-3.5" y="-3.5" fill="currentColor" style="offset-path:path('M372 190 H506');animation-delay:4s"/>
         </g>
         <g style="color:#8ca89b">
           <path d="M372 208 H418 V320 H506" stroke="currentColor" stroke-width="1.6" opacity=".2"/>
-          <g class="fx-route__branch" style="animation-delay:8s"><path d="M372 208 H418 V320 H506" stroke="currentColor" stroke-width="1.6"/><rect x="501" y="315" width="10" height="10" stroke="currentColor" stroke-width="1.6" fill="#0b0b0e"/><text x="506" y="350" fill="currentColor" font-size="13" text-anchor="middle">Google</text></g>
+          <g class="fx-route__branch" style="animation-delay:8s"><path d="M372 208 H418 V320 H506" stroke="currentColor" stroke-width="1.6"/><rect x="501" y="315" width="10" height="10" stroke="currentColor" stroke-width="1.6" fill="#0b0b0e"/><text x="506" y="350" fill="currentColor" font-size="13" text-anchor="middle">Bedroom</text></g>
           <rect class="fx-route__packet" width="7" height="7" x="-3.5" y="-3.5" fill="currentColor" style="offset-path:path('M372 208 H418 V320 H506');animation-delay:8s"/>
         </g>
       </svg>
@@ -168,9 +168,9 @@
   <section class="demo" id="stack">
     <p class="id">fx:story-stack</p>
     <div class="stack-wrap fx-stack" id="stackHost">
-      <article class="fx-stack__card"><h3>Indie developer</h3><p>One key for every model in the side project.</p></article>
-      <article class="fx-stack__card"><h3>Enterprise platform</h3><p>Limits and spend per team.</p></article>
-      <article class="fx-stack__card"><h3>AI agency</h3><p>Separate projects per client.</p></article>
+      <article class="fx-stack__card"><h3>Home office</h3><p>Neutral, even light from nine to six.</p></article>
+      <article class="fx-stack__card"><h3>Reading nook</h3><p>Warm light that dims as the evening goes.</p></article>
+      <article class="fx-stack__card"><h3>Studio</h3><p>True colour for paint and photo work.</p></article>
       <div class="stack-controls" style="position:absolute;bottom:-56px;left:0">
         <button class="btn btn--ghost" type="button" data-fx-stack-next>Next</button>
         <button class="btn btn--ghost" type="button" data-fx-stack-toggle aria-pressed="false">Pause</button>
@@ -178,11 +178,11 @@
       </div>
     </div>
   </section>
-  <!-- ═══ Dot language (Cloudflare / Linear) ═══ -->
+  <!-- ═══ Dot language ═══ -->
   <section class="demo" id="dots">
     <p class="id">fx:dot-field · spotlight · fade-center</p>
     <div class="dot-panel fx-dots fx-dots--spotlight fx-dots--fade-center" id="dotPanel">
-      <h2>Region: Earth</h2>
+      <h2>Every room, mapped</h2>
       <p style="color:var(--body);position:relative">Move the pointer: the dots under it brighten.</p>
     </div>
   </section>
@@ -197,7 +197,7 @@
     <div class="globe-wrap" id="globeWrap">
       <div class="globe-host" id="globeHost"></div>
       <div class="marker" id="mk1">EU</div><div class="marker" id="mk2">US</div><div class="marker" id="mk3">SG</div>
-      <div class="globe-callout fx-bracket fx-bracket--dashed"><b>4.5x faster</b>Illustrative callout: replace with a measured fact.</div>
+      <div class="globe-callout fx-bracket fx-bracket--dashed"><b>3 regions</b>Illustrative callout: replace with a measured fact.</div>
     </div>
   </section>
 
@@ -220,35 +220,35 @@
     <p class="id">fx:bolts · fx:seam-dashed</p>
     <div class="bolt-grid fx-bolted">
       <i class="fx-bolt fx-bolt--tl"></i><i class="fx-bolt fx-bolt--tr"></i><i class="fx-bolt fx-bolt--bl"></i><i class="fx-bolt fx-bolt--br"></i>
-      <div><b>Security</b><p style="color:var(--body)">One plate of the grid.</p></div>
-      <div><b>Compute</b><p style="color:var(--body)">Corners are bolted, not rounded.</p></div>
-      <div><b>Network</b><p style="color:var(--body)">The border stops at each bolt.</p></div>
+      <div><b>Sensor</b><p style="color:var(--body)">One plate of the grid.</p></div>
+      <div><b>Battery</b><p style="color:var(--body)">Corners are bolted, not rounded.</p></div>
+      <div><b>Body</b><p style="color:var(--body)">The border stops at each bolt.</p></div>
     </div>
   </section>
 
   <section class="demo">
     <p class="id">fx:comet-beam · active state</p>
-    <div class="comet-card fx-comet" id="comet"><b>Streaming response</b><p style="color:var(--body)">The comet runs only while this card is active.</p>
+    <div class="comet-card fx-comet" id="comet"><b>Firmware updating</b><p style="color:var(--body)">The comet runs only while this card is active.</p>
       <button class="btn btn--ghost" type="button" id="cometToggle" aria-pressed="true">Stop</button></div>
   </section>
 
   <section class="demo">
     <p class="id">fx:scroll-fade-edges</p>
     <div class="chips fx-scroll-fade" tabindex="0" aria-label="Products">
-      <span>Network &amp; CDN</span><span>SASE / Zero Trust</span><span>Compute &amp; Storage</span><span>AI Gateway</span><span>Workers</span><span>R2</span><span>D1</span><span>Queues</span><span>Durable Objects</span><span>Images</span><span>Stream</span><span>Pages</span>
+      <span>Desk lamps</span><span>Floor lamps</span><span>Pendants</span><span>Wall lights</span><span>Light strips</span><span>Bulbs</span><span>Hub</span><span>Remote</span><span>Dimmer</span><span>Sensors</span><span>Mounts</span><span>Spare parts</span>
     </div>
   </section>
 
   <section class="demo">
     <p class="id">fx:rotating-phrase</p>
-    <p class="phrase-line">Everything needed to <span id="phrase">build secure applications</span></p>
+    <p class="phrase-line">Light that adjusts to <span id="phrase">late reading</span></p>
   </section>
 
-  <!-- ═══ Apple ═══ -->
+  <!-- ═══ Scroll scenes ═══ -->
   <section class="demo">
     <p class="id">fx:dotnav-progress</p>
     <div class="slides" id="slides">
-      <div data-on style="background:#16233a">M5</div><div style="background:#2a1a3a">M5 Pro</div><div style="background:#3a2416">M5 Max</div><div style="background:#16302a">Battery</div>
+      <div data-on style="background:#16233a">Mini</div><div style="background:#2a1a3a">Arc</div><div style="background:#3a2416">Halo</div><div style="background:#16302a">Battery</div>
     </div>
     <div class="dotnav-wrap"><div id="dotnavHost"></div></div>
   </section>
@@ -259,7 +259,7 @@
   </section>
 </main>
 
-<section class="theme-scene fx-theme-scrub"><p class="id" style="color:inherit;opacity:.6">fx:theme-scrub</p><h2>Fresh faced.<br>Timelessly made.</h2></section>
+<section class="theme-scene fx-theme-scrub"><p class="id" style="color:inherit;opacity:.6">fx:theme-scrub</p><h2>Built to be left on.<br>Made to be repaired.</h2></section>
 
 <section class="fx-rails"><main><p class="id">fx:blueprint-rails — the seam lines above and below this band</p></main></section>
 
@@ -272,15 +272,15 @@
   window.fxField = BetterFx.mountDitherField(document.getElementById('fieldHost'), { shape: 'warp', bayer: 4, pxSize: 2, scale: 0.6, colorFront: '#ffffff' });
 
   var palettes = [
-    ['#f1d4cb', '#d97757', '#7a3a24'], ['#c9f2e4', '#3fa58a', '#1c4d40'], ['#e2d8ff', '#8c6ff0', '#3e2f78'], ['#f3e1c8', '#c9925a', '#5e4126']
+    ['#f6e4c2', '#d2a24f', '#5c4320'], ['#dcebdf', '#6f9e80', '#26443a'], ['#dae3f2', '#6b85b5', '#29385a'], ['#ececea', '#9b9b96', '#3a3a38']
   ];
-  var names = [['Anthropic', 'Claude Opus'], ['OpenAI', 'GPT Astra'], ['xAI', 'Grok'], ['DeepSeek', 'V4.1 Flash']];
+  var names = [['Desk lamp', 'Lumen Mini', '$129'], ['Floor lamp', 'Lumen Arc', '$249'], ['Pendant', 'Lumen Halo', '$189'], ['Wall light', 'Lumen Slate', '$159']];
   var patterns = ['ribbon', 'rise', 'ribbon', 'camo'];
   function card(i, extra) {
     var a = document.createElement('a');
     a.href = '#'; a.className = 'card fx-grain fx-edge ' + (extra || '');
     a.innerHTML = BetterFx.bakeDither({ pattern: patterns[i % 4], seed: 11 + i * 7, tones: palettes[i % 4], avoid: [{ x: 1.75, y: 0.92, r: 0.22 }] }) +
-      '<header><div class="maker">' + names[i % 4][0] + '</div><h3>' + names[i % 4][1] + '</h3></header><footer><span class="price">1 / 5.5 USD</span></footer>';
+      '<header><div class="maker">' + names[i % 4][0] + '</div><h3>' + names[i % 4][1] + '</h3></header><footer><span class="price">' + names[i % 4][2] + '</span></footer>';
     return a;
   }
   var cards = document.getElementById('bakeCards');
@@ -296,15 +296,15 @@
     var date = new Date(today - (89 - d) * 864e5);
     var bad = d === 23 || d === 61;
     items.push({ major: date.getUTCDay() === 1, tone: bad ? '#f5a524' : null,
-      title: bad ? 'Degraded' : 'Operational', caption: bad ? 'Elevated error rate on one provider' : 'All checks passed',
+      title: bad ? 'Degraded' : 'Operational', caption: bad ? 'One lamp missed a firmware update' : 'All lamps reachable',
       date: date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }) });
   }
-  BetterFx.rulerScrubber(document.getElementById('rulerHost'), { items: items, label: 'Uptime, last 90 days' });
+  BetterFx.rulerScrubber(document.getElementById('rulerHost'), { items: items, label: 'Hub uptime, last 90 days' });
   BetterFx.storyStack(document.getElementById('stackHost'), { ms: 7000 });
 
   // Dot language
   BetterFx.dotSpotlight(document.getElementById('dotPanel'));
-  BetterFx.dotMatrix(document.getElementById('matrixText'), { source: { text: 'EDGE', font: '800 150px system-ui, sans-serif' }, pitch: 7, radius: 2.6, mode: 'threshold', cut: 0.4, color: '#f38020', dim: 0.12, origin: [0, 0.5] });
+  BetterFx.dotMatrix(document.getElementById('matrixText'), { source: { text: 'LUMEN', font: '800 150px system-ui, sans-serif' }, pitch: 7, radius: 2.6, mode: 'threshold', cut: 0.4, color: '#f2a93b', dim: 0.12, origin: [0, 0.5] });
   var C = [[48,-100,24],[60,-110,14],[-15,-60,17],[-35,-65,8],[52,15,13],[62,40,16],[5,20,20],[-20,25,12],[48,90,28],[25,80,12],[35,105,14],[-25,135,13],[65,-40,7]];
   function land(lat, lon) {
     var v = 0;
@@ -316,7 +316,7 @@
     return v > 0.55;
   }
   BetterFx.dotGlobe(document.getElementById('globeHost'), {
-    land: land, color: '#f38020', speed: 5, tilt: 22, lon0: 1.2,
+    land: land, color: '#f2a93b', speed: 5, tilt: 22, lon0: 1.2,
     arcs: [[[50, 10], [40, -95]], [[50, 10], [5, 105]]],
     markers: [{ lat: 50, lon: 10, el: document.getElementById('mk1') }, { lat: 40, lon: -95, el: document.getElementById('mk2') }, { lat: 5, lon: 105, el: document.getElementById('mk3') }]
   });
@@ -334,10 +334,10 @@
   var comet = document.getElementById('comet'), ct = document.getElementById('cometToggle');
   comet.setAttribute('data-active', '');
   ct.addEventListener('click', function () { var on = comet.toggleAttribute('data-active'); ct.textContent = on ? 'Stop' : 'Start'; ct.setAttribute('aria-pressed', String(on)); });
-  BetterFx.rotatingPhrase(document.getElementById('phrase'), { variants: ['build secure applications', 'connect and protect your employees', 'run code close to users'] });
+  BetterFx.rotatingPhrase(document.getElementById('phrase'), { variants: ['late reading', 'video calls', 'the first hour of the morning'] });
   var slides = document.querySelectorAll('#slides > div');
   window.fxDotnav = BetterFx.dotnav(document.getElementById('dotnavHost'), { count: slides.length, ms: 5000, label: 'Highlights',
-    labels: ['M5', 'M5 Pro', 'M5 Max', 'Battery'],
+    labels: ['Mini', 'Arc', 'Halo', 'Battery'],
     onSelect: function (i) { slides.forEach(function (s, n) { if (n === i) s.setAttribute('data-on', ''); else s.removeAttribute('data-on'); }); } });
 </script>
 </body>
