@@ -18,7 +18,7 @@
  * focus, stuck after release. Warnings: no hover, instant changes, `transition: all`.
  */
 import { spawn } from 'node:child_process';
-import { mkdtempSync, rmSync, existsSync } from 'node:fs';
+import { mkdtempSync, rmSync, existsSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -47,7 +47,9 @@ if (!chromePath) { console.error('Chrome/Chromium/Edge not found; pass --chrome 
 const profile = mkdtempSync(join(tmpdir(), 'bd-motion-'));
 // CI runners (e.g. Ubuntu 24.04 on GitHub Actions) often cannot start Chrome's sandbox.
 const sandboxArgs = flag('no-sandbox') || process.env.CI ? ['--no-sandbox'] : [];
-const proc = spawn(chromePath, [...sandboxArgs, '--headless=new', '--remote-debugging-port=0', '--no-first-run', '--no-default-browser-check',
+// Small /dev/shm in containers crashes Chrome's renderer on Linux.
+const linuxArgs = process.platform === 'linux' ? ['--disable-dev-shm-usage'] : [];
+const proc = spawn(chromePath, [...sandboxArgs, ...linuxArgs, '--headless=new', '--remote-debugging-port=0', '--no-first-run', '--no-default-browser-check',
   '--disable-gpu', '--hide-scrollbars', '--force-device-scale-factor=1', '--disable-component-update', '--disable-background-networking', '--disable-sync', '--disable-extensions', '--disable-breakpad', '--metrics-recording-only', `--user-data-dir=${profile}`, 'about:blank'], { stdio: ['ignore', 'ignore', 'pipe'] });
 // Wait for Chrome to exit before removing its profile (Windows keeps files locked until then).
 const chromeExited = new Promise((r) => proc.once('exit', r));
@@ -62,10 +64,27 @@ async function finish(code) {
 }
 process.on('SIGINT', () => finish(130));
 
+// Chrome writes DevToolsActivePort into the profile; it is more reliable than parsing stderr,
+// which some builds buffer or word differently. Fail fast with Chrome's own output if it exits.
+let stderrTail = '';
+proc.stderr.on('data', (d) => { stderrTail = (stderrTail + d).slice(-4000); });
 const wsUrl = await new Promise((res, rej) => {
-  let buf = '';
-  const t = setTimeout(() => rej(new Error('Chrome did not start')), 15000);
-  proc.stderr.on('data', (d) => { buf += d; const m = buf.match(/DevTools listening on (ws:\/\/\S+)/); if (m) { clearTimeout(t); res(m[1]); } });
+  const stop = (fn, v) => { clearInterval(poll); clearTimeout(t); proc.off('exit', onExit); fn(v); };
+  const onExit = (code, sig) => stop(rej, new Error(`Chrome exited before DevTools was ready (code ${code}, signal ${sig})`));
+  proc.once('exit', onExit);
+  proc.once('error', (e) => stop(rej, e));
+  const t = setTimeout(() => stop(rej, new Error('Chrome did not start within 45 s')), 45000);
+  const poll = setInterval(() => {
+    const m = stderrTail.match(/DevTools listening on (ws:\/\/\S+)/);
+    if (m) return stop(res, m[1]);
+    try {
+      const [port, path] = readFileSync(join(profile, 'DevToolsActivePort'), 'utf8').trim().split('\n');
+      if (port && path) stop(res, `ws://127.0.0.1:${port.trim()}${path.trim()}`);
+    } catch {}
+  }, 100);
+}).catch(async (e) => {
+  console.error(`${e.message}\nchrome: ${chromePath}\n--- chrome stderr (tail) ---\n${stderrTail.trim() || '(empty)'}`);
+  await finish(2);
 });
 
 const ws = new WebSocket(wsUrl);
