@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.1 — 2026-10-23
+
+### Fixed
+
+- **Motion probe starts Chrome reliably in CI.** `motion_probe.mjs` reads the DevTools endpoint from `DevToolsActivePort` in its temporary profile instead of relying only on the stderr banner, so it no longer fails with a bare `Chrome did not start` on Linux runners such as GitHub Actions `ubuntu-latest`. When Chrome exits before DevTools is ready, the probe stops at once and prints Chrome's exit code, binary path, and stderr tail. On Linux it adds `--disable-dev-shm-usage`, and the startup timeout is 45 s.
+
 ## 1.7.0 — 2026-10-23
 
 ### Changed
