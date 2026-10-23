@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Driftline · Night trains across Europe</title>
+<meta name="description" content="Book overnight sleeper trains between European cities: seat, couchette or private cabin.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Non-blocking font load: a slow font host must not hold back the scripts. -->
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300..600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="interaction-kit.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip ui-dim ui-focus" href="#book">Skip to booking</a>
+
+<nav class="nav" aria-label="Main">
+  <div class="wrap-app nav-row">
+    <a class="brand ui-dim ui-focus" href="#top">Driftline</a>
+    <a class="l ui-dim ui-focus" href="#book">Book</a>
+    <a class="l ui-dim ui-focus" href="#berths">Berths</a>
+    <a class="l ui-dim ui-focus" href="#timetable">Timetable</a>
+  </div>
+</nav>
+
+<main id="top">
+  <section class="hero-sec" aria-labelledby="heroTitle">
+    <div class="wrap">
+      <h1 class="hero" id="heroTitle">Bed in Paris,<br>breakfast in Berlin.</h1>
+      <p class="intro">Sleeper trains between nine European cities, with seats, couchettes and private cabins.</p>
+      <div class="actions"><a class="btn btn-primary ui-press ui-focus" href="#book">Find a train</a><a class="more ui-dim ui-focus" href="#timetable">All routes<span class="ui-icon-nudge" aria-hidden="true">›</span></a></div>
+    </div>
+    <div class="wide">
+      <figure class="network">
+        <svg id="map" class="map" viewBox="0 0 1000 600" role="group" aria-label="Network map: select a line to book that route"></svg>
+        <figcaption class="map-cap" id="mapCap" aria-live="polite"></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="book" class="book-sec" aria-labelledby="bookTitle">
+    <div class="wrap-app">
+      <h2 class="headline" id="bookTitle">Choose your night.</h2>
+
+      <form class="search" id="search" autocomplete="off">
+        <div class="f f-from">
+          <label for="from">From</label>
+          <div class="select"><select id="from" class="ui-field"></select><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></div>
+        </div>
+        <button type="button" class="icon-btn swap ui-press ui-press--on-dark ui-focus" id="swap" aria-label="Swap From and To">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 7h12l-3-3M16 13H4l3 3"/></svg>
+        </button>
+        <div class="f f-to">
+          <label for="to">To</label>
+          <div class="select"><select id="to" class="ui-field"></select><svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg></div>
+        </div>
+        <div class="f f-date">
+          <label for="date">Night of</label>
+          <input type="date" id="date" class="ui-field">
+        </div>
+        <div class="f f-pax">
+          <span class="lbl" id="paxLbl">Travellers</span>
+          <div class="stepper" role="group" aria-labelledby="paxLbl">
+            <button type="button" class="icon-btn ui-press ui-press--on-dark ui-focus" id="paxMinus" aria-label="Fewer travellers"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10"/></svg></button>
+            <output id="pax" class="pax-val" aria-live="polite">1</output>
+            <button type="button" class="icon-btn ui-press ui-press--on-dark ui-focus" id="paxPlus" aria-label="More travellers"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 10h10M10 5v10"/></svg></button>
+          </div>
+        </div>
+      </form>
+
+      <div class="book-grid">
+        <div class="results" id="results" aria-live="polite"></div>
+        <aside class="summary" id="summary" aria-labelledby="sumTitle">
+          <h3 class="sum-title" id="sumTitle">Your trip</h3>
+          <dl class="sum-list" id="sumList"></dl>
+          <div class="sum-total"><span>Total</span><span class="total" id="total">–</span></div>
+          <button type="button" class="btn btn-primary btn-block ui-press ui-focus" id="continue" aria-disabled="true" aria-describedby="sumNote">Review booking</button>
+          <p class="sum-note" id="sumNote">Choose a class to see the total.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section id="berths" class="berths-sec" aria-labelledby="berthsTitle">
+    <div class="wrap-app split">
+      <div class="split-text">
+        <h2 class="headline" id="berthsTitle">Three ways to sleep.</h2>
+        <div class="seg" id="berthSeg" role="tablist" aria-label="Berth type">
+          <button type="button" role="tab" id="tab-seat" aria-controls="plan" aria-selected="false" class="ui-focus">Seat</button>
+          <button type="button" role="tab" id="tab-couchette" aria-controls="plan" aria-selected="true" class="ui-focus">Couchette</button>
+          <button type="button" role="tab" id="tab-cabin" aria-controls="plan" aria-selected="false" class="ui-focus">Cabin</button>
+        </div>
+        <p class="lead" id="berthText"></p>
+      </div>
+      <div class="plan" id="plan" role="tabpanel" aria-labelledby="tab-couchette"></div>
+    </div>
+  </section>
+
+  <section id="timetable" class="tt-sec" data-theme="light" aria-labelledby="ttTitle">
+    <div class="wrap-app">
+      <h2 class="headline" id="ttTitle">Every route, every night.</h2>
+      <div class="tt" role="table" aria-label="Timetable">
+        <div class="tt-row tt-head" role="row">
+          <span role="columnheader">Route</span>
+          <span role="columnheader">Outbound</span>
+          <span role="columnheader">Return</span>
+          <span role="columnheader">Runs</span>
+          <span role="columnheader" class="num">Seats from</span>
+          <span role="columnheader"><span class="sr">Action</span></span>
+        </div>
+        <div id="ttBody" role="rowgroup"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot"><div class="wrap-app">Driftline is a design demo. Timetables, fares and availability are sample data; no tickets are sold and no payment is taken.</div></footer>
+
+<dialog class="sheet ui-pop-in" id="review" aria-labelledby="revTitle">
+  <div class="sheet-body" id="revForm">
+    <h2 class="title-2" id="revTitle">Review booking</h2>
+    <dl class="sum-list" id="revList"></dl>
+    <div class="sum-total"><span>Total</span><span class="total" id="revTotal"></span></div>
+    <form id="paxForm" novalidate>
+      <div class="field">
+        <label for="pname">Lead traveller</label>
+        <input id="pname" class="ui-field" name="name" autocomplete="name" required aria-describedby="pnameErr">
+        <span class="err" id="pnameErr" hidden></span>
+      </div>
+      <div class="field">
+        <label for="pmail">Email for tickets</label>
+        <input id="pmail" class="ui-field" name="email" type="email" autocomplete="email" required aria-describedby="pmailErr">
+        <span class="err" id="pmailErr" hidden></span>
+      </div>
+      <div class="sheet-actions">
+        <button type="button" class="btn btn-ghost ui-press ui-press--on-dark ui-focus" id="revBack">Back</button>
+        <button type="submit" class="btn btn-primary ui-press ui-focus" id="revSubmit"><span class="ui-btn-state"><span class="ui-state-label">Submit request</span><span class="ui-state-pending"><span class="ui-spinner" aria-hidden="true"></span></span><span class="ui-state-done">Done</span></span></button>
+      </div>
+    </form>
+  </div>
+  <div class="sheet-body" id="revDone" hidden>
+    <svg class="done-mark" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22"/><path d="M15 24.5l6 6 12-13"/></svg>
+    <h2 class="title-2" id="doneTitle" tabindex="-1">The demo ends here.</h2>
+    <p class="done-text" id="doneText"></p>
+    <div class="sheet-actions"><button type="button" class="btn btn-primary ui-press ui-focus" id="revClose">Close</button></div>
+  </div>
+</dialog>
+
+<script src="interaction-kit.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Better Design — live demo</title>
+<meta name="description" content="Live pages built from the Better Design skill's bundled assets: the default style, the interaction kit, and the signature effects.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300..600&display=swap&subset=cyrillic" rel="stylesheet">
+<link rel="stylesheet" href="assets/motion/interaction-kit.css">
+<!-- Demo hub for GitHub Pages. demo/build.sh copies this file next to skills/better-design/assets
+     and docs/images, so the relative paths below resolve only in the built site. -->
+<style>
+  /* Tokens: assets/DESIGN.house-style.md (same values as assets/house-style.html). */
+  :root {
+    --color-canvas: #000; --color-surface: #161617; --color-surface-raised: #1d1d1f;
+    --color-text: #f5f5f7; --color-text-secondary: #a1a1a6; --color-hairline: rgb(255 255 255 / 0.1);
+    --color-action: #f5f5f7; --color-on-action: #000;
+    --color-link: #2997ff; --color-focus: #2997ff; --color-glass: rgb(22 22 23 / 0.8);
+    --font-ui: "Geologica", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    --radius-tile: 28px; --radius-card: 18px; --radius-pill: 9999px;
+    --ui-focus-ring: var(--color-focus);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--color-canvas); color: var(--color-text); font: 340 17px/1.5 var(--font-ui); -webkit-font-smoothing: antialiased; }
+  a { color: var(--color-link); text-decoration: none; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  img { display: block; max-width: 100%; height: auto; }
+  .wrap { max-width: 980px; margin-inline: auto; padding-inline: 24px; }
+  .wide { max-width: 1240px; margin-inline: auto; padding-inline: 24px; }
+
+  .nav { position: sticky; top: 0; z-index: 10; background: var(--color-glass); -webkit-backdrop-filter: blur(20px) saturate(1.8); backdrop-filter: blur(20px) saturate(1.8); border-bottom: 1px solid var(--color-hairline); }
+  .nav .wrap { height: 52px; display: flex; align-items: center; gap: 24px; }
+  .nav b { font-size: 21px; font-weight: 500; letter-spacing: -0.02em; margin-right: auto; }
+  .nav a.l { color: var(--color-text-secondary); font-size: 14px; font-weight: 400; }
+  .nav a.l:hover { color: var(--color-text); }
+
+  .hero { font-size: clamp(44px, 7vw, 80px); line-height: 1.05; font-weight: 500; letter-spacing: -0.035em; margin: 0; }
+  .headline { font-size: clamp(32px, 4vw, 48px); line-height: 1.08; font-weight: 500; letter-spacing: -0.03em; margin: 0; }
+  .title { font-size: clamp(26px, 2.6vw, 32px); line-height: 1.12; font-weight: 500; letter-spacing: -0.025em; margin: 0; }
+  .intro { font-size: clamp(21px, 2.4vw, 28px); line-height: 1.18; letter-spacing: -0.01em; color: var(--color-text-secondary); margin: 14px 0 0; }
+  .lead { font-size: 19px; line-height: 1.42; color: var(--color-text-secondary); margin: 10px 0 0; }
+  .more { display: inline-block; margin-top: 16px; }
+
+  section { padding-block: 96px; }
+  .hero-sec { text-align: center; padding-top: 104px; padding-bottom: 72px; }
+
+  /* Install command: the one action of the hero. */
+  .hero-sec .intro { max-width: 720px; margin-inline: auto; }
+  .install { margin: 36px auto 0; max-width: 720px; display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 20px; border-radius: var(--radius-pill); background: var(--color-surface); border: 1px solid var(--color-hairline); text-align: left; }
+  .install code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; font: 400 15px/1.4 var(--font-mono); color: var(--color-text); scrollbar-width: none; }
+  .install code::-webkit-scrollbar { display: none; }
+  .install code .p { color: var(--color-text-secondary); user-select: none; }
+  .btn { font: inherit; font-weight: 400; display: inline-flex; align-items: center; justify-content: center; height: 44px; padding-inline: 22px; border-radius: var(--radius-pill); border: 0; cursor: pointer; flex: none; }
+  .btn-primary { background: var(--color-action); color: var(--color-on-action); }
+  .hero-links { margin-top: 24px; display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+
+  /* Before / after: one prompt, two builds, switched in place. */
+  .compare-tabs { margin-top: 32px; --ui-seg-track: var(--color-surface); --ui-seg-indicator: var(--color-action); font-size: 17px; font-weight: 400; }
+  /* The kit's list plus color, so the label inverts with the sliding indicator. */
+  .compare-tabs > button { padding: 10px 22px; white-space: nowrap;
+    transition: opacity var(--ui-hover) var(--ui-ease-color), transform var(--ui-release) var(--ui-spring-pop), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out), color 250ms var(--ui-ease-color); }
+  .compare-tabs .short { display: none; }
+  @media (max-width: 480px) {
+    .compare-tabs .long { display: none; }
+    .compare-tabs .short { display: inline; }
+  }
+  .compare-tabs > button[aria-selected="true"] { color: var(--color-on-action); }
+  .compare-sec { padding-top: 40px; }
+  .window { border-radius: var(--radius-card); background: var(--color-surface); overflow: hidden; }
+  .window__bar { height: 44px; display: flex; align-items: center; gap: 16px; padding-inline: 16px; font-size: 13px; font-weight: 400; color: var(--color-text-secondary); }
+  .window__dots { display: flex; gap: 8px; }
+  .window__dots i { width: 12px; height: 12px; border-radius: 50%; background: var(--color-surface-raised); }
+  .window__label { flex: 1; min-width: 0; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .window__open { font-size: 13px; white-space: nowrap; }
+  .window__body { position: relative; height: clamp(520px, 78vh, 860px); background: var(--color-canvas); }
+  .window__body iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--color-canvas); opacity: 0; visibility: hidden; transition: opacity 300ms cubic-bezier(0.28, 0.11, 0.32, 1), visibility 0s linear 300ms; }
+  .window__body iframe[data-on] { opacity: 1; visibility: visible; transition-delay: 0s; }
+  .prompt { max-width: 760px; margin: 24px auto 0; text-align: center; font-size: 14px; font-weight: 400; line-height: 1.43; color: var(--color-text-secondary); }
+  .prompt q { color: var(--color-text); }
+  .section-head { margin-bottom: 40px; }
+  .section-head .lead { max-width: 640px; }
+  @media (prefers-reduced-motion: reduce) { .window__body iframe { transition: none; } }
+
+  /* Demo pages: one wide feature, then a pair. Each card is one link to its live page. */
+  .demos { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .demo { grid-column: span 1; display: flex; flex-direction: column; background: var(--color-surface); border-radius: var(--radius-tile); overflow: hidden; color: inherit; }
+  .demo:hover { text-decoration: none; }
+  .demo .txt { padding: 40px 40px 0; }
+  .demo .shot { margin-top: auto; padding: 32px 0 0 40px; }
+  .demo .shot img { border-radius: var(--radius-card) 0 0 0; border: 1px solid var(--color-hairline); border-width: 1px 0 0 1px; }
+  .demo--feature { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1.6fr; align-items: center; }
+  .demo--feature .txt { padding: 56px; }
+  .demo--feature .shot { padding: 48px 0 0 0; align-self: end; }
+  .demo .go { color: var(--color-link); }
+  /* Pair cards crop their stills to one height so both cards end on the same line. */
+  .demo:not(.demo--feature) .shot img { width: 100%; height: 220px; object-fit: cover; object-position: var(--crop, center); }
+
+  .foot { padding-block: 40px; border-top: 1px solid var(--color-hairline); font-size: 12px; font-weight: 400; letter-spacing: 0.01em; color: var(--color-text-secondary); }
+  .foot .wrap { display: flex; gap: 16px 24px; flex-wrap: wrap; }
+  .foot a { color: var(--color-text-secondary); }
+  .foot a:hover { color: var(--color-text); }
+
+  @media (max-width: 834px) {
+    .demo--feature { grid-template-columns: 1fr; }
+    .demo--feature .txt { padding: 40px 40px 0; }
+    .demo--feature .shot { padding: 32px 0 0 40px; }
+  }
+  @media (max-width: 734px) {
+    section { padding-block: 64px; }
+    .hero-sec { padding-top: 72px; padding-bottom: 48px; }
+    .demos { grid-template-columns: 1fr; }
+    .demo .txt, .demo--feature .txt { padding: 28px 24px 0; }
+    .demo .shot, .demo--feature .shot { padding: 24px 0 0 24px; }
+    .nav a.l.opt { display: none; }
+    /* Phones: the command wraps above a full-width button instead of hiding behind it. */
+    .install { flex-direction: column; align-items: stretch; gap: 12px; padding: 16px; border-radius: var(--radius-card); }
+    .install code { white-space: normal; overflow-wrap: anywhere; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<nav class="nav" aria-label="Main"><div class="wrap"><b>Better Design</b><a class="l opt ui-dim ui-focus" href="https://github.com/Moddingflow/better-design/blob/main/docs/examples.md">Examples</a><a class="l ui-dim ui-focus" href="https://github.com/Moddingflow/better-design">GitHub</a></div></nav>
+
+<main>
+  <section class="hero-sec">
+    <div class="wrap">
+      <h1 class="hero">Better Design</h1>
+      <p class="intro">A UI/UX skill for Codex, Claude Code, Cursor and other agents. Same prompt, same model: one site built without it, one with it.</p>
+      <div class="compare-tabs" role="tablist" aria-label="Build">
+        <button type="button" role="tab" id="tab-without" aria-controls="compare-panel" aria-selected="false" tabindex="-1">Without <span class="long">the </span>skill</button>
+        <button type="button" role="tab" id="tab-with" aria-controls="compare-panel" aria-selected="true">With <span class="long">Better Design</span><span class="short">skill</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="compare-sec" style="padding-bottom:0">
+    <div class="wide">
+      <div class="window" id="compare-panel" role="tabpanel" aria-labelledby="tab-with">
+        <div class="window__bar">
+          <span class="window__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="window__label" id="compareLabel">driftline · built with Better Design</span>
+          <a class="window__open ui-dim ui-focus" id="compareOpen" href="compare/with/" target="_blank" rel="noopener">Open full page <span class="ui-icon-nudge" aria-hidden="true">›</span></a>
+        </div>
+        <div class="window__body">
+          <iframe id="frame-without" src="compare/without/" title="Driftline, built without the skill" tabindex="-1"></iframe>
+          <iframe id="frame-with" src="compare/with/" title="Driftline, built with Better Design" data-on></iframe>
+        </div>
+      </div>
+      <p class="prompt">Prompt for both: <q>Make me a website for Driftline, a night-train booking service: overnight sleeper routes between European cities. People pick a route and date, compare seat, couchette and private cabin, and book.</q> The second run added “Use the better-design skill.”</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap" style="text-align:center">
+      <h2 class="headline">Install</h2>
+      <div class="install">
+        <code id="cmd"><span class="p" aria-hidden="true">$ </span>npx skills add Moddingflow/better-design --skill better-design</code>
+        <button class="btn btn-primary ui-press ui-focus" type="button" id="copy" aria-describedby="cmd"><span class="ui-btn-state"><span class="ui-state-label">Copy</span><span class="ui-state-pending"><span class="ui-spinner" aria-hidden="true"></span></span><span class="ui-state-done">Copied ✓</span></span></button>
+      </div>
+      <p class="hero-links"><a class="ui-dim ui-focus" href="https://github.com/Moddingflow/better-design#installation">Other agents and options <span class="ui-icon-nudge" aria-hidden="true">›</span></a></p>
+      <p id="copyStatus" class="sr-only" role="status"></p>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <div class="wide section-head">
+      <h2 class="headline">Bundled live pages</h2>
+      <p class="lead">Built only from the skill's own assets. Open one and press everything.</p>
+    </div>
+    <div class="wide demos">
+      <a class="demo demo--feature ui-press ui-press--surface ui-press--on-dark ui-focus" href="assets/house-style.html">
+        <div class="txt">
+          <h2 class="headline">The default style</h2>
+          <p class="lead">What the agent builds when there is no brief and no design system: a product page and an app screen with a working switch and field error.</p>
+          <span class="go more">Open the page <span class="ui-icon-nudge" aria-hidden="true">›</span></span>
+        </div>
+        <div class="shot"><img src="images/house-style.png" width="1600" height="956" alt="Product page in the default style: black canvas, light headline, one white pill button"></div>
+      </a>
+      <a class="demo ui-press ui-press--surface ui-press--on-dark ui-focus" href="assets/motion/kit.html">
+        <div class="txt">
+          <h2 class="title">Interaction kit</h2>
+          <p class="lead">Press, bloom and spring release, async button states, switches, segmented controls, menus and disclosures.</p>
+          <span class="go more">Press the buttons <span class="ui-icon-nudge" aria-hidden="true">›</span></span>
+        </div>
+        <div class="shot" style="--crop: left top"><img src="images/kit.webp" width="1560" height="640" alt="Interaction kit bench: buttons, async states, a switch, a checkbox and a segmented control" loading="lazy"></div>
+      </a>
+      <a class="demo ui-press ui-press--surface ui-press--on-dark ui-focus" href="assets/effects/gallery.html">
+        <div class="txt">
+          <h2 class="title">Signature effects</h2>
+          <p class="lead">The opt-in pool: live dither field, dot globe with routes, dot matrix text, scroll scenes and hover responses.</p>
+          <span class="go more">Move the pointer <span class="ui-icon-nudge" aria-hidden="true">›</span></span>
+        </div>
+        <div class="shot"><img src="images/effects.webp" width="1400" height="294" alt="Live dither field behind a call to action with two buttons" loading="lazy"></div>
+      </a>
+    </div>
+  </section>
+</main>
+<footer class="foot"><div class="wrap"><span>MIT License</span><a class="ui-dim ui-focus" href="https://github.com/Moddingflow/better-design/blob/main/CHANGELOG.md">Changelog</a><a class="ui-dim ui-focus" href="https://github.com/Moddingflow/better-design/blob/main/README.ru.md">Русский</a></div></footer>
+<script src="assets/motion/interaction-kit.js"></script>
+<script>
+  BetterUI.init(document);
+
+  // Before / after switch: both builds stay loaded so switching keeps their state.
+  var builds = [
+    { tab: 'tab-without', frame: 'frame-without', href: 'compare/without/', label: 'driftline · built without the skill' },
+    { tab: 'tab-with', frame: 'frame-with', href: 'compare/with/', label: 'driftline · built with Better Design' }
+  ];
+  var panel = document.getElementById('compare-panel');
+  BetterUI.segmented(document.querySelector('.compare-tabs'), {
+    onChange: function (i) {
+      builds.forEach(function (b, n) {
+        var f = document.getElementById(b.frame);
+        if (n === i) { f.setAttribute('data-on', ''); f.removeAttribute('tabindex'); }
+        else { f.removeAttribute('data-on'); f.setAttribute('tabindex', '-1'); }
+      });
+      panel.setAttribute('aria-labelledby', builds[i].tab);
+      document.getElementById('compareLabel').textContent = builds[i].label;
+      document.getElementById('compareOpen').href = builds[i].href;
+    }
+  });
+
+  var copyBtn = document.getElementById('copy');
+  var copyStatus = document.getElementById('copyStatus');
+  var text = 'npx skills add Moddingflow/better-design --skill better-design';
+  copyBtn.addEventListener('click', function () {
+    BetterUI.runWithState(copyBtn, function () {
+      if (!navigator.clipboard) return Promise.reject(new Error('no clipboard'));
+      return navigator.clipboard.writeText(text);
+    }, {
+      onError: function () {
+        // Clipboard blocked: select the command so Ctrl+C works.
+        var r = document.createRange(); r.selectNodeContents(document.getElementById('cmd'));
+        var s = getSelection(); s.removeAllRanges(); s.addRange(r);
+        copyStatus.textContent = 'Copy failed. The command is selected, press Ctrl+C.';
+      }
+    }).then(function () { copyStatus.textContent = 'Command copied'; }, function () {});
+  });
+</script>
+</body>
+</html>

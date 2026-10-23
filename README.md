@@ -8,6 +8,8 @@ Give your AI coding agent a repeatable process for designing interfaces: product
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Agent Skills](https://img.shields.io/badge/format-Agent%20Skills-24292f.svg)](https://agentskills.io)
 
+**[▶ Live demo](https://moddingflow.github.io/better-design/)**: one prompt built with and without the skill, side by side, plus the bundled live pages. Try it before you install.
+
 **[Install](#installation)** · **[Example prompts](docs/examples.md)** · **[How it works](#how-it-works)** · **[Validation](docs/validation.md)** · **[Changelog](CHANGELOG.md)** · **[Русский](README.ru.md)**
 
 ![A product page built in the Better Design default style: black canvas, a light Geologica headline, one white pill and a blue text link](docs/images/house-style.png)
@@ -154,15 +156,15 @@ The skill treats probe errors, or a probe that was never run on a created page, 
 
 ## Optional effects pool
 
-For expressive surfaces whose art direction asks for a signature detail, the [effects library](skills/better-design/references/effects-library.md) offers tested, dependency-free recipes with rules for when they fit, budgets per page, fallbacks, and reduced motion. Nothing in it is a default. Patterns were studied on KumoRouter, Cloudflare, Linear, and Apple product pages and rewritten from their observed behavior.
+For expressive surfaces whose art direction asks for a signature detail, the [effects library](skills/better-design/references/effects-library.md) offers tested, dependency-free recipes with rules for when they fit, budgets per page, fallbacks, and reduced motion. Nothing in it is a default. Patterns were studied on Cloudflare, Linear, and Apple product pages and rewritten from their observed behavior.
 
 ![A CTA band over a live ordered-dither field of folded liquid metal](docs/images/effects-dither-field.webp)
 
-![Catalog cards with baked halftone glows in vendor colors](docs/images/effects-dither-bake.webp)
+![Product cards with baked halftone glows, one color per product line](docs/images/effects-dither-bake.webp)
 
 ![A dotted globe with route arcs, HTML markers, and a bracketed callout](docs/images/effects-dot-globe.webp)
 
-![The word EDGE rebuilt as an LED dot matrix](docs/images/effects-dot-matrix.webp)
+![The word LUMEN rebuilt as an LED dot matrix](docs/images/effects-dot-matrix.webp)
 
 - **Dither:** a live WebGL ordered-dither field and a zero-runtime baked halftone for card sets.
 - **Dot language:** dot-grid fields with a pointer spotlight, any image or text rebuilt from dots, a dotted globe with routes, pulsing dot bands, data as dot columns, and 5×5 LED status icons.
@@ -281,6 +283,6 @@ Yes, under the [MIT license](LICENSE). Preserve the license notice when redistri
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for focused changes, reproducible reports, and validation commands, and [CHANGELOG.md](CHANGELOG.md) for releases.
 
-The references record the original skill's sources and conceptual influences, including [Impeccable](https://github.com/pbakaus/impeccable) and [Taste Skill](https://github.com/Leonxlnx/taste-skill). Effect recipes were written from behavior observed on KumoRouter, Cloudflare, Linear, and Apple; no code was copied from those sites. Agent Skills, the Skills CLI, and supported agent products are maintained by their respective authors. This is an independent project.
+The references record the original skill's sources and conceptual influences, including [Impeccable](https://github.com/pbakaus/impeccable) and [Taste Skill](https://github.com/Leonxlnx/taste-skill). Effect recipes were written from behavior observed on Cloudflare, Linear, and Apple; no code was copied from those sites. Agent Skills, the Skills CLI, and supported agent products are maintained by their respective authors. This is an independent project.
 
 Maintained by [Moddingflow](https://github.com/Moddingflow). [MIT](LICENSE).
