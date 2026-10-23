@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Driftline — Night trains across Europe</title>
+<meta name="description" content="Book overnight sleeper trains between European cities. Compare seats, couchettes and private cabins.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#search">Skip to search</a>
+
+<header class="top">
+  <div class="wrap top__inner">
+    <a class="brand" href="#top" aria-label="Driftline home">
+      <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
+        <path d="M21 5a11 11 0 1 0 6 16A9 9 0 0 1 21 5Z" fill="currentColor"/>
+        <path d="M3 27h26" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Driftline</span>
+    </a>
+    <nav class="top__nav" aria-label="Main">
+      <a href="#routes">Routes</a>
+      <a href="#classes">Sleeping options</a>
+      <a href="#onboard">On board</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero__grid">
+      <div class="hero__copy">
+        <p class="eyebrow">Overnight sleeper trains · 9 routes · 11 cities</p>
+        <h1>Board after dinner.<br>Wake up somewhere else.</h1>
+        <p class="lede">Driftline runs sleeper trains between European cities. Choose a seat, a couchette or a cabin of your own, and arrive in the city centre in time for breakfast.</p>
+
+        <form id="search" class="search" autocomplete="off" novalidate>
+          <div class="search__pair">
+            <label class="field">
+              <span class="field__label">From</span>
+              <select id="from" name="from" required></select>
+            </label>
+            <button type="button" id="swap" class="swap" aria-label="Swap departure and arrival">
+              <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M6 3 3 6l3 3M3 6h11M14 11l3 3-3 3M17 14H6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <label class="field">
+              <span class="field__label">To</span>
+              <select id="to" name="to" required></select>
+            </label>
+          </div>
+          <div class="search__row">
+            <label class="field">
+              <span class="field__label">Departure night</span>
+              <input type="date" id="date" name="date" required>
+            </label>
+            <label class="field field--narrow">
+              <span class="field__label">Travellers</span>
+              <select id="pax" name="pax">
+                <option value="1">1 adult</option>
+                <option value="2" selected>2 adults</option>
+                <option value="3">3 adults</option>
+                <option value="4">4 adults</option>
+              </select>
+            </label>
+            <button class="btn btn--lamp search__go" type="submit">Find trains</button>
+          </div>
+          <p class="search__error" id="searchError" role="alert" hidden></p>
+        </form>
+      </div>
+
+      <figure class="map" aria-label="Driftline network map">
+        <svg id="map" viewBox="0 0 560 640" role="img" aria-labelledby="mapTitle">
+          <title id="mapTitle">Map of Driftline night routes between European cities</title>
+        </svg>
+        <figcaption class="map__caption" id="mapCaption">Every line is one night. Tap a city to start there.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Booking flow -->
+  <section id="book" class="book" hidden>
+    <div class="wrap">
+      <ol class="steps" aria-label="Booking progress">
+        <li data-step="1" class="is-current"><span>1</span>Train</li>
+        <li data-step="2"><span>2</span>Sleeping option</li>
+        <li data-step="3"><span>3</span>Details</li>
+      </ol>
+
+      <div class="book__grid">
+        <div class="book__main">
+          <div id="stepTrain" class="panel">
+            <header class="panel__head">
+              <h2 id="resultsTitle">Trains</h2>
+              <div class="daystrip" id="daystrip" role="group" aria-label="Nearby dates"></div>
+            </header>
+            <div id="results" class="results"></div>
+          </div>
+
+          <div id="stepClass" class="panel" hidden>
+            <header class="panel__head">
+              <h2>Choose how you sleep</h2>
+              <p class="panel__sub" id="classSub"></p>
+            </header>
+            <div id="classOptions" class="options" role="radiogroup" aria-label="Sleeping options"></div>
+            <div id="extras" class="extras"></div>
+            <div class="panel__actions">
+              <button type="button" class="btn btn--ghost" data-back="1">Back to trains</button>
+              <button type="button" class="btn btn--lamp" id="toDetails" disabled>Continue</button>
+            </div>
+          </div>
+
+          <div id="stepDetails" class="panel" hidden>
+            <header class="panel__head">
+              <h2>Who's travelling</h2>
+              <p class="panel__sub">Names must match ID — conductors check them at boarding.</p>
+            </header>
+            <form id="detailsForm" novalidate>
+              <div id="paxFields" class="paxfields"></div>
+              <label class="field field--block">
+                <span class="field__label">Email for tickets</span>
+                <input type="email" id="email" name="email" placeholder="you@example.com" required>
+              </label>
+              <p class="notice">
+                <strong>This is a demo.</strong> At this point a real Driftline booking would be submitted for payment. Nothing is charged and no ticket is issued here.
+              </p>
+              <div class="panel__actions">
+                <button type="button" class="btn btn--ghost" data-back="2">Back</button>
+                <button type="submit" class="btn btn--lamp">Review booking</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <aside class="summary" id="summary" aria-live="polite">
+          <h2 class="summary__title">Your journey</h2>
+          <div id="summaryBody" class="summary__body"></div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section id="routes" class="section">
+    <div class="wrap">
+      <div class="section__head">
+        <h2>Tonight's departures</h2>
+        <p>All trains leave between 18:30 and 21:30 and arrive before 10:00.</p>
+      </div>
+      <ul class="routecards" id="routecards"></ul>
+    </div>
+  </section>
+
+  <section id="classes" class="section section--alt">
+    <div class="wrap">
+      <div class="section__head">
+        <h2>Three ways to spend the night</h2>
+        <p>Every ticket includes a pillow, blanket and water. Couchettes and cabins add bedding and breakfast.</p>
+      </div>
+      <div class="tiers">
+        <article class="tier">
+          <svg class="tier__plan" viewBox="0 0 160 90" aria-hidden="true">
+            <rect x="2" y="2" width="156" height="86" rx="6" class="plan-wall"/>
+            <g class="plan-item"><rect x="14" y="14" width="34" height="28" rx="5"/><rect x="62" y="14" width="34" height="28" rx="5"/><rect x="110" y="14" width="34" height="28" rx="5"/><rect x="14" y="50" width="34" height="28" rx="5"/><rect x="62" y="50" width="34" height="28" rx="5"/><rect x="110" y="50" width="34" height="28" rx="5"/></g>
+          </svg>
+          <h3>Seat</h3>
+          <p class="tier__from">from <strong>€39</strong></p>
+          <p>Reclining seat in a six-seat compartment. Lights dim after midnight.</p>
+          <ul class="ticks"><li>Reading light &amp; socket</li><li>Luggage rack overhead</li><li>Shared washroom</li></ul>
+        </article>
+        <article class="tier">
+          <svg class="tier__plan" viewBox="0 0 160 90" aria-hidden="true">
+            <rect x="2" y="2" width="156" height="86" rx="6" class="plan-wall"/>
+            <g class="plan-item"><rect x="14" y="12" width="132" height="16" rx="4"/><rect x="14" y="36" width="132" height="16" rx="4" opacity=".6"/><rect x="14" y="60" width="132" height="16" rx="4" opacity=".35"/></g>
+          </svg>
+          <h3>Couchette</h3>
+          <p class="tier__from">from <strong>€69</strong></p>
+          <p>A flat berth in a compartment of four or six, with sheets and a lockable door.</p>
+          <ul class="ticks"><li>Bedding made up on arrival</li><li>Women-only compartments</li><li>Breakfast included</li></ul>
+        </article>
+        <article class="tier tier--feature">
+          <svg class="tier__plan" viewBox="0 0 160 90" aria-hidden="true">
+            <rect x="2" y="2" width="156" height="86" rx="6" class="plan-wall"/>
+            <g class="plan-item"><rect x="14" y="14" width="92" height="26" rx="5"/><rect x="14" y="50" width="92" height="26" rx="5" opacity=".6"/><rect x="118" y="14" width="28" height="62" rx="5" opacity=".35"/></g>
+          </svg>
+          <h3>Private cabin</h3>
+          <p class="tier__from">from <strong>€149</strong></p>
+          <p>A room for one to three people with real beds, a washbasin and a key card.</p>
+          <ul class="ticks"><li>Deluxe cabins with shower &amp; WC</li><li>Hot breakfast served to the cabin</li><li>Welcome drink &amp; slippers</li></ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="onboard" class="section">
+    <div class="wrap facts">
+      <div class="fact"><h3>City centre to city centre</h3><p>No airport transfers or security queues. Board up to 30 minutes before departure.</p></div>
+      <div class="fact"><h3>Bikes and big bags</h3><p>Bicycle spaces on every train, bookable as an add-on. No baggage weight limits.</p></div>
+      <div class="fact"><h3>Change of plans</h3><p>Free changes until 24 hours before departure on all fares, including seats.</p></div>
+      <div class="fact"><h3>About a fifth of the CO₂</h3><p>Compared with flying the same route, by our estimate per passenger on a full train.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__inner">
+    <p class="brand brand--small"><svg viewBox="0 0 32 32" width="20" height="20" aria-hidden="true"><path d="M21 5a11 11 0 1 0 6 16A9 9 0 0 1 21 5Z" fill="currentColor"/></svg>Driftline</p>
+    <p class="foot__note">Design demo. Timetables, prices and availability are invented; no bookings or payments are processed.</p>
+  </div>
+</footer>
+
+<dialog id="review" class="review" aria-labelledby="reviewTitle">
+  <form method="dialog" class="review__inner">
+    <p class="eyebrow">Demo — booking not submitted</p>
+    <h2 id="reviewTitle">Booking summary</h2>
+    <div id="reviewBody"></div>
+    <p class="notice notice--soft">In the live service this is where the booking request would go to Driftline and you'd be taken to payment. In this demo nothing is sent, charged or reserved.</p>
+    <div class="panel__actions">
+      <button value="edit" class="btn btn--ghost">Edit details</button>
+      <button value="new" class="btn btn--lamp" id="startOver">Start a new search</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>

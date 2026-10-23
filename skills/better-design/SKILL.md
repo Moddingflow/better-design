@@ -3,7 +3,7 @@ name: better-design
 description: "Design, improve, and validate UI/UX for applications, websites, native interfaces, and games: an art direction derived from the product, a coherent visual system kept in the project's DESIGN.md (read first, created when missing, the single source of interface values), measured layout geometry (equal spacing, shared alignment lines, content centered inside small controls, nothing clipped or touching its container edge), a catalog of AI-slop patterns that rejects page narration and redundant helper text, a living motion language (press feedback, transitions, choreography, reduced motion), an Apple-like ultra-minimal default style, an opt-in pool of signature effects, clear actions, accessibility, drag and drop anticipated from the start (drop zones for every upload), and real states (including skeleton loaders and loading splash) without AI slop. Use for interface creation, redesigns, focused UI changes, animation and interaction polish, design plans, and UX audits; not for backend-only tasks."
 license: MIT
 metadata:
-  version: "1.6.0"
+  version: "1.7.0"
 ---
 
 # Better Design
@@ -40,12 +40,23 @@ Evaluate coherence, expressiveness, and accessibility separately. Do not promise
   Functionality and applicable accessibility requirements apply at every level.
 - **Default visual direction.** When the user names no visual style and the project has no
   DESIGN.md, brand, code tokens, or live UI to inherit, build in the house style: premium
-  ultra-minimal in the spirit of Apple (black canvas, near-white type, two grays, one blue for
-  links and focus, real content as the only color). Rules and the ready DESIGN.md preset are
-  in [house-style.md](references/house-style.md). Any visual cue from the user (colors, mood,
-  theme, reference, brand, audience style) overrides it: follow the request, and apply only
-  the parts of the house style the request leaves open and does not contradict. Never
-  restyle an existing product into it unless asked. Games keep their own art direction.
+  ultra-minimal in the spirit of Apple (black canvas, near-white Geologica at weights 500 and
+  340, two grays, one blue for links and focus, pill actions, surfaces separated by tone,
+  real content as the only color). Rules and the ready DESIGN.md preset are
+  in [house-style.md](references/house-style.md); read it whole before writing any style.
+  Two misreadings send agents elsewhere, so check them explicitly (house-style.md section 1):
+  the product's domain, industry, audience, or name is not a visual cue ("a coffee roastery",
+  "for developers"), and untouched scaffold defaults are not a system to inherit (the
+  shadcn/ui default theme, Tailwind's default palette, create-next-app, Vite, or Expo
+  starters, Bootstrap, MUI, or Chakra defaults); map the house style onto them instead.
+  When it applies, start from the reference file
+  [house-style.html](assets/house-style.html), not a blank page: take its tokens, type
+  classes, nav, buttons, tiles, and section rhythm (or port them into the stack's
+  components), then replace its content (house-style.md section 1). Any visual cue from the
+  user (colors, mood, theme, reference, brand, audience style) overrides it: follow the
+  request, and apply only the parts of the house style the request leaves open and does not
+  contradict. Never restyle an existing product into it unless asked. Games keep their own
+  art direction.
 - Preserve the established brand, density, game-like, editorial, or expressive composition.
   Do not replace them with a generic gray CRM. For a real conflict, choose the smallest
   accessible adjustment and explain the specific deviation.

@@ -30,6 +30,56 @@ Scope: websites, web apps, desktop and mobile apps, dashboards and tools. Games 
 own world's art direction; their launchers, stores, and account pages may use the house
 style when no cue exists.
 
+### What is not a cue, and what is not a system
+
+Most failures to apply this style come from reading one of these as a reason to skip it:
+
+- **Not a visual cue:** the product's domain, industry, audience, price level, or name.
+  "A coffee roastery", "a SaaS for accountants", "a fitness app", "for developers", "a
+  premium brand" describe what to build, not how it should look. They feed the concept
+  (section 10), imagery, and copy; palette, type, shape, and motion stay the house style.
+  Only words about appearance count: colors, mood, theme, a named reference or brand,
+  "playful", "retro", "light", "for kids", and the like.
+- **Not a system:** defaults nobody chose. A fresh shadcn/ui install with its default theme
+  (neutral, zinc, or slate base color and its stock `--radius`), Tailwind's default palette and type
+  scale, the create-next-app, Vite, Astro, or Expo starter styles, and untouched Bootstrap,
+  MUI, Chakra, Mantine, or Material defaults are scaffolding. Keep the component library and
+  map the house style onto its tokens (table below). A theme becomes a system once someone
+  customized it for this product: a brand color, a chosen font, a DESIGN.md, or shipped
+  screens that use it.
+- **Not a reason to leave it:** a product without photos (use the imagery path in
+  section 5), a dense catalog or shop (section 6), or a dark style the agent finds plain.
+
+Mapping onto common scaffolds (dark values; light ones from section 3):
+
+| Scaffold token | House-style role |
+| --- | --- |
+| shadcn `--background` / `--foreground` | canvas `#000` / text `#f5f5f7` |
+| shadcn `--card`, `--popover`, `--muted`, `--secondary` | surface `#161617` (popover and inputs: surface-raised `#1d1d1f`) |
+| shadcn `--muted-foreground` | text-secondary `#a1a1a6` |
+| shadcn `--primary` / `--primary-foreground` | action `#f5f5f7` / `#000` |
+| shadcn `--accent` | surface-raised `#1d1d1f` (hover fill, not a hue) |
+| shadcn `--border` / `--input` / `--ring` | hairline `rgb(255 255 255 / 0.1)` / field-border `#86868b` / focus `#2997ff` |
+| shadcn `--radius` | `1.125rem` (cards 18 px); buttons get `rounded-full`, tiles 28 px |
+| Tailwind `fontFamily.sans` | Geologica stack (section 4); remove Inter/Geist imports |
+| Tailwind `font-bold` / `font-semibold` on headings | `font-medium` (500); body text weight 340 |
+
+### Start from the reference
+
+Do not compose the look from memory. When the style applies:
+
+1. Open [house-style.html](../assets/house-style.html) and read it whole. It is the visual
+   source of truth: tokens on `:root`, the type classes (`.hero`, `.headline`, `.title`,
+   `.intro`, `.lead`), the glass nav with the late primary pill, pill buttons, tiles, the
+   feature split, the light chapter, and the app settings screen.
+2. Start the new page or app shell from it: copy its tokens and type classes verbatim (or
+   port them 1:1 into the stack's theme and components), plus the
+   [interaction kit](../assets/motion/). Change values only through DESIGN.md.
+3. Replace the placeholder product ("Lumen") with the real one: content, imagery, section
+   order, and the signature detail chosen from the concept.
+4. Before finishing, put a screenshot of your page next to one of house-style.html at the
+   same width (section 11). They must read as one family.
+
 ## 2. The character in one paragraph
 
 Black canvas, near-white type, two grays, no decoration. One idea per section, set large,
@@ -64,7 +114,8 @@ Rules:
 - **Monochrome UI.** Gray steps carry hierarchy; blue is reserved for links, focus, and
   selection. No second accent unless the product brings one (then one, used for actions).
 - **Color comes from content.** Product renders, screenshots, photos, and charts supply the
-  chroma. Without real imagery, stay typographic; never fill the gap with gradients or glow.
+  chroma. Without real imagery, follow the imagery path in section 5; never fill the gap
+  with gradients, glow, or tinted UI.
 - **No gradient backgrounds, no glass panels.** Glass (blur 20 px, saturate 180%,
   `rgb(22 22 23 / 0.8)`) is allowed only for floating chrome: the sticky nav and floating
   media controls.
@@ -121,6 +172,26 @@ footnote 13/18 400, caption 12/16 400. Dense tools step down to body 14–15 at 
   then the product). Feature sections alternate: left-aligned text with large media, a
   two-tile row, a full-width media band. Never everything centered, never a grid of
   identical icon cards.
+- **Page anatomy (sites and landing pages).** Build from these blocks of the reference, in
+  an order the content needs: (1) hero: headline, one intro line, a primary pill and a text
+  link, then one large product media block up to 1440 px wide; (2) feature split: text left,
+  large media right (or mirrored); (3) a two-tile row: each tile a short headline, one line,
+  a link, and media bleeding off its edge; (4) a full-width media band or `fx:scroll-zoom`;
+  (5) one light chapter (`data-theme="light"`) as a break, at most one per page; (6) a quiet
+  footer in caption type. Adjacent sections use different blocks. Apps and tools use the app
+  scale and the grouped-list pattern of the reference's settings screen instead.
+- **The hero leads with the product, not a panel.** Its leading element is the product
+  shown as an object: a photo, a render, or the real app screen in a device or window frame.
+  Dashboards, charts, stat rows, configurators, and forms are content for feature sections,
+  where they sit as the media of a split or tile, not as a boxed widget under the headline.
+- **Imagery path when no photos exist.** Take the first that applies: (1) real assets from
+  the project or the user; (2) the product's own interface rendered as real HTML inside a
+  device or window frame; (3) a large monochrome object drawn in SVG or CSS (the bag, the
+  lamp, the device) with soft tone steps on a surface tile; (4) a media slot of the final
+  size and crop on surface, labeled for the real image, as in the reference ("Product render
+  (real image goes here)"). A correctly sized empty slot keeps the composition; replacing
+  the image with a chart, a gradient, or decoration breaks it. Never AI-generated scenes or
+  stock clichés.
 - **Radii:** tiles 28 px, cards 18 px, inputs 12 px, buttons and chips pill (9999 px),
   sheets 16–20 px top. Nested radius = outer − inset.
 - **Depth:** flat on dark (tone steps instead of shadows); on light, one soft shadow for
@@ -132,6 +203,12 @@ footnote 13/18 400, caption 12/16 400. Dense tools step down to body 14–15 at 
   regular label, action fill. One per viewport.
 - **Secondary action:** a text link in link color with a chevron ("Learn more ›"), or a
   ghost pill with a field-border outline. Never two filled buttons side by side.
+- **Catalogs and shops:** "one primary per viewport" means one filled pill for the
+  page-level action (checkout, subscribe, buy the hero product). Repeated per-item actions
+  ("Add to bag", "Choose") are ghost pills or text links. Item cards are media-led: the
+  product image (or its slot from the imagery path) fills at least half the card, then the
+  name, one line, and the price in tabular numerals. At most one item grid per page, three
+  or four per row on desktop; a single hero product or a featured split comes before it.
 - **Nav:** 48–52 px, transparent over the hero, then glass (`fx:header-morph` fits);
   12–14 px links in text-secondary, active in text. Its primary pill fades in only once the
   hero's primary action has left the viewport.
@@ -206,7 +283,18 @@ The palette and type are shared by design, so character has to come from the pro
   (`python -B -X utf8 scripts/validate_design.py tokens assets/house-style.tokens.json
   --require-contrast`); re-run it after any color override.
 - Compare with the reference render [house-style.html](../assets/house-style.html) (hero,
-  feature split, tiles, light chapter, app settings screen) at phone and desktop widths.
+  feature split, tiles, light chapter, app settings screen) at phone and desktop widths:
+  screenshot both at 1440 and 390 and look at them side by side. Same family means the
+  same headline weight and tracking, the same nav, pill buttons, tile radius and padding,
+  and the same section rhythm. List every deviation with its reason in DESIGN.md.
+- Style conformance in the code (any hit is an error unless DESIGN.md records it):
+  a headline above weight 500 or body text above 400; a font family other than Geologica
+  and its fallback stack; a hex color outside section 3 in UI (content imagery excepted);
+  an elevation shadow (a blurred `box-shadow`) on a dark surface, while the interaction
+  kit's focus rings and press fills are fine; any `linear-gradient` or `radial-gradient`
+  used as a background; a border drawn around a tile or card; a filled button that is not a
+  pill; more than one filled action pill visible in one viewport (selection indicators,
+  counters, and chips do not count).
 - Squint test: one leading element per section survives blur and grayscale.
 - Count per viewport: one primary action, at most two text levels per block, no decoration
   without a function.

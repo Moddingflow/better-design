@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.7.0 — unreleased
+
+### Changed
+
+- **The default style applies more reliably.** `house-style.md` now states what is not a visual cue (the product's domain, industry, audience, or name) and what is not a design system to inherit (untouched shadcn/ui, Tailwind, starter-template, Bootstrap, MUI, Chakra, or Mantine defaults), with a token mapping for shadcn/ui and Tailwind. `SKILL.md` names both checks where the default is chosen.
+- **Start from the reference.** When the default style applies, the agent starts from `assets/house-style.html` (tokens, type classes, nav, buttons, tiles, section rhythm) instead of composing the look from memory.
+- **Page anatomy and imagery.** The default style defines the blocks a site is built from, requires the hero to lead with the product rather than a dashboard or widget, and gives an imagery path for products without photos (own UI in a frame, a drawn monochrome object, or a sized and labeled media slot).
+- **Catalogs and shops.** One filled pill per viewport is the page-level action; per-item actions are ghost pills or links, and item cards are media-led.
+- **Verification.** A side-by-side screenshot comparison with the reference at 1440 and 390 px and a list of code-level conformance checks (headline weight, font family, palette, shadows, gradients, tile borders, pill shape, filled pills per viewport).
+- The effects gallery uses the placeholder product from the reference page.
+
+### Added
+
+- **Live demo** on GitHub Pages (`demo/`, deployed by `.github/workflows/pages.yml`): the same prompt built by an agent with and without the skill, switchable in place, plus the bundled live pages.
+
 ## 1.6.0 — 2026-10-20
 
 ### Added
