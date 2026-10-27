@@ -1,0 +1,993 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Диспетчерская — сводка смены</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Condensed:wght@500;600&family=Fira+Sans:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Fira+Sans+Condensed:wght@500;600&family=Fira+Sans:wght@400;500&display=swap" rel="stylesheet"></noscript>
+<style>
+/* ── Tokens (DESIGN.md) ─────────────────────────────────────────────────────────────── */
+:root {
+  --c-paper: #EEF0E9; --c-sheet: #FAFBF7; --c-sunk: #E3E6DD;
+  --c-ink: #1B201D; --c-ink-2: #535A54;
+  --c-line: #D2D6CB; --c-line-strong: #7F857C;
+  --c-water: #11698A; --c-water-deep: #0C5470; --c-on-water: #FFFFFF; --c-water-wash: #D9E9EE;
+  --c-focus: #0B4C66;
+  --c-road: #AE3320; --c-road-wash: #F5E0D9;
+  --c-ochre: #7E5600; --c-ochre-wash: #F3E8C8;
+  --c-park: #2C6639;
+
+  --f-cond: "Fira Sans Condensed", "Fira Sans", "Arial Narrow", sans-serif;
+  --f-text: "Fira Sans", system-ui, sans-serif;
+  --t-h1: 600 22px/28px var(--f-cond);
+  --t-h2: 600 17px/22px var(--f-cond);
+  --t-fig: 600 17px/22px var(--f-cond);
+  --t-body: 400 14px/20px var(--f-text);
+  --t-strong: 500 14px/20px var(--f-text);
+  --t-label: 500 13px/16px var(--f-text);
+  --t-caption: 400 12px/16px var(--f-text);
+
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px;
+  --r-control: 4px; --r-panel: 6px; --r-overlay: 8px;
+  --h-sm: 30px; --h-md: 36px;
+  --side-w: 216px; --rail-w: 360px;
+  --shadow-overlay: 0 8px 24px rgb(27 32 29 / 0.16), 0 1px 3px rgb(27 32 29 / 0.12);
+
+  --m-micro: 140ms; --m-small: 200ms; --m-medium: 280ms; --m-trace: 420ms;
+  --e-standard: cubic-bezier(0.2, 0, 0, 1); --e-enter: cubic-bezier(0, 0, 0, 1); --e-exit: cubic-bezier(0.3, 0, 1, 1);
+
+  /* interaction kit mapping */
+  --ui-focus-ring: var(--c-focus);
+  --ui-highlight: rgb(255 255 255 / 0.24);
+  --ui-highlight-on-light: rgb(17 105 138 / 0.14);
+  --ui-seg-track: var(--c-sunk);
+  --ui-seg-indicator: var(--c-sheet);
+}
+
+/* ── Interaction kit (better-design assets/motion/interaction-kit.css, used parts) ───── */
+:root {
+  --ui-press-down: 80ms; --ui-release: 520ms; --ui-hover: 200ms; --ui-focus: 160ms; --ui-state: 260ms;
+  --ui-ease-out: cubic-bezier(0.2, 0, 0, 1); --ui-ease-color: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ui-spring-pop: linear(0, 0.044, 0.155, 0.307, 0.475, 0.642, 0.794, 0.922, 1.023, 1.094, 1.139, 1.16, 1.162, 1.15, 1.129, 1.103, 1.075, 1.049, 1.025, 1.006, 0.991, 0.981, 0.976, 0.973, 0.974, 0.977, 0.981, 0.985, 0.989, 0.994, 0.997, 1, 1.002, 1.003, 1.004, 1.004, 1.004, 1.004, 1.003, 1.002, 1);
+  --ui-spring-snap: linear(0, 0.03, 0.105, 0.207, 0.32, 0.435, 0.545, 0.644, 0.732, 0.806, 0.867, 0.915, 0.953, 0.981, 1.001, 1.015, 1.023, 1.027, 1.028, 1.028, 1.026, 1.023, 1.02, 1.016, 1.013, 1.01, 1.008, 1.006, 1.004, 1.003, 1);
+  interpolate-size: allow-keywords;
+}
+.ui-press { position: relative; isolation: isolate; overflow: hidden; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transform: scale(1);
+  transition: transform var(--ui-release) var(--ui-spring-pop), background-color var(--ui-hover) var(--ui-ease-color), color var(--ui-hover) var(--ui-ease-color), border-color var(--ui-hover) var(--ui-ease-color), box-shadow var(--ui-hover) var(--ui-ease-color), filter var(--ui-hover) var(--ui-ease-color), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.ui-press:active:not(:disabled):not([aria-disabled="true"]), .ui-press[data-pressed] { transform: scale(var(--ui-press-scale, 0.96)); filter: brightness(var(--ui-press-brightness, 0.92)); transition-duration: var(--ui-press-down); transition-timing-function: var(--ui-ease-out); }
+.ui-press--on-dark { --ui-press-brightness: 1.18; }
+.ui-press--surface { --ui-press-scale: 0.985; }
+.ui-press::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(circle at var(--ui-px, 50%) var(--ui-py, 50%), var(--ui-bloom, var(--ui-highlight-on-light)) 0%, transparent var(--ui-bloom-r, 70%)); opacity: 0; transition: opacity 600ms var(--ui-ease-out); }
+.ui-press--on-dark::after { --ui-bloom: var(--ui-highlight); }
+.ui-press[data-pressed]::after { opacity: 1; transition-duration: 90ms; }
+@media (hover: hover) and (pointer: fine) {
+  .ui-press:hover:not(:disabled) { filter: brightness(var(--ui-hover-brightness, 0.96)); }
+  .ui-press--on-dark:hover:not(:disabled) { --ui-hover-brightness: 1.1; }
+  .ui-press:hover .ui-icon-nudge { transform: translateX(3px); }
+}
+.ui-press:disabled, .ui-press[aria-disabled="true"] { cursor: not-allowed; opacity: 0.45; filter: none; }
+.ui-focus { outline: 2px solid transparent; outline-offset: 6px; }
+.ui-focus:not(.ui-press, .ui-dim, .ui-field, .ui-segmented > button) { transition: outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.ui-focus:focus-visible { outline-color: var(--ui-focus-ring); outline-offset: 2px; }
+.ui-dim { transition: opacity 320ms var(--ui-ease-out), color var(--ui-hover) var(--ui-ease-color), background-color var(--ui-hover) var(--ui-ease-color), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.ui-dim:active, .ui-dim[data-pressed] { opacity: 0.5; transition-duration: 40ms, var(--ui-hover), var(--ui-hover), var(--ui-focus), var(--ui-focus); }
+.ui-segmented { position: relative; display: inline-flex; padding: 3px; border-radius: var(--r-panel); background: var(--ui-seg-track); isolation: isolate; }
+.ui-segmented > button { position: relative; z-index: 1; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; opacity: 0.78;
+  transition: opacity var(--ui-hover) var(--ui-ease-color), transform var(--ui-release) var(--ui-spring-pop), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.ui-segmented > button[aria-selected="true"] { opacity: 1; }
+.ui-segmented > button:active { transform: scale(0.95); opacity: 0.55; transition-duration: var(--ui-hover), var(--ui-press-down), var(--ui-focus), var(--ui-focus); }
+.ui-segmented__indicator { position: absolute; z-index: 0; top: 3px; bottom: 3px; left: 0; border-radius: var(--r-control); background: var(--ui-seg-indicator); box-shadow: 0 0 0 1px var(--c-line), 0 1px 2px rgb(27 32 29 / 0.08);
+  transform: translateX(var(--ui-seg-x, 0)); width: var(--ui-seg-w, 0); transition: transform 460ms var(--ui-spring-snap), width 460ms var(--ui-spring-snap); }
+@media (hover: hover) and (pointer: fine) {
+  .ui-segmented > button:hover:not([aria-selected="true"]) { opacity: 1; }
+  .ui-segmented > button:hover:not([aria-selected="true"]):active { opacity: 0.55; }
+}
+.ui-btn-state { display: inline-grid; place-items: center; }
+.ui-btn-state > * { grid-area: 1 / 1; transition: opacity 180ms var(--ui-ease-out), transform 260ms var(--ui-spring-snap); }
+.ui-btn-state > .ui-state-pending, .ui-btn-state > .ui-state-done { opacity: 0; transform: translateY(6px) scale(0.9); }
+.ui-btn-state[data-state="pending"] > .ui-state-label, .ui-btn-state[data-state="done"] > .ui-state-label { opacity: 0; transform: translateY(-6px) scale(0.96); }
+.ui-btn-state[data-state="pending"] > .ui-state-pending, .ui-btn-state[data-state="done"] > .ui-state-done { opacity: 1; transform: none; }
+.ui-spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: ui-spin 700ms linear infinite; }
+@keyframes ui-spin { to { transform: rotate(360deg); } }
+.ui-field { transition: border-color var(--ui-hover) var(--ui-ease-color), box-shadow var(--ui-focus) var(--ui-ease-out); }
+.ui-field:focus-visible, .ui-field:focus { outline: none; border-color: var(--ui-focus-ring); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ui-focus-ring) 30%, transparent); }
+@keyframes ui-shake { 0%, 100% { transform: none; } 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+.ui-shake { animation: ui-shake 320ms var(--ui-ease-out); }
+.ui-pop-in { transform-origin: var(--ui-origin, top center); transition: opacity 200ms var(--ui-ease-out), transform 260ms var(--ui-spring-snap), overlay 200ms allow-discrete, display 200ms allow-discrete; }
+.ui-pop-in:not(:popover-open):not([open]) { opacity: 0; transform: scale(0.96) translateY(-4px); transition-duration: 140ms; }
+.ui-pop-in:popover-open, .ui-pop-in[open] { opacity: 1; transform: none; }
+@starting-style { .ui-pop-in:popover-open, .ui-pop-in[open] { opacity: 0; transform: scale(0.96) translateY(-4px); } }
+dialog.ui-pop-in::backdrop { background: rgb(27 32 29 / 0); transition: background-color 260ms var(--ui-ease-out), overlay 260ms allow-discrete, display 260ms allow-discrete; }
+dialog.ui-pop-in[open]::backdrop { background: rgb(27 32 29 / 0.36); }
+@starting-style { dialog.ui-pop-in[open]::backdrop { background: rgb(27 32 29 / 0); } }
+
+/* ── Base ───────────────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: var(--s-4); }
+body { margin: 0; background: var(--c-paper); color: var(--c-ink); font: var(--t-body); font-synthesis: none; -webkit-font-smoothing: antialiased; }
+::selection { background: var(--c-water-wash); color: var(--c-ink); }
+h1, h2, h3, p, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--c-water); }
+.icon { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.num { font-variant-numeric: tabular-nums; }
+.vh { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* ── Buttons ────────────────────────────────────────────────────────────────────────── */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2); height: var(--h-md); padding: 0 14px; border-radius: var(--r-control);
+  border: 1px solid var(--c-line-strong); background: var(--c-sheet); color: var(--c-ink); font: var(--t-label); white-space: nowrap; cursor: pointer; text-decoration: none; }
+.btn--sm { height: var(--h-sm); padding: 0 10px; }
+.btn--primary { background: var(--c-water); border-color: var(--c-water); color: var(--c-on-water); }
+.btn--quiet { border-color: transparent; background: transparent; color: var(--c-water); }
+.btn--icon { width: var(--h-md); padding: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .btn--secondary:hover { border-color: var(--c-ink-2); }
+  .btn--quiet:hover { background: var(--c-water-wash); }
+}
+
+/* ── App shell ──────────────────────────────────────────────────────────────────────── */
+.app { display: grid; grid-template-columns: var(--side-w) minmax(0, 1fr); min-height: 100vh; }
+.side { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: var(--s-5); padding: var(--s-5) var(--s-4); border-right: 1px solid var(--c-line); background: var(--c-sheet); }
+.mark { display: flex; align-items: center; gap: var(--s-2); padding: 0 var(--s-2); font: var(--t-h2); color: var(--c-ink); }
+.mark svg { width: 22px; height: 22px; flex: none; }
+.nav { display: grid; gap: var(--s-1); }
+.nav a { display: flex; align-items: center; gap: var(--s-3); height: var(--h-md); padding: 0 var(--s-2); border-radius: var(--r-control); color: var(--c-ink-2); text-decoration: none; font: var(--t-label); }
+.nav a .icon { width: 18px; height: 18px; }
+.nav a[aria-current="page"] { background: var(--c-water-wash); color: var(--c-ink); }
+.nav a[aria-current="page"] .icon { color: var(--c-water); }
+.nav .count { margin-left: auto; font: var(--t-caption); font-variant-numeric: tabular-nums; color: var(--c-road); font-weight: 500; }
+@media (hover: hover) and (pointer: fine) { .nav a:not([aria-current]):hover { background: var(--c-paper); color: var(--c-ink); } }
+
+.work { min-width: 0; padding: var(--s-5); display: grid; gap: var(--s-4); align-content: start; max-width: 1680px; width: 100%; }
+
+/* Header */
+.top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 420px) auto; grid-template-areas: "title search act"; align-items: center; gap: var(--s-4); }
+.top__title { grid-area: title; display: grid; gap: 2px; min-width: 0; }
+.top h1 { font: var(--t-h1); }
+.status-line { display: flex; flex-wrap: wrap; align-items: center; column-gap: var(--s-3); row-gap: 0; font: var(--t-caption); color: var(--c-ink-2); }
+.status-line .demo { color: var(--c-ochre); }
+.search { grid-area: search; position: relative; justify-self: end; width: 100%; }
+.search .icon { position: absolute; left: 12px; top: 10px; color: var(--c-ink-2); pointer-events: none; }
+.field { width: 100%; height: var(--h-md); padding: 0 12px; border: 1px solid var(--c-line-strong); border-radius: var(--r-control); background: var(--c-sheet); font: var(--t-body); }
+.search .field { padding-left: 36px; }
+.field::placeholder { color: var(--c-ink-2); opacity: 1; }
+.top__act { grid-area: act; display: flex; gap: var(--s-2); }
+
+/* Workspace grid */
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) var(--rail-w); gap: var(--s-4); align-items: start; }
+.col { display: grid; gap: var(--s-4); min-width: 0; }
+
+.panel { background: var(--c-sheet); border: 1px solid var(--c-line); border-radius: var(--r-panel); min-width: 0; }
+.panel__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-3); min-height: 56px; padding: var(--s-3) var(--s-4); border-bottom: 1px solid var(--c-line); }
+.panel__head h2 { font: var(--t-h2); display: flex; align-items: baseline; gap: var(--s-2); }
+.panel__head h2 .n { font: var(--t-fig); font-variant-numeric: tabular-nums; color: var(--c-ink-2); }
+.panel__head .tools { margin-left: auto; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2); }
+.panel__sub { font: var(--t-caption); color: var(--c-ink-2); }
+
+/* Flash for changed values */
+@keyframes wash { from { background-color: var(--c-water-wash); } to { background-color: transparent; } }
+.flash { animation: wash 1200ms var(--e-standard); }
+
+/* ── Problems ───────────────────────────────────────────────────────────────────────── */
+.probs > li { display: grid; grid-template-rows: 1fr; transition: grid-template-rows var(--m-medium) var(--e-standard), opacity var(--m-small) var(--e-exit); }
+.probs > li.is-leaving { grid-template-rows: 0fr; opacity: 0; }
+.probs > li > .prob { overflow: hidden; min-height: 0; }
+.prob__in { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; column-gap: var(--s-3); row-gap: var(--s-2); align-items: center; padding: var(--s-3) var(--s-4); border-top: 1px solid var(--c-line); }
+.probs > li:first-child .prob__in { border-top: 0; }
+.prob__icon { align-self: start; margin-top: 2px; }
+.prob[data-sev="high"] .prob__icon, .prob[data-sev="high"] .prob__title { color: var(--c-road); }
+.prob[data-sev="mid"] .prob__icon, .prob[data-sev="mid"] .prob__title { color: var(--c-ochre); }
+.prob__title { font: var(--t-strong); }
+.prob__meta { display: flex; flex-wrap: wrap; column-gap: var(--s-3); font: var(--t-caption); color: var(--c-ink-2); }
+.prob__meta b { font-weight: 500; color: var(--c-ink); }
+.prob__act { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--s-2); }
+.empty { padding: var(--s-5) var(--s-4); display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); color: var(--c-ink-2); }
+.empty .icon { color: var(--c-park); }
+
+/* ── Orders ─────────────────────────────────────────────────────────────────────────── */
+.seg button { height: 24px; padding: 0 10px; font: var(--t-label); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.seg .c { font-variant-numeric: tabular-nums; color: var(--c-ink-2); font-weight: 400; }
+.chip { display: inline-flex; align-items: center; gap: var(--s-1); height: var(--h-sm); padding: 0 var(--s-1) 0 10px; border-radius: var(--r-control); background: var(--c-water-wash); color: var(--c-ink); font: var(--t-label); }
+.chip button { width: 24px; height: 24px; display: inline-grid; place-items: center; border: 0; border-radius: var(--r-control); background: transparent; cursor: pointer; padding: 0; color: var(--c-ink-2); }
+.tablewrap { overflow-x: auto; }
+table.orders { width: 100%; border-collapse: collapse; font: var(--t-body); }
+.orders th { text-align: left; font: var(--t-caption); color: var(--c-ink-2); font-weight: 500; padding: var(--s-2) var(--s-4); border-bottom: 1px solid var(--c-line); white-space: nowrap; }
+.orders td { padding: 10px var(--s-4); border-bottom: 1px solid var(--c-line); vertical-align: middle; }
+.orders tbody tr:last-child td { border-bottom: 0; }
+.orders tbody tr { transition: background-color var(--m-micro) var(--e-standard); }
+@media (hover: hover) and (pointer: fine) { .orders tbody tr[data-id]:hover { background: color-mix(in srgb, var(--c-paper) 60%, transparent); } }
+.orders .th-due, .orders .o-due { text-align: right; }
+.o-id { font: var(--t-strong); font-variant-numeric: tabular-nums; white-space: nowrap; width: 1%; }
+.o-st { white-space: nowrap; width: 1%; }
+.st { display: inline-flex; align-items: center; gap: 6px; }
+.st--new { color: var(--c-ochre); }
+.st--route { color: var(--c-water); }
+.st--done { color: var(--c-park); }
+.st--pack { color: var(--c-ink); }
+.st span { color: var(--c-ink); }
+.o-addr { min-width: 180px; }
+.o-addr .zone { display: block; font: var(--t-caption); color: var(--c-ink-2); }
+.o-cour { white-space: nowrap; width: 1%; }
+.o-cour .none { color: var(--c-ink-2); }
+.o-due { white-space: nowrap; width: 1%; }
+.due { display: grid; justify-items: end; }
+.due .t { font: var(--t-fig); font-variant-numeric: tabular-nums; }
+.due .rel { font: var(--t-caption); color: var(--c-ink-2); font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: var(--s-1); }
+.due.is-late .t, .due.is-late .rel { color: var(--c-road); }
+.due.is-late .rel { font-weight: 500; }
+.due .rel .icon { width: 12px; height: 12px; }
+tr.is-new { animation: wash 1600ms var(--e-standard); }
+.tbl-note { padding: var(--s-5) var(--s-4); display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); color: var(--c-ink-2); }
+.err { color: var(--c-road); display: flex; align-items: center; gap: var(--s-2); }
+
+/* ── Skeletons ──────────────────────────────────────────────────────────────────────── */
+.sk { display: block; height: 12px; border-radius: var(--r-control); background: var(--c-sunk); }
+.sk-row { display: grid; grid-template-columns: 16px 1fr 160px; gap: var(--s-3); align-items: center; padding: var(--s-4); border-top: 1px solid var(--c-line); }
+.sk-row:first-child { border-top: 0; }
+.sk-stack { display: grid; gap: var(--s-2); }
+@keyframes sk-breathe { 50% { opacity: 0.55; } }
+[aria-busy="true"] .sk { animation: sk-breathe 1600ms ease-in-out infinite; }
+.region { transition: opacity var(--m-small) var(--e-enter); }
+.region.is-entering { opacity: 0; }
+
+/* ── Map (signature) ────────────────────────────────────────────────────────────────── */
+.map { position: relative; margin: var(--s-4); aspect-ratio: 340 / 220; }
+.map svg.city { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.zone-shape { fill: var(--c-paper); stroke: var(--c-sheet); stroke-width: 3; stroke-linejoin: round; transition: fill var(--m-small) var(--e-standard); }
+.zone-shape.is-sel { fill: var(--c-water-wash); }
+.contour { fill: none; stroke: var(--c-line); stroke-width: 0.75; }
+.river { fill: none; stroke: var(--c-water-wash); stroke-width: 11; stroke-linecap: round; }
+.river-edge { fill: none; stroke: var(--c-water); stroke-width: 1; opacity: 0.55; }
+.trace { fill: none; stroke: var(--c-water); stroke-width: 2.25; stroke-linejoin: round; stroke-dasharray: var(--len); stroke-dashoffset: var(--len); transition: stroke-dashoffset var(--m-small) var(--e-exit); }
+.trace.is-on { stroke-dashoffset: 0; transition: stroke-dashoffset var(--m-trace) var(--e-standard); }
+.zbtn { position: absolute; translate: -50% -50%; display: grid; justify-items: center; gap: 0; min-width: 56px; padding: 2px var(--s-2) 4px; border: 0; border-radius: var(--r-control); background: transparent; cursor: pointer; color: var(--c-ink); }
+.zbtn .zn { font: 500 12px/16px var(--f-cond); color: var(--c-ink-2); white-space: nowrap; }
+.zbtn .zc { font: var(--t-fig); font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: var(--s-1); }
+.zbtn .zc .icon { width: 14px; height: 14px; color: var(--c-road); }
+.zbtn[aria-pressed="true"] .zn { color: var(--c-water-deep); }
+@media (hover: hover) and (pointer: fine) { .zbtn:hover { background: color-mix(in srgb, var(--c-sheet) 80%, transparent); } }
+.map-legend { display: flex; flex-wrap: wrap; gap: var(--s-1) var(--s-4); padding: 0 var(--s-4) var(--s-4); font: var(--t-caption); color: var(--c-ink-2); }
+.map-legend span { display: inline-flex; align-items: center; gap: var(--s-1); }
+.map-legend .icon { width: 12px; height: 12px; color: var(--c-road); }
+
+/* ── Couriers ───────────────────────────────────────────────────────────────────────── */
+.cour > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--s-3); padding: 10px var(--s-4); border-top: 1px solid var(--c-line); min-height: 56px; }
+.cour > li:first-child { border-top: 0; }
+.cour .who { display: grid; min-width: 0; }
+.cour .name { font: var(--t-strong); }
+.cour .state { display: inline-flex; align-items: center; gap: 6px; font: var(--t-caption); color: var(--c-ink-2); }
+.cour .state .icon { width: 14px; height: 14px; }
+.cour .state .zn { margin-left: var(--s-1); color: var(--c-ink-2); font-weight: 400; }
+.cour [data-s="lost"] .state { color: var(--c-road); font-weight: 500; }
+.cour [data-s="free"] .state .icon { color: var(--c-park); }
+.cour [data-s="route"] .state .icon { color: var(--c-water); }
+.cour .load { font: var(--t-caption); color: var(--c-ink-2); white-space: nowrap; }
+
+/* ── Popover (assign) ───────────────────────────────────────────────────────────────── */
+.pick { position: fixed; inset: auto; margin: 0; width: 280px; max-height: min(420px, 70vh); overflow: auto; padding: var(--s-2); border: 1px solid var(--c-line); border-radius: var(--r-overlay); background: var(--c-sheet); color: var(--c-ink); box-shadow: var(--shadow-overlay); }
+.pick h3 { font: var(--t-label); color: var(--c-ink-2); padding: var(--s-2) var(--s-2) var(--s-2); }
+.pick ul { display: grid; gap: 2px; }
+.pick button { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--s-2); text-align: left; min-height: 44px; padding: 6px var(--s-2); border: 0; border-radius: var(--r-control); background: transparent; cursor: pointer; }
+.pick .pn { font: var(--t-strong); }
+.pick .pz { font: var(--t-caption); color: var(--c-ink-2); }
+.pick .pl { font: var(--t-caption); color: var(--c-ink-2); }
+@media (hover: hover) and (pointer: fine) { .pick button:hover { background: var(--c-paper); } }
+
+/* ── Dialog ─────────────────────────────────────────────────────────────────────────── */
+dialog.dlg { width: min(440px, calc(100vw - 2 * var(--s-4))); padding: 0; border: 1px solid var(--c-line); border-radius: var(--r-overlay); background: var(--c-sheet); color: var(--c-ink); box-shadow: var(--shadow-overlay); }
+.dlg form { display: grid; gap: var(--s-4); padding: var(--s-5); }
+.dlg h2 { font: var(--t-h2); }
+.fld { display: grid; gap: 6px; }
+.fld label { font: var(--t-label); }
+.fld .hint { font: var(--t-caption); color: var(--c-ink-2); }
+.fld .msg { font: var(--t-caption); color: var(--c-road); display: flex; align-items: center; gap: var(--s-1); }
+.fld .msg[hidden] { display: none; }
+.fld .field[aria-invalid="true"] { border-color: var(--c-road); }
+select.field { appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23535A54' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); }
+.dlg__act { display: flex; justify-content: flex-end; gap: var(--s-2); padding-top: var(--s-2); }
+
+/* ── Toast ──────────────────────────────────────────────────────────────────────────── */
+.toasts { position: fixed; right: var(--s-5); bottom: var(--s-5); display: grid; gap: var(--s-2); z-index: 20; max-width: calc(100vw - 2 * var(--s-4)); }
+.toast { display: flex; align-items: center; gap: var(--s-3); min-height: 48px; padding: var(--s-2) var(--s-2) var(--s-2) var(--s-4); border-radius: var(--r-overlay); background: var(--c-ink); color: var(--c-sheet); box-shadow: var(--shadow-overlay); font: var(--t-body);
+  transition: opacity var(--m-small) var(--e-enter), transform var(--m-medium) var(--e-enter); }
+.toast .icon { color: #9FD3B0; }
+.toast.is-hidden { opacity: 0; transform: translateY(8px); transition-timing-function: var(--e-exit); transition-duration: var(--m-micro); }
+@starting-style { .toast { opacity: 0; transform: translateY(8px); } }
+.toast .btn--quiet { color: #A9DDF0; }
+@media (hover: hover) and (pointer: fine) { .toast .btn--quiet:hover { background: rgb(255 255 255 / 0.1); } }
+
+/* ── Responsive ─────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1279px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .rail { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+}
+@media (max-width: 1023px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .side { position: static; height: auto; flex-direction: row; align-items: center; gap: var(--s-4); padding: var(--s-2) var(--s-4); border-right: 0; border-bottom: 1px solid var(--c-line); }
+  .nav { display: flex; gap: var(--s-1); }
+  .work { padding: var(--s-4); }
+  .top { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title act" "search search"; gap: var(--s-3); }
+  .search { justify-self: stretch; }
+}
+@media (max-width: 759px) {
+  .rail { grid-template-columns: minmax(0, 1fr); }
+  .side { flex-direction: column; align-items: stretch; gap: var(--s-2); padding: var(--s-3) var(--s-3) var(--s-2); }
+  .mark { padding: 0; }
+  .nav { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; }
+  .nav a { flex-direction: column; justify-content: center; gap: 2px; height: 52px; padding: 0 2px; font: var(--t-caption); text-align: center; }
+  .nav .count { position: absolute; top: 4px; right: calc(50% - 22px); margin: 0; }
+  .nav a { position: relative; }
+  .work { padding: var(--s-3); gap: var(--s-3); }
+  .panel__head { padding: var(--s-3); }
+  .prob__in { grid-template-columns: 16px minmax(0, 1fr); padding: var(--s-3); }
+  .prob__act { grid-column: 2; justify-content: flex-start; }
+  .seg { display: flex; width: 100%; overflow-x: auto; }
+  .panel__head .tools { margin-left: 0; width: 100%; }
+  table.orders thead { display: none; }
+  table.orders, .orders tbody { display: block; }
+  .orders tbody tr[data-id] { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "id st due" "addr addr due" "cour cour cour"; column-gap: var(--s-3); row-gap: 2px; padding: 10px var(--s-3); border-bottom: 1px solid var(--c-line); }
+  .orders tbody tr:last-child { border-bottom: 0; }
+  .orders td { padding: 0; border: 0; width: auto; }
+  .o-id { grid-area: id; } .o-st { grid-area: st; } .o-addr { grid-area: addr; min-width: 0; } .o-cour { grid-area: cour; padding-top: var(--s-1) !important; } .o-due { grid-area: due; align-self: start; }
+  .o-cour:empty { display: none; }
+  .map { margin: var(--s-3); }
+  .map-legend { padding: 0 var(--s-3) var(--s-3); }
+  .cour > li { padding: 10px var(--s-3); }
+  .toasts { right: var(--s-3); left: var(--s-3); bottom: var(--s-3); }
+  .zbtn { min-width: 0; padding: 2px var(--s-1); }
+  .zbtn .zc { font: 600 15px/20px var(--f-cond); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-press, .ui-segmented > button, .ui-btn-state > * { transition-property: background-color, color, filter, opacity, box-shadow, outline-offset, outline-color, border-color; }
+  .ui-press:active:not(:disabled), .ui-press[data-pressed], .ui-segmented > button:active { transform: none; }
+  .ui-segmented__indicator, .ui-pop-in { transition-duration: 0.01ms; }
+  .ui-shake { animation: none; }
+  .ui-btn-state > * { transform: none !important; }
+  .trace, .trace.is-on { transition-duration: 0.01ms; }
+  .probs > li { transition-property: opacity; }
+  .toast, .toast.is-hidden { transform: none; }
+  [aria-busy="true"] .sk { animation: none; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-sum" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M14.1 6.4 9.9 4.3a2 2 0 0 0-1.8 0L3.6 6.6A1 1 0 0 0 3 7.5v12.4a1 1 0 0 0 1.4.9l3.7-1.9a2 2 0 0 1 1.8 0l4.2 2.1a2 2 0 0 0 1.8 0l4.5-2.3a1 1 0 0 0 .6-.9V4.1a1 1 0 0 0-1.4-.9l-3.7 1.9a2 2 0 0 1-1.8 0z"/><path d="M15 5.8v15M9 3.2v15"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24"><path d="m16 3 4 4-4 4M20 7H4M8 21l-4-4 4-4M4 17h16"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M17 7 7 17M7 7l10 10"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+  <symbol id="i-new" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-dasharray="3.2 3"/></symbol>
+  <symbol id="i-route" viewBox="0 0 24 24"><path d="m3 11 19-9-9 19-2-8-8-2z"/></symbol>
+  <symbol id="i-off" viewBox="0 0 24 24"><path d="M12 20h.01M8.5 16.43a5 5 0 0 1 7 0M2 8.82a15 15 0 0 1 4.17-2.65M10.66 5c4.01-.36 8.14.9 11.34 3.76M16.85 11.25a10 10 0 0 1 2.22 1.68M5 13a10 10 0 0 1 5.24-2.76M2 2l20 20"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-door" viewBox="0 0 24 24"><path d="M13 4h3a2 2 0 0 1 2 2v14M2 20h3M13 20h9M10 12v.01"/><path d="M13 4.56v16.18a.5.5 0 0 1-.6.49L5 20V5.56a2 2 0 0 1 1.5-1.94l4-1A2 2 0 0 1 13 4.56Z"/></symbol>
+</svg>
+
+<div class="app" data-sample="fixtures: all orders, addresses, couriers, phones and delays are sample data">
+  <aside class="side" data-ui-edge>
+    <div class="mark" aria-label="Диспетчерская">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="2" fill="none" stroke="#1B201D" stroke-width="1.75"/><path d="M13.5 2.5c-2 4.5 3 7-0.5 11.5s1 6 0 7.5" fill="none" stroke="#11698A" stroke-width="2.25" stroke-linecap="round"/></svg>
+      <span>Диспетчерская</span>
+    </div>
+    <nav class="nav" aria-label="Разделы">
+      <a href="#top" aria-current="page" class="ui-dim ui-focus"><svg class="icon" aria-hidden="true"><use href="#i-sum"/></svg><span>Сводка</span></a>
+      <a href="#problems" class="ui-dim ui-focus"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg><span>Проблемы</span><span class="count" id="navProb" aria-label=""></span></a>
+      <a href="#orders" class="ui-dim ui-focus"><svg class="icon" aria-hidden="true"><use href="#i-box"/></svg><span>Заказы</span></a>
+      <a href="#couriers" class="ui-dim ui-focus"><svg class="icon" aria-hidden="true"><use href="#i-user"/></svg><span>Курьеры</span></a>
+      <a href="#zones" class="ui-dim ui-focus"><svg class="icon" aria-hidden="true"><use href="#i-map"/></svg><span>Зоны</span></a>
+    </nav>
+  </aside>
+
+  <main class="work" id="top" data-ui-edge>
+    <header class="top">
+      <div class="top__title">
+        <h1>Сводка смены</h1>
+        <p class="status-line"><span>Обновлено <time id="updated" class="num">—</time></span><span class="demo">Демо-данные</span></p>
+      </div>
+      <div class="search" role="search">
+        <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+        <label class="vh" for="q">Поиск заказа</label>
+        <input id="q" class="field ui-field" type="search" placeholder="Номер, адрес или курьер" autocomplete="off">
+      </div>
+      <div class="top__act">
+        <button class="btn btn--secondary btn--icon ui-press ui-focus" id="refresh" type="button" aria-label="Обновить данные"><span class="ui-btn-state"><svg class="icon ui-state-label" aria-hidden="true"><use href="#i-refresh"/></svg><span class="ui-spinner ui-state-pending" aria-hidden="true"></span><svg class="icon ui-state-done" aria-hidden="true"><use href="#i-check"/></svg></span></button>
+        <button class="btn btn--primary ui-press ui-press--on-dark ui-focus" id="newOrder" type="button"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span>Новый заказ</span></button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div class="col">
+        <section class="panel" id="problems" aria-labelledby="h-prob">
+          <div class="panel__head"><h2 id="h-prob">Требуют действия <span class="n" id="probN"></span></h2></div>
+          <div class="region" id="probRegion" aria-busy="true"></div>
+        </section>
+
+        <section class="panel" id="orders" aria-labelledby="h-ord">
+          <div class="panel__head">
+            <h2 id="h-ord">Заказы</h2>
+            <div class="tools">
+              <span id="zoneChip"></span>
+              <div class="seg" id="tabs" role="tablist" aria-label="Статус заказов">
+                <button type="button" role="tab" aria-selected="true" data-f="active" class="ui-focus">Активные <span class="c" data-c="active"></span></button>
+                <button type="button" role="tab" aria-selected="false" data-f="new" class="ui-focus">Новые <span class="c" data-c="new"></span></button>
+                <button type="button" role="tab" aria-selected="false" data-f="pack" class="ui-focus">Сборка <span class="c" data-c="pack"></span></button>
+                <button type="button" role="tab" aria-selected="false" data-f="route" class="ui-focus">В пути <span class="c" data-c="route"></span></button>
+                <button type="button" role="tab" aria-selected="false" data-f="done" class="ui-focus">Доставлены <span class="c" data-c="done"></span></button>
+              </div>
+            </div>
+          </div>
+          <div class="region tablewrap" id="ordRegion" aria-busy="true" role="tabpanel" aria-labelledby="h-ord"></div>
+        </section>
+      </div>
+
+      <div class="col rail">
+        <section class="panel" id="zones" aria-labelledby="h-zones">
+          <div class="panel__head"><h2 id="h-zones">Зоны</h2><p class="panel__sub">Число в зоне: активные заказы</p></div>
+          <div class="map" id="map">
+            <svg class="city" viewBox="0 0 340 220" aria-hidden="true" id="citySvg">
+              <g id="zoneShapes"></g>
+              <path class="contour" d="M20 30 C60 18 90 34 120 26 M14 108 C40 98 70 116 96 104 M232 34 C262 22 296 40 326 30 M250 186 C280 176 300 196 326 186 M112 196 C140 186 160 204 190 194"/>
+              <path class="river" d="M240 -4 C232 30 220 60 214 84 C208 108 192 124 196 146 C200 170 200 192 202 224"/>
+              <path class="river-edge" d="M234.5 -4 C226.5 30 214.5 60 208.5 84 C202.5 108 186.5 124 190.5 146 C194.5 170 194.5 192 196.5 224 M245.5 -4 C237.5 30 225.5 60 219.5 84 C213.5 108 197.5 124 201.5 146 C205.5 170 205.5 192 207.5 224"/>
+              <g id="zoneTraces"></g>
+            </svg>
+          </div>
+          <p class="map-legend"><span><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>есть проблема</span><span>Нажмите зону, чтобы отфильтровать заказы</span></p>
+        </section>
+
+        <section class="panel" id="couriers" aria-labelledby="h-cour">
+          <div class="panel__head"><h2 id="h-cour">Курьеры <span class="n" id="courN"></span></h2><p class="panel__sub" id="courSub"></p></div>
+          <div class="region" id="courRegion" aria-busy="true"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div id="pick" class="pick ui-pop-in" popover="auto" role="dialog" aria-labelledby="pickH"></div>
+
+<dialog class="dlg ui-pop-in" id="dlg" aria-labelledby="dlgH">
+  <form id="orderForm" novalidate>
+    <h2 id="dlgH">Новый заказ</h2>
+    <div class="fld">
+      <label for="fAddr">Адрес доставки</label>
+      <input id="fAddr" class="field ui-field" type="text" autocomplete="off" aria-describedby="fAddrMsg" placeholder="Улица, дом, квартира">
+      <p class="msg" id="fAddrMsg" hidden><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg><span>Укажите адрес: улица и дом</span></p>
+    </div>
+    <div class="row2">
+      <div class="fld">
+        <label for="fZone">Зона</label>
+        <select id="fZone" class="field ui-field"></select>
+      </div>
+      <div class="fld">
+        <label for="fDue">Доставить за</label>
+        <select id="fDue" class="field ui-field"><option value="30">30 мин</option><option value="45">45 мин</option><option value="60" selected>60 мин</option><option value="90">90 мин</option></select>
+      </div>
+    </div>
+    <div class="dlg__act">
+      <button type="button" class="btn btn--secondary ui-press ui-focus" id="dlgCancel">Отмена</button>
+      <button type="submit" class="btn btn--primary ui-press ui-press--on-dark ui-focus" id="dlgSubmit"><span class="ui-btn-state"><span class="ui-state-label">Создать заказ</span><span class="ui-spinner ui-state-pending" aria-hidden="true"></span><span class="ui-state-done">Создан</span></span></button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+/* ── Interaction kit JS (better-design assets/motion/interaction-kit.js, used parts) ── */
+(function (root) {
+  'use strict';
+  var MIN_PRESS_MS = 90;
+  var reduceMq = root.matchMedia('(prefers-reduced-motion: reduce)');
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+  var PRESSABLE = '.ui-press, .ui-dim';
+  function disabled(el) { return el.disabled || el.getAttribute('aria-disabled') === 'true'; }
+  function pressScale(el) { if (el.classList.contains('ui-press--surface')) return 0.985; var r = el.getBoundingClientRect(); return clamp(1 - 8 / (r.width + r.height), 0.9, 0.985).toFixed(4); }
+  function pressOn(el, x, y) {
+    if (disabled(el)) return;
+    var r = el.getBoundingClientRect();
+    el.style.setProperty('--ui-press-scale', pressScale(el));
+    if (x != null) { el.style.setProperty('--ui-px', ((x - r.left) / r.width * 100).toFixed(1) + '%'); el.style.setProperty('--ui-py', ((y - r.top) / r.height * 100).toFixed(1) + '%'); }
+    else { el.style.setProperty('--ui-px', '50%'); el.style.setProperty('--ui-py', '50%'); }
+    el._uiPressAt = performance.now(); clearTimeout(el._uiPressTimer); el.setAttribute('data-pressed', '');
+  }
+  function pressOff(el) {
+    if (!el || !el.hasAttribute('data-pressed')) return;
+    var wait = Math.max(0, MIN_PRESS_MS - (performance.now() - (el._uiPressAt || 0)));
+    clearTimeout(el._uiPressTimer); el._uiPressTimer = setTimeout(function () { el.removeAttribute('data-pressed'); }, wait);
+  }
+  function init(scope) {
+    scope = scope || document; var active = null;
+    scope.addEventListener('pointerdown', function (e) { if (e.pointerType === 'mouse' && e.button !== 0) return; var el = e.target.closest && e.target.closest(PRESSABLE); if (!el) return; active = el; pressOn(el, e.clientX, e.clientY); }, { passive: true });
+    root.addEventListener('pointerup', function () { pressOff(active); active = null; }, { passive: true });
+    root.addEventListener('pointercancel', function () { pressOff(active); active = null; }, { passive: true });
+    function key(e) { if (e.repeat) return; var el = e.target.closest && e.target.closest(PRESSABLE); if (!el) return; if (e.key === ' ' || e.key === 'Enter') { if (e.type === 'keydown') pressOn(el); else pressOff(el); } }
+    scope.addEventListener('keydown', key); scope.addEventListener('keyup', key);
+    scope.addEventListener('focusout', function (e) { var el = e.target.closest && e.target.closest(PRESSABLE); if (el) pressOff(el); });
+  }
+  function segmented(el, opts) {
+    var o = Object.assign({ onChange: null }, opts || {});
+    el.classList.add('ui-segmented');
+    var ind = document.createElement('span'); ind.className = 'ui-segmented__indicator'; ind.setAttribute('aria-hidden', 'true'); el.insertBefore(ind, el.firstChild);
+    var items = Array.prototype.slice.call(el.querySelectorAll(':scope > button'));
+    var attr = 'aria-selected';
+    function place(animate) {
+      var cur = items.filter(function (b) { return b.getAttribute(attr) === 'true'; })[0] || items[0]; if (!cur) return;
+      if (!animate) ind.style.transition = 'none';
+      el.style.setProperty('--ui-seg-x', (cur.offsetLeft - 3) + 'px'); el.style.setProperty('--ui-seg-w', cur.offsetWidth + 'px');
+      if (!animate) { void ind.offsetWidth; ind.style.transition = ''; }
+    }
+    function select(b) { items.forEach(function (x) { x.setAttribute(attr, String(x === b)); x.tabIndex = x === b ? 0 : -1; }); place(true); if (o.onChange) o.onChange(b); }
+    items.forEach(function (b) { b.tabIndex = b.getAttribute(attr) === 'true' ? 0 : -1; b.addEventListener('click', function () { select(b); }); });
+    el.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0; if (!d) return;
+      var i = items.findIndex(function (x) { return x.getAttribute(attr) === 'true'; }); var n = items[(i + d + items.length) % items.length];
+      e.preventDefault(); select(n); n.focus();
+    });
+    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(function () { place(false); }).observe(el);
+    place(false);
+    return { select: function (b) { select(b); }, place: place };
+  }
+  function runWithState(btn, task, opts) {
+    var o = Object.assign({ doneMs: 1200 }, opts || {});
+    var box = btn.querySelector('.ui-btn-state') || btn;
+    if (box.getAttribute('data-state') === 'pending') return Promise.resolve();
+    btn.style.minWidth = btn.getBoundingClientRect().width + 'px';
+    box.setAttribute('data-state', 'pending'); btn.setAttribute('aria-busy', 'true');
+    return Promise.resolve().then(task).then(function (v) {
+      box.setAttribute('data-state', 'done'); btn.removeAttribute('aria-busy');
+      setTimeout(function () { box.removeAttribute('data-state'); btn.style.minWidth = ''; }, o.doneMs); return v;
+    }, function (err) { box.removeAttribute('data-state'); btn.removeAttribute('aria-busy'); btn.style.minWidth = ''; shake(btn); throw err; });
+  }
+  function shake(el) { if (reduceMq.matches) return; el.classList.remove('ui-shake'); void el.offsetWidth; el.classList.add('ui-shake'); el.addEventListener('animationend', function () { el.classList.remove('ui-shake'); }, { once: true }); }
+  function originFrom(pop, trigger) { var p = pop.getBoundingClientRect(), t = trigger.getBoundingClientRect(); var x = clamp(t.left + t.width / 2 - p.left, 0, p.width), y = t.top + t.height / 2 < p.top ? 0 : p.height; pop.style.setProperty('--ui-origin', x + 'px ' + y + 'px'); }
+  root.BetterUI = { init: init, segmented: segmented, runWithState: runWithState, shake: shake, originFrom: originFrom };
+})(window);
+
+/* ── Fixtures (sample data, not real) ───────────────────────────────────────────────── */
+const T0 = Date.now();
+const MIN = 60000;
+const at = (m) => T0 + m * MIN;
+const FIX = {
+  zones: [
+    { id: 'n', name: 'Север',   pts: '8,8 232,8 214,84 112,78 8,86', lx: 110, ly: 42 },
+    { id: 'e', name: 'Восток',  pts: '232,8 332,8 332,74 214,84', lx: 284, ly: 40 },
+    { id: 'w', name: 'Запад',   pts: '8,86 112,78 98,150 84,212 8,212', lx: 52, ly: 148 },
+    { id: 'c', name: 'Центр',   pts: '112,78 214,84 196,146 98,150', lx: 154, ly: 114 },
+    { id: 'z', name: 'Заречье', pts: '214,84 332,74 332,212 202,212 196,146', lx: 270, ly: 148 },
+    { id: 's', name: 'Юг',      pts: '98,150 196,146 202,212 84,212', lx: 146, ly: 184 }
+  ],
+  couriers: [
+    { id: 'c1', name: 'Ильдар К.',    zone: 'c', s: 'route', phone: '+70000000001' },
+    { id: 'c2', name: 'Марина С.',    zone: 'z', s: 'route', phone: '+70000000002' },
+    { id: 'c3', name: 'Олег П.',      zone: 'c', s: 'free',  phone: '+70000000003' },
+    { id: 'c4', name: 'Артём Л.',     zone: 'w', s: 'lost', since: -14, phone: '+70000000004' },
+    { id: 'c5', name: 'Дина Р.',      zone: 'n', s: 'route', phone: '+70000000005' },
+    { id: 'c6', name: 'Святослав Б.', zone: 's', s: 'break', until: 20, phone: '+70000000006' },
+    { id: 'c7', name: 'Тимур Г.',     zone: 'z', s: 'free',  phone: '+70000000007' },
+    { id: 'c8', name: 'Вера Н.',      zone: 'e', s: 'route', phone: '+70000000008' },
+    { id: 'c9', name: 'Руслан Ш.',    zone: 's', s: 'free',  phone: '+70000000009' }
+  ],
+  orders: [
+    { id: 4817, st: 'route', addr: 'ул. Садовая, 14, кв. 52', zone: 'c', cour: 'c1', due: -6 },
+    { id: 4790, st: 'route', addr: 'пр. Мира, 101, кв. 7', zone: 'z', cour: 'c2', due: 4 },
+    { id: 4809, st: 'route', addr: 'ул. Лесная, 3, кв. 18', zone: 'w', cour: 'c4', due: 12 },
+    { id: 4811, st: 'route', addr: 'ул. Лесная, 27', zone: 'w', cour: 'c4', due: 22 },
+    { id: 4821, st: 'route', addr: 'Северный пр., 60, кв. 11', zone: 'n', cour: 'c5', due: 16 },
+    { id: 4826, st: 'route', addr: 'ул. Заводская, 12', zone: 'e', cour: 'c8', due: 19 },
+    { id: 4828, st: 'pack',  addr: 'ул. Новая, 8, кв. 140', zone: 'n', cour: 'c5', due: 30 },
+    { id: 4825, st: 'pack',  addr: 'Береговая ул., 9', zone: 'z', cour: 'c7', due: 38 },
+    { id: 4832, st: 'new',   addr: 'ул. Полевая, 45, кв. 3', zone: 'z', cour: null, due: 41 },
+    { id: 4830, st: 'pack',  addr: 'ул. Восточная, 5, кв. 64', zone: 'e', cour: 'c8', due: 47 },
+    { id: 4834, st: 'new',   addr: 'Школьный пер., 2', zone: 'c', cour: null, due: 55 },
+    { id: 4836, st: 'new',   addr: 'ул. Парковая, 31', zone: 's', cour: null, due: 60 },
+    { id: 4802, st: 'done',  addr: 'ул. Садовая, 2, кв. 9', zone: 'c', cour: 'c1', doneAt: -24 },
+    { id: 4805, st: 'done',  addr: 'Речная ул., 17', zone: 'z', cour: 'c2', doneAt: -15 },
+    { id: 4798, st: 'done',  addr: 'ул. Южная, 40, кв. 21', zone: 's', cour: 'c9', doneAt: -38 }
+  ],
+  problems: [
+    { id: 'p1', kind: 'late', order: 4817 },
+    { id: 'p2', kind: 'lost', courier: 'c4' },
+    { id: 'p3', kind: 'noanswer', order: 4790, since: -8, phone: '+70000000101' },
+    { id: 'p4', kind: 'unassigned', order: 4832, since: -9 },
+    { id: 'p5', kind: 'address', order: 4825, note: 'Не указана квартира', phone: '+70000000102' }
+  ]
+};
+// Convert relative minutes to absolute times once (data stays fixed while the clock moves).
+FIX.orders.forEach(o => { if (o.due != null) o.due = at(o.due); if (o.doneAt != null) o.doneAt = at(o.doneAt); });
+FIX.couriers.forEach(c => { if (c.since != null) c.since = at(c.since); if (c.until != null) c.until = at(c.until); });
+FIX.problems.forEach(p => { if (p.since != null) p.since = at(p.since); });
+
+const FAIL_ONCE = new URLSearchParams(location.search).has('fail');
+let failed = false;
+// Fixture "network": 450 ms latency stands in for the dispatch API.
+function fetchShift() {
+  return new Promise((res, rej) => setTimeout(() => {
+    if (FAIL_ONCE && !failed) { failed = true; rej(new Error('Сервер диспетчерской не ответил')); return; }
+    res(JSON.parse(JSON.stringify(FIX)));
+  }, 450));
+}
+
+/* ── State & helpers ────────────────────────────────────────────────────────────────── */
+let S = null;
+const ui = { tab: 'active', zone: null, q: '' };
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const icon = (id, cls = 'icon') => `<svg class="${cls}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
+const hhmm = (t) => new Date(t).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+const minsFrom = (t) => Math.round((t - Date.now()) / MIN);
+const zoneName = (id) => S.zones.find(z => z.id === id).name;
+const courier = (id) => S.couriers.find(c => c.id === id);
+const order = (id) => S.orders.find(o => o.id === id);
+const ACTIVE = ['new', 'pack', 'route'];
+const plural = (n, a, b, c) => { const m10 = n % 10, m100 = n % 100; return m10 === 1 && m100 !== 11 ? a : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? b : c; };
+const ordersOf = (cid) => S.orders.filter(o => o.cour === cid && ACTIVE.includes(o.st));
+const STATUS = { new: ['new', 'Новый'], pack: ['box', 'Сборка'], route: ['route', 'В пути'], done: ['ok', 'Доставлен'] };
+
+function dueHTML(o) {
+  if (o.st === 'done') return `<span class="due"><span class="t">${hhmm(o.doneAt)}</span><span class="rel">доставлен</span></span>`;
+  const m = minsFrom(o.due);
+  if (m < 0) return `<span class="due is-late"><span class="t">${hhmm(o.due)}</span><span class="rel">${icon('alert')}просрочен на ${-m} мин</span></span>`;
+  return `<span class="due"><span class="t">${hhmm(o.due)}</span><span class="rel">${m === 0 ? 'сейчас' : `через ${m} мин`}</span></span>`;
+}
+
+/* ── Problems ───────────────────────────────────────────────────────────────────────── */
+function probView(p) {
+  const o = p.order ? order(p.order) : null;
+  const c = p.courier ? courier(p.courier) : o && o.cour ? courier(o.cour) : null;
+  const meta = [];
+  if (o) meta.push(`<b>Заказ ${o.id}</b>`, `<span>${esc(o.addr)}</span>`);
+  let sev = 'mid', ico = 'clock', title = '', acts = '';
+  const tel = (num, label) => `<a class="btn btn--secondary btn--sm ui-press ui-focus" href="tel:${num}" data-sample>${icon('phone')}${label}</a>`;
+  switch (p.kind) {
+    case 'late': {
+      const m = -minsFrom(o.due);
+      sev = 'high'; ico = 'alert'; title = `Опаздывает на ${Math.max(m, 1)} мин`;
+      if (c) meta.push(`<span>${esc(c.name)}</span>`);
+      acts = `<button type="button" class="btn btn--secondary btn--sm ui-press ui-focus" data-act="assign" data-p="${p.id}">${icon('swap')}Переназначить</button>
+              <button type="button" class="btn btn--secondary btn--sm ui-press ui-focus" data-act="extend" data-p="${p.id}">${icon('clock')}Продлить на 15 мин</button>`;
+      break;
+    }
+    case 'lost': {
+      const held = ordersOf(c.id);
+      sev = 'high'; ico = 'off'; title = `Курьер не на связи ${-minsFrom(c.since)} мин`;
+      meta.push(`<b>${esc(c.name)}</b>`, `<span>${zoneName(c.zone)}</span>`, `<span>на руках ${held.length} ${plural(held.length, 'заказ', 'заказа', 'заказов')}: ${held.map(x => x.id).join(', ')}</span>`);
+      acts = `${tel(c.phone, 'Позвонить')}
+              <button type="button" class="btn btn--secondary btn--sm ui-press ui-focus" data-act="assign" data-p="${p.id}" ${held.length ? '' : 'disabled'}>${icon('swap')}Передать заказы</button>`;
+      break;
+    }
+    case 'noanswer': {
+      ico = 'door'; title = `Клиент не отвечает, курьер ждёт ${-minsFrom(p.since)} мин`;
+      if (c) meta.push(`<span>${esc(c.name)}</span>`);
+      acts = `${tel(p.phone, 'Позвонить клиенту')}
+              <button type="button" class="btn btn--quiet btn--sm ui-press ui-focus" data-act="resolve" data-p="${p.id}">${icon('check')}Решено</button>`;
+      break;
+    }
+    case 'unassigned': {
+      ico = 'user'; title = `Нет курьера, ждёт ${-minsFrom(p.since)} мин`;
+      meta.push(`<span>${zoneName(o.zone)}</span>`);
+      acts = `<button type="button" class="btn btn--primary btn--sm ui-press ui-press--on-dark ui-focus" data-act="assign" data-p="${p.id}">${icon('user')}Назначить</button>`;
+      break;
+    }
+    case 'address': {
+      ico = 'pin'; title = p.note;
+      acts = `${tel(p.phone, 'Позвонить клиенту')}
+              <button type="button" class="btn btn--quiet btn--sm ui-press ui-focus" data-act="resolve" data-p="${p.id}">${icon('check')}Решено</button>`;
+      break;
+    }
+  }
+  return `<li data-pid="${p.id}"><div class="prob" data-sev="${sev}"><div class="prob__in">
+    <span class="prob__icon">${icon(ico)}</span>
+    <div><p class="prob__title">${title}</p><p class="prob__meta">${meta.join('')}</p></div>
+    <div class="prob__act">${acts}</div></div></div></li>`;
+}
+function renderProblems() {
+  const r = $('#probRegion');
+  const list = S.problems;
+  $('#probN').textContent = list.length || '';
+  const nav = $('#navProb'); nav.textContent = list.length || ''; nav.setAttribute('aria-label', list.length ? `${list.length} открытых` : '');
+  if (!list.length) { r.innerHTML = `<p class="empty">${icon('ok')}Открытых проблем нет</p>`; return; }
+  const rank = { late: 0, lost: 1, unassigned: 2, noanswer: 3, address: 4 };
+  r.innerHTML = `<ul class="probs">${[...list].sort((a, b) => rank[a.kind] - rank[b.kind]).map(probView).join('')}</ul>`;
+}
+
+/* ── Orders ─────────────────────────────────────────────────────────────────────────── */
+function filtered() {
+  let list = S.orders.filter(o => ui.tab === 'active' ? ACTIVE.includes(o.st) : o.st === ui.tab);
+  if (ui.zone) list = list.filter(o => o.zone === ui.zone);
+  if (ui.q) {
+    const q = ui.q.toLowerCase();
+    list = list.filter(o => String(o.id).includes(q) || o.addr.toLowerCase().includes(q) || (o.cour && courier(o.cour).name.toLowerCase().includes(q)));
+  }
+  return ui.tab === 'done' ? list.sort((a, b) => b.doneAt - a.doneAt) : list.sort((a, b) => a.due - b.due);
+}
+function renderOrders(highlight) {
+  const counts = { active: 0, new: 0, pack: 0, route: 0, done: 0 };
+  S.orders.forEach(o => { if (!ui.zone || o.zone === ui.zone) { counts[o.st]++; if (ACTIVE.includes(o.st)) counts.active++; } });
+  document.querySelectorAll('#tabs [data-c]').forEach(el => { const v = String(counts[el.dataset.c]); if (el.textContent !== v) { el.textContent = v; } });
+  tabsCtl && tabsCtl.place(false);
+
+  $('#zoneChip').innerHTML = ui.zone ? `<span class="chip">Зона: ${zoneName(ui.zone)}<button type="button" class="ui-press ui-focus" data-act="clearzone" aria-label="Сбросить фильтр по зоне">${icon('x')}</button></span>` : '';
+  const list = filtered();
+  const r = $('#ordRegion');
+  if (!list.length) {
+    const why = ui.q ? `Нет заказов по запросу «${esc(ui.q)}»` : ui.zone ? `В зоне ${zoneName(ui.zone)} таких заказов нет` : 'Таких заказов нет';
+    const reset = ui.q ? `<button type="button" class="btn btn--secondary btn--sm ui-press ui-focus" data-act="clearq">Сбросить поиск</button>` : ui.zone ? `<button type="button" class="btn btn--secondary btn--sm ui-press ui-focus" data-act="clearzone">Все зоны</button>` : '';
+    r.innerHTML = `<p class="tbl-note">${why}${reset}</p>`;
+    return;
+  }
+  r.innerHTML = `<table class="orders"><thead><tr><th scope="col">№</th><th scope="col">Статус</th><th scope="col">Адрес</th><th scope="col">Курьер</th><th scope="col" class="th-due">Срок</th></tr></thead><tbody>${list.map(o => {
+    const [si, sl] = STATUS[o.st];
+    const cour = o.cour ? esc(courier(o.cour).name) : (o.st === 'done' ? '' : `<button type="button" class="btn btn--secondary btn--sm ui-press ui-focus" data-act="assign-order" data-o="${o.id}">${icon('user')}Назначить</button>`);
+    return `<tr data-id="${o.id}" data-zone="${o.zone}" class="${highlight === o.id ? 'is-new' : ''}">
+      <td class="o-id">${o.id}</td>
+      <td class="o-st"><span class="st st--${o.st}">${icon(si)}<span>${sl}</span></span></td>
+      <td class="o-addr">${esc(o.addr)}<span class="zone">${zoneName(o.zone)}</span></td>
+      <td class="o-cour">${cour}</td>
+      <td class="o-due" data-due>${dueHTML(o)}</td></tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+/* ── Map ────────────────────────────────────────────────────────────────────────────── */
+function buildMap() {
+  const shapes = $('#zoneShapes'), traces = $('#zoneTraces'), map = $('#map');
+  shapes.innerHTML = S.zones.map(z => `<polygon class="zone-shape" data-z="${z.id}" points="${z.pts}" />`).join('');
+  traces.innerHTML = S.zones.map(z => `<polygon class="trace" data-z="${z.id}" points="${z.pts}" />`).join('');
+  traces.querySelectorAll('.trace').forEach(p => p.style.setProperty('--len', Math.ceil(p.getTotalLength())));
+  map.querySelectorAll('.zbtn').forEach(b => b.remove());
+  S.zones.forEach(z => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'zbtn ui-press ui-focus'; b.dataset.z = z.id; b.dataset.act = 'zone';
+    b.style.left = (z.lx / 340 * 100) + '%'; b.style.top = (z.ly / 220 * 100) + '%';
+    map.appendChild(b);
+  });
+}
+function renderMap() {
+  const hotZones = new Set(S.problems.map(p => p.order ? order(p.order).zone : courier(p.courier).zone));
+  S.zones.forEach(z => {
+    const n = S.orders.filter(o => o.zone === z.id && ACTIVE.includes(o.st)).length;
+    const hot = hotZones.has(z.id);
+    const b = $(`.zbtn[data-z="${z.id}"]`);
+    b.setAttribute('aria-pressed', String(ui.zone === z.id));
+    b.setAttribute('aria-label', `${z.name}: ${n} ${plural(n, 'активный заказ', 'активных заказа', 'активных заказов')}${hot ? ', есть проблема' : ''}`);
+    b.innerHTML = `<span class="zn">${z.name}</span><span class="zc">${hot ? icon('alert') : ''}${n}</span>`;
+    const sh = $(`.zone-shape[data-z="${z.id}"]`);
+    sh.classList.toggle('is-sel', ui.zone === z.id); sh.classList.toggle('is-hot', hot);
+  });
+}
+let traced = null;
+function trace(zone) {
+  if (traced === zone) return;
+  document.querySelectorAll('.trace.is-on').forEach(t => t.classList.remove('is-on'));
+  traced = zone;
+  if (zone) $(`.trace[data-z="${zone}"]`).classList.add('is-on');
+}
+
+/* ── Couriers ───────────────────────────────────────────────────────────────────────── */
+function renderCouriers() {
+  const rank = { lost: 0, free: 1, route: 2, break: 3 };
+  const list = [...S.couriers].sort((a, b) => rank[a.s] - rank[b.s] || a.name.localeCompare(b.name, 'ru'));
+  const free = S.couriers.filter(c => c.s === 'free').length;
+  $('#courN').textContent = S.couriers.length;
+  $('#courSub').textContent = `свободны ${free}`;
+  $('#courRegion').innerHTML = `<ul class="cour">${list.map(c => {
+    const held = ordersOf(c.id).length;
+    let st;
+    if (c.s === 'lost') st = `${icon('off')}Не на связи ${-minsFrom(c.since)} мин`;
+    else if (c.s === 'free') st = `${icon('ok')}Свободен`;
+    else if (c.s === 'break') st = `${icon('pause')}Перерыв до ${hhmm(c.until)}`;
+    else st = `${icon('route')}На заказе`;
+    const right = c.s === 'lost'
+      ? `<a class="btn btn--secondary btn--sm ui-press ui-focus" href="tel:${c.phone}" data-sample>${icon('phone')}Позвонить</a>`
+      : `<span class="load">${held ? `${held} ${plural(held, 'заказ', 'заказа', 'заказов')}` : 'без заказов'}</span>`;
+    return `<li data-s="${c.s}" data-cid="${c.id}"><div class="who"><span class="name">${esc(c.name)}</span><span class="state">${st}<span class="zn">${zoneName(c.zone)}</span></span></div>${right}</li>`;
+  }).join('')}</ul>`;
+}
+
+function renderAll(hl) { renderProblems(); renderOrders(hl); renderMap(); renderCouriers(); }
+
+/* ── Loading ────────────────────────────────────────────────────────────────────────── */
+function skeletons() {
+  const row = `<div class="sk-row" aria-hidden="true"><span class="sk"></span><span class="sk-stack"><span class="sk" style="width:46%"></span><span class="sk" style="width:72%"></span></span><span class="sk"></span></div>`;
+  $('#probRegion').innerHTML = row.repeat(3);
+  $('#ordRegion').innerHTML = row.repeat(6);
+  $('#courRegion').innerHTML = row.repeat(5);
+}
+function setBusy(b) { ['#probRegion', '#ordRegion', '#courRegion'].forEach(s => $(s).setAttribute('aria-busy', String(b))); }
+function load() {
+  skeletons(); setBusy(true);
+  return fetchShift().then(data => {
+    S = data; buildMap();
+    ['#probRegion', '#ordRegion', '#courRegion'].forEach(s => $(s).classList.add('is-entering'));
+    renderAll(); setBusy(false);
+    $('#updated').textContent = hhmm(Date.now());
+    requestAnimationFrame(() => requestAnimationFrame(() => document.querySelectorAll('.region.is-entering').forEach(r => r.classList.remove('is-entering'))));
+  }, err => {
+    setBusy(false);
+    const box = `<div class="tbl-note"><span class="err">${icon('alert')}Не удалось загрузить данные смены: ${esc(err.message)}.</span><button type="button" class="btn btn--secondary btn--sm ui-press ui-focus" data-act="retry">Повторить</button></div>`;
+    $('#probRegion').innerHTML = box; $('#ordRegion').innerHTML = ''; $('#courRegion').innerHTML = '';
+  });
+}
+
+/* ── Undo & toasts ──────────────────────────────────────────────────────────────────── */
+let snapshot = null;
+function remember() { snapshot = JSON.stringify(S); }
+function toast(text, undoable) {
+  const host = $('#toasts');
+  host.querySelectorAll('.toast').forEach(t => t.remove());
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = `${icon('check')}<span>${text}</span>${undoable ? `<button type="button" class="btn btn--quiet btn--sm ui-press ui-press--on-dark ui-focus" data-act="undo">Отменить</button>` : ''}`;
+  host.appendChild(el);
+  let timer, left = 6000, started = Date.now();
+  const hide = () => { el.classList.add('is-hidden'); setTimeout(() => el.remove(), 200); };
+  const arm = () => { started = Date.now(); timer = setTimeout(hide, left); };
+  const pause = () => { clearTimeout(timer); left = Math.max(1500, left - (Date.now() - started)); };
+  el.addEventListener('pointerenter', pause); el.addEventListener('pointerleave', arm);
+  el.addEventListener('focusin', pause); el.addEventListener('focusout', arm);
+  arm();
+}
+function resolveProblem(pid, after) {
+  const li = $(`#probRegion li[data-pid="${pid}"]`);
+  const done = () => { S.problems = S.problems.filter(p => p.id !== pid); after && after(); renderAll(); };
+  if (!li || matchMedia('(prefers-reduced-motion: reduce)').matches) { done(); return; }
+  li.classList.add('is-leaving');
+  setTimeout(done, 280);
+}
+
+/* ── Assign popover ─────────────────────────────────────────────────────────────────── */
+const pick = $('#pick');
+function openPick(trigger, title, zone, exclude, onPick) {
+  const cands = S.couriers.filter(c => c.id !== exclude && (c.s === 'free' || (c.s === 'route' && ordersOf(c.id).length < 2)))
+    .sort((a, b) => (b.zone === zone) - (a.zone === zone) || (a.s === 'free' ? -1 : 1) - (b.s === 'free' ? -1 : 1));
+  pick.innerHTML = `<h3 id="pickH">${title}</h3><ul>${cands.map(c => {
+    const held = ordersOf(c.id).length;
+    return `<li><button type="button" class="ui-press ui-press--surface ui-focus" data-cid="${c.id}"><span><span class="pn">${esc(c.name)}</span><br><span class="pz">${zoneName(c.zone)}${c.zone === zone ? ', та же зона' : ''}</span></span><span class="pl">${c.s === 'free' ? 'свободен' : `${held} ${plural(held, 'заказ', 'заказа', 'заказов')}`}</span></button></li>`;
+  }).join('')}</ul>`;
+  pick._onPick = onPick; pick._trigger = trigger;
+  pick.showPopover();
+  const t = trigger.getBoundingClientRect(), w = pick.offsetWidth, h = pick.offsetHeight;
+  let left = Math.min(Math.max(16, t.right - w), innerWidth - w - 16);
+  let top = t.bottom + 6; if (top + h > innerHeight - 16) top = Math.max(16, t.top - h - 6);
+  pick.style.left = left + 'px'; pick.style.top = top + 'px';
+  BetterUI.originFrom(pick, trigger);
+  const first = pick.querySelector('button'); first && first.focus();
+}
+pick.addEventListener('click', e => {
+  const b = e.target.closest('button[data-cid]'); if (!b) return;
+  const fn = pick._onPick; pick.hidePopover(); fn && fn(b.dataset.cid);
+});
+pick.addEventListener('toggle', e => { if (e.newState === 'closed' && pick._trigger && document.contains(pick._trigger) && pick.contains(document.activeElement) === false && document.activeElement === document.body) pick._trigger.focus(); });
+
+function assignFor(pid, trigger) {
+  const p = S.problems.find(x => x.id === pid);
+  if (p.kind === 'lost') {
+    const c = courier(p.courier), held = ordersOf(c.id);
+    openPick(trigger, `Передать ${held.length} ${plural(held.length, 'заказ', 'заказа', 'заказов')} от ${c.name}`, c.zone, c.id, cid => {
+      remember();
+      resolveProblem(pid, () => { held.forEach(o => { order(o.id).cour = cid; }); });
+      toast(`Заказы ${held.map(o => o.id).join(', ')} переданы: ${courier(cid).name}`, true);
+    });
+    return;
+  }
+  const o = order(p.order);
+  openPick(trigger, `${o.cour ? 'Переназначить' : 'Назначить'} заказ ${o.id}`, o.zone, o.cour, cid => {
+    remember();
+    resolveProblem(pid, () => { const x = order(o.id); x.cour = cid; if (x.st === 'new') x.st = 'pack'; });
+    toast(`Заказ ${o.id}: ${courier(cid).name}`, true);
+  });
+}
+
+/* ── Events ─────────────────────────────────────────────────────────────────────────── */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+  const act = b.dataset.act;
+  if (act === 'assign') assignFor(b.dataset.p, b);
+  else if (act === 'assign-order') {
+    const o = order(+b.dataset.o);
+    openPick(b, `Назначить заказ ${o.id}`, o.zone, null, cid => {
+      remember();
+      const pr = S.problems.find(p => p.kind === 'unassigned' && p.order === o.id);
+      const apply = () => { const x = order(o.id); x.cour = cid; if (x.st === 'new') x.st = 'pack'; };
+      if (pr) resolveProblem(pr.id, apply); else { apply(); renderAll(); }
+      toast(`Заказ ${o.id}: ${courier(cid).name}`, true);
+    });
+  }
+  else if (act === 'extend') {
+    const p = S.problems.find(x => x.id === b.dataset.p); remember();
+    const nd = order(p.order).due + 15 * MIN;
+    resolveProblem(p.id, () => { order(p.order).due = nd; });
+    toast(`Срок заказа ${p.order} продлён до ${hhmm(nd)}`, true);
+  }
+  else if (act === 'resolve') { const p = S.problems.find(x => x.id === b.dataset.p); remember(); resolveProblem(p.id); toast(`Проблема по заказу ${p.order} закрыта`, true); }
+  else if (act === 'undo') { if (snapshot) { S = JSON.parse(snapshot); snapshot = null; renderAll(); } b.closest('.toast').remove(); toast('Действие отменено', false); }
+  else if (act === 'zone') { ui.zone = ui.zone === b.dataset.z ? null : b.dataset.z; renderOrders(); renderMap(); }
+  else if (act === 'clearzone') { ui.zone = null; renderOrders(); renderMap(); }
+  else if (act === 'clearq') { ui.q = ''; $('#q').value = ''; renderOrders(); $('#q').focus(); }
+  else if (act === 'retry') load();
+});
+
+// Signature: hovering or focusing an order traces its zone on the map.
+const ordRegion = $('#ordRegion');
+ordRegion.addEventListener('pointerover', e => { const tr = e.target.closest('tr[data-zone]'); trace(tr ? tr.dataset.zone : null); });
+ordRegion.addEventListener('pointerleave', () => trace(null));
+ordRegion.addEventListener('focusin', e => { const tr = e.target.closest('tr[data-zone]'); trace(tr ? tr.dataset.zone : null); });
+ordRegion.addEventListener('focusout', () => trace(null));
+$('#probRegion').addEventListener('pointerover', e => {
+  const li = e.target.closest('li[data-pid]'); if (!li || !S) { trace(null); return; }
+  const p = S.problems.find(x => x.id === li.dataset.pid); trace(p ? (p.order ? order(p.order).zone : courier(p.courier).zone) : null);
+});
+$('#probRegion').addEventListener('pointerleave', () => trace(null));
+
+let qTimer;
+$('#q').addEventListener('input', e => { clearTimeout(qTimer); qTimer = setTimeout(() => { ui.q = e.target.value.trim(); if (S) renderOrders(); }, 120); });
+$('#q').addEventListener('keydown', e => { if (e.key === 'Escape' && e.target.value) { e.target.value = ''; ui.q = ''; renderOrders(); } });
+document.addEventListener('keydown', e => { if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); $('#q').focus(); } });
+
+$('#refresh').addEventListener('click', e => {
+  const btn = e.currentTarget;
+  BetterUI.runWithState(btn, () => new Promise(res => setTimeout(res, 450))).then(() => { $('#updated').textContent = hhmm(Date.now()); if (S) renderAll(); const u = $('#updated'); u.classList.remove('flash'); void u.offsetWidth; u.classList.add('flash'); });
+});
+
+// New order dialog
+const dlg = $('#dlg');
+$('#newOrder').addEventListener('click', () => {
+  if (!S) return;
+  $('#fZone').innerHTML = S.zones.map(z => `<option value="${z.id}">${z.name}</option>`).join('');
+  if (ui.zone) $('#fZone').value = ui.zone;
+  $('#fAddr').value = ''; $('#fAddr').removeAttribute('aria-invalid'); $('#fAddrMsg').hidden = true;
+  dlg.showModal(); $('#fAddr').focus();
+});
+$('#dlgCancel').addEventListener('click', () => dlg.close());
+$('#fAddr').addEventListener('input', () => { if ($('#fAddr').value.trim()) { $('#fAddr').removeAttribute('aria-invalid'); $('#fAddrMsg').hidden = true; } });
+$('#orderForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const addr = $('#fAddr').value.trim();
+  if (addr.length < 3) { $('#fAddr').setAttribute('aria-invalid', 'true'); $('#fAddrMsg').hidden = false; BetterUI.shake($('#fAddr')); $('#fAddr').focus(); return; }
+  const btn = $('#dlgSubmit');
+  BetterUI.runWithState(btn, () => new Promise(res => setTimeout(res, 450)), { doneMs: 500 }).then(() => {
+    remember();
+    const id = Math.max(...S.orders.map(o => o.id)) + 1;
+    S.orders.push({ id, st: 'new', addr, zone: $('#fZone').value, cour: null, due: Date.now() + (+$('#fDue').value) * MIN });
+    setTimeout(() => {
+      dlg.close();
+      if (!['active', 'new'].includes(ui.tab)) tabsCtl.select($('#tabs [data-f="new"]'));
+      if (ui.zone && ui.zone !== $('#fZone').value) ui.zone = null;
+      renderAll(id); toast(`Заказ ${id} создан`, true);
+    }, 350);
+  });
+});
+
+// Tabs
+let tabsCtl = null;
+tabsCtl = BetterUI.segmented($('#tabs'), { onChange: b => { ui.tab = b.dataset.f; if (S) renderOrders(); } });
+
+// Live clock: due captions and "не на связи" minutes follow the time without re-rendering controls.
+setInterval(() => {
+  if (!S) return;
+  document.querySelectorAll('#ordRegion tr[data-id]').forEach(tr => { const o = order(+tr.dataset.id); if (o) tr.querySelector('[data-due]').innerHTML = dueHTML(o); });
+}, 30000);
+
+BetterUI.init(document);
+load();
+</script>
+</body>
+</html>

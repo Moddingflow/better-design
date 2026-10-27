@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Тесто — пекарня в Казани</title>
+<meta name="description" content="Пекарня «Тесто» в Казани: что выходит из печи сегодня, меню и предзаказ к нужному часу.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300..600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300..600&display=swap" rel="stylesheet"></noscript>
+<style>
+/*
+ * better-design · interaction kit (CSS)
+ * The baseline motion every interactive element ships with. Not optional and not a polish
+ * pass: adopt it at the start of a UI, map the --ui-* tokens to DESIGN.md motion roles,
+ * then build components on top. Pair with interaction-kit.js (pointer highlight, size-aware
+ * press depth, keyboard press, segmented indicator, button states).
+ *
+ * Press model (all three layers together; one layer alone reads as "dead"):
+ *   1. Down, immediately (≤ 90 ms): the element compresses by a constant ~3 px per side
+ *      (scale set per element by JS; CSS fallback 0.96) and its fill shifts one step.
+ *   2. A soft highlight blooms from the exact press point.
+ *   3. Release: it springs back with a small overshoot (~16% of the travel, ≈ 1.006 scale),
+ *      settling in ~500 ms. The action itself never waits for the animation.
+ */
+
+:root {
+  /* Durations */
+  --ui-press-down: 80ms;
+  --ui-release: 520ms;
+  --ui-hover: 200ms;
+  --ui-focus: 160ms;
+  --ui-state: 260ms;
+  /* Easing */
+  --ui-ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ui-ease-color: cubic-bezier(0.25, 0.1, 0.25, 1);
+  /* Damped springs as linear() curves (zeta 0.5 → 16% overshoot; zeta 0.75 → 3%). */
+  --ui-spring-pop: linear(0, 0.044, 0.155, 0.307, 0.475, 0.642, 0.794, 0.922, 1.023, 1.094, 1.139, 1.16, 1.162, 1.15, 1.129, 1.103, 1.075, 1.049, 1.025, 1.006, 0.991, 0.981, 0.976, 0.973, 0.974, 0.977, 0.981, 0.985, 0.989, 0.994, 0.997, 1, 1.002, 1.003, 1.004, 1.004, 1.004, 1.004, 1.003, 1.002, 1);
+  --ui-spring-snap: linear(0, 0.03, 0.105, 0.207, 0.32, 0.435, 0.545, 0.644, 0.732, 0.806, 0.867, 0.915, 0.953, 0.981, 1.001, 1.015, 1.023, 1.027, 1.028, 1.028, 1.026, 1.023, 1.02, 1.016, 1.013, 1.01, 1.008, 1.006, 1.004, 1.003, 1);
+  /* Colors (map to DESIGN.md roles) */
+  --ui-focus-ring: #2997ff;
+  --ui-highlight: rgb(255 255 255 / 0.22);      /* bloom on dark fills */
+  --ui-highlight-on-light: rgb(0 0 0 / 0.12);   /* bloom on light fills */
+}
+
+/* ── Press: the base for every button, link-button, chip, tile and icon button ──────── */
+.ui-press {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transform: scale(1);
+  transition:
+    transform var(--ui-release) var(--ui-spring-pop),
+    background-color var(--ui-hover) var(--ui-ease-color),
+    color var(--ui-hover) var(--ui-ease-color),
+    box-shadow var(--ui-hover) var(--ui-ease-color),
+    filter var(--ui-hover) var(--ui-ease-color),
+    outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out);
+}
+.ui-press:active:not(:disabled):not([aria-disabled="true"]),
+.ui-press[data-pressed] {
+  transform: scale(var(--ui-press-scale, 0.96));
+  filter: brightness(var(--ui-press-brightness, 0.92));
+  transition-duration: var(--ui-press-down);
+  transition-timing-function: var(--ui-ease-out);
+}
+/* Dark fills brighten instead of darkening. */
+.ui-press--on-dark { --ui-press-brightness: 1.18; }
+/* Large surfaces (tiles, cards, list rows) move less. */
+.ui-press--surface { --ui-press-scale: 0.985; }
+
+/* Highlight bloom from the press point (coordinates set by interaction-kit.js). */
+.ui-press::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--ui-px, 50%) var(--ui-py, 50%), var(--ui-bloom, var(--ui-highlight-on-light)) 0%, transparent var(--ui-bloom-r, 70%));
+  opacity: 0;
+  transition: opacity 600ms var(--ui-ease-out);
+}
+.ui-press--on-dark::after { --ui-bloom: var(--ui-highlight); }
+.ui-press[data-pressed]::after { opacity: 1; transition-duration: 90ms; }
+
+/* Hover: a fill step and the content's own micro-motion, never a lift. */
+@media (hover: hover) and (pointer: fine) {
+  .ui-press:hover:not(:disabled) { filter: brightness(var(--ui-hover-brightness, 0.96)); }
+  .ui-press--on-dark:hover:not(:disabled) { --ui-hover-brightness: 1.1; }
+  .ui-press:hover .ui-icon-nudge { transform: translateX(3px); }
+}
+.ui-icon-nudge { display: inline-block; transition: transform 300ms var(--ui-spring-snap); }
+
+/* Disabled: no press, no hover, visibly unavailable. */
+.ui-press:disabled, .ui-press[aria-disabled="true"] { cursor: not-allowed; opacity: 0.45; filter: none; }
+
+/* ── Focus: the ring grows into place instead of popping ─────────────────────────────── */
+.ui-focus { outline: 2px solid transparent; outline-offset: 6px; }
+/* Components below list the ring in their own transition; a bare .ui-focus gets its own.
+   Never give an element a second `transition` shorthand: the later one wins and silently
+   deletes the press and release animation. */
+.ui-focus:not(.ui-press, .ui-dim, .ui-switch, .ui-check, .ui-link, .ui-field, .ui-segmented > button) { transition: outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.ui-focus:focus-visible { outline-color: var(--ui-focus-ring); outline-offset: 2px; }
+
+/* ── Link: underline draws from the reading start; press dims ───────────────────────── */
+.ui-link {
+  color: inherit; text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 320ms var(--ui-ease-out), opacity 120ms linear, outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out);
+}
+@media (hover: hover) and (pointer: fine) { .ui-link:hover { background-size: 100% 1px; } }
+.ui-link:focus-visible { background-size: 100% 1px; }
+.ui-link:active { opacity: 0.6; transition-duration: 320ms, 40ms, var(--ui-focus), var(--ui-focus); }
+
+/* ── Text action (nav links, "Learn more ›"): dims under the finger, eases back ───── */
+.ui-dim { transition: opacity 320ms var(--ui-ease-out), color var(--ui-hover) var(--ui-ease-color), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.ui-dim:active, .ui-dim[data-pressed] { opacity: 0.5; transition-duration: 40ms, var(--ui-hover), var(--ui-focus), var(--ui-focus); }
+@media (hover: hover) and (pointer: fine) { .ui-dim:hover .ui-icon-nudge { transform: translateX(3px); } }
+
+/* ── Switch: the thumb stretches under the finger, then travels with a snap spring ───── */
+.ui-switch { position: relative; width: 51px; height: 31px; border-radius: 99px; border: 0; padding: 0; cursor: pointer; flex: none;
+  background: var(--ui-switch-off, #39393d); transition: background-color var(--ui-state) var(--ui-ease-color), filter var(--ui-hover) var(--ui-ease-color), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.ui-switch[aria-checked="true"] { background: var(--ui-switch-on, #30d158); }
+.ui-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 99px; background: #fff;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.25); transition: left 420ms var(--ui-spring-snap), width 160ms var(--ui-ease-out); }
+.ui-switch[aria-checked="true"]::after { left: 22px; }
+.ui-switch:active::after, .ui-switch[data-pressed]::after { width: 33px; }
+.ui-switch[aria-checked="true"]:active::after, .ui-switch[aria-checked="true"][data-pressed]::after { left: 16px; }
+
+/* ── Checkbox: the box compresses on press; the tick draws itself ───────────────────── */
+.ui-check { position: relative; display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 7px; flex: none; cursor: pointer;
+  border: 1.5px solid var(--ui-check-border, #86868b); background: transparent;
+  transition: background-color 180ms var(--ui-ease-color), border-color 180ms var(--ui-ease-color), transform var(--ui-release) var(--ui-spring-pop), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out), box-shadow 300ms var(--ui-ease-out); }
+.ui-check:active { transform: scale(0.88); box-shadow: 0 0 0 5px var(--ui-check-halo, rgb(255 255 255 / 0.14)); transition-duration: 180ms, 180ms, var(--ui-press-down), var(--ui-focus), var(--ui-focus), 60ms; }
+.ui-check[aria-checked="true"] { background: var(--ui-check-on, #2997ff); border-color: var(--ui-check-on, #2997ff); }
+.ui-check svg { width: 14px; height: 14px; overflow: visible; }
+.ui-check path { fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 20; stroke-dashoffset: 20; transition: stroke-dashoffset 120ms var(--ui-ease-out); }
+.ui-check[aria-checked="true"] path { stroke-dashoffset: 0; transition: stroke-dashoffset 260ms var(--ui-ease-out) 60ms; }
+
+/* ── Segmented control / tabs: one indicator slides between options ─────────────────── */
+.ui-segmented { position: relative; display: inline-flex; padding: 3px; border-radius: 99px; background: var(--ui-seg-track, rgb(255 255 255 / 0.08)); isolation: isolate; }
+.ui-segmented > button { position: relative; z-index: 1; border: 0; background: none; color: inherit; font: inherit; padding: 8px 16px; border-radius: 99px; cursor: pointer;
+  opacity: 0.7; transition: opacity var(--ui-hover) var(--ui-ease-color), transform var(--ui-release) var(--ui-spring-pop), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.ui-segmented > button[aria-selected="true"], .ui-segmented > button[aria-pressed="true"] { opacity: 1; }
+.ui-segmented > button:active { transform: scale(0.95); opacity: 0.55; transition-duration: var(--ui-hover), var(--ui-press-down), var(--ui-focus), var(--ui-focus); }
+.ui-segmented__indicator { position: absolute; z-index: 0; top: 3px; bottom: 3px; left: 0; width: 0; border-radius: 99px; background: var(--ui-seg-indicator, rgb(255 255 255 / 0.16));
+  transform: translateX(var(--ui-seg-x, 0)); width: var(--ui-seg-w, 0); transition: transform 460ms var(--ui-spring-snap), width 460ms var(--ui-spring-snap); }
+
+@media (hover: hover) and (pointer: fine) {
+  .ui-switch:hover { filter: brightness(1.12); }
+  .ui-check:hover:not([aria-checked="true"]) { border-color: var(--ui-check-hover, #c7c7cc); }
+  .ui-segmented > button:hover:not([aria-selected="true"]):not([aria-pressed="true"]) { opacity: 0.9; }
+  /* A hover rule with :not() chains outranks a plain :active rule: restate the press after
+     it with the same chain, or the press is invisible while the pointer is over the item. */
+  .ui-segmented > button:hover:not([aria-selected="true"]):not([aria-pressed="true"]):active { opacity: 0.55; }
+}
+
+/* ── Button states: pending keeps its width; success confirms once ──────────────────── */
+.ui-btn-state { display: inline-grid; place-items: center; }
+.ui-btn-state > * { grid-area: 1 / 1; transition: opacity 180ms var(--ui-ease-out), transform 260ms var(--ui-spring-snap); }
+.ui-btn-state > .ui-state-pending, .ui-btn-state > .ui-state-done { opacity: 0; transform: translateY(6px) scale(0.9); }
+.ui-btn-state[data-state="pending"] > .ui-state-label, .ui-btn-state[data-state="done"] > .ui-state-label { opacity: 0; transform: translateY(-6px) scale(0.96); }
+.ui-btn-state[data-state="pending"] > .ui-state-pending, .ui-btn-state[data-state="done"] > .ui-state-done { opacity: 1; transform: none; }
+.ui-spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: ui-spin 700ms linear infinite; }
+@keyframes ui-spin { to { transform: rotate(360deg); } }
+
+/* ── Icon swap (copy → check, play → pause): the old icon leaves, the new one lands ─── */
+.ui-swap { display: inline-grid; place-items: center; }
+.ui-swap > * { grid-area: 1 / 1; transition: opacity 160ms var(--ui-ease-out), transform 380ms var(--ui-spring-pop); }
+.ui-swap > :last-child { opacity: 0; transform: scale(0.5) rotate(-30deg); }
+.ui-swap[data-swapped] > :first-child { opacity: 0; transform: scale(0.5) rotate(30deg); }
+.ui-swap[data-swapped] > :last-child { opacity: 1; transform: none; }
+
+/* ── Toggle icon pop (like, bookmark, star): one pop when it turns on ───────────────── */
+@keyframes ui-pop { 0% { transform: scale(1); } 35% { transform: scale(1.28); } 100% { transform: scale(1); } }
+[aria-pressed="true"] > .ui-pop-icon { animation: ui-pop 420ms var(--ui-ease-out); }
+
+/* ── Field: focus grows the ring; an error shakes once, with its text ───────────────── */
+.ui-field { transition: border-color var(--ui-hover) var(--ui-ease-color), box-shadow var(--ui-focus) var(--ui-ease-out); }
+.ui-field:focus-visible, .ui-field:focus { outline: none; border-color: var(--ui-focus-ring); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ui-focus-ring) 35%, transparent); }
+@keyframes ui-shake { 0%, 100% { transform: none; } 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+.ui-shake { animation: ui-shake 320ms var(--ui-ease-out); }
+
+/* ── Menus, popovers, dialogs: grow from their origin, leave faster ─────────────────── */
+.ui-pop-in {
+  transform-origin: var(--ui-origin, top center);
+  transition: opacity 200ms var(--ui-ease-out), transform 260ms var(--ui-spring-snap), overlay 200ms allow-discrete, display 200ms allow-discrete;
+}
+.ui-pop-in:not(:popover-open):not([open]) { opacity: 0; transform: scale(0.96) translateY(-4px); transition-duration: 140ms; }
+.ui-pop-in:popover-open, .ui-pop-in[open] { opacity: 1; transform: none; }
+@starting-style { .ui-pop-in:popover-open, .ui-pop-in[open] { opacity: 0; transform: scale(0.96) translateY(-4px); } }
+dialog.ui-pop-in::backdrop { background: rgb(0 0 0 / 0); transition: background-color 260ms var(--ui-ease-out), overlay 260ms allow-discrete, display 260ms allow-discrete; }
+dialog.ui-pop-in[open]::backdrop { background: rgb(0 0 0 / 0.5); }
+@starting-style { dialog.ui-pop-in[open]::backdrop { background: rgb(0 0 0 / 0); } }
+
+/* ── Disclosure: height animates to auto ────────────────────────────────────────────── */
+:root { interpolate-size: allow-keywords; }
+.ui-disclosure::details-content { block-size: 0; overflow: clip; transition: block-size 320ms var(--ui-ease-out), content-visibility 320ms allow-discrete; }
+.ui-disclosure[open]::details-content { block-size: auto; }
+.ui-disclosure summary { transition: background-color var(--ui-hover) var(--ui-ease-color), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+@media (hover: hover) and (pointer: fine) { .ui-disclosure summary:hover { background-color: var(--ui-row-hover, rgb(255 255 255 / 0.04)); } }
+.ui-disclosure summary:active { background-color: var(--ui-row-press, rgb(255 255 255 / 0.08)); transition-duration: 60ms, var(--ui-focus), var(--ui-focus); }
+.ui-disclosure summary .ui-chevron { display: inline-block; transition: transform 320ms var(--ui-spring-snap); }
+.ui-disclosure[open] summary .ui-chevron { transform: rotate(90deg); }
+
+/* ── Reduced motion: keep every state change visible, drop travel, scale and springs ── */
+@media (prefers-reduced-motion: reduce) {
+  .ui-press, .ui-check, .ui-segmented > button, .ui-icon-nudge, .ui-swap > *, .ui-btn-state > * { transition-property: background-color, color, filter, opacity, box-shadow, outline-offset, outline-color; }
+  .ui-press:active:not(:disabled):not([aria-disabled="true"]), .ui-press[data-pressed], .ui-check:active, .ui-segmented > button:active { transform: none; }
+  .ui-switch::after, .ui-segmented__indicator, .ui-pop-in, .ui-disclosure::details-content { transition-duration: 0.01ms; }
+  [aria-pressed="true"] > .ui-pop-icon, .ui-shake { animation: none; }
+  .ui-swap > :last-child, .ui-swap[data-swapped] > :first-child, .ui-btn-state > * { transform: none; }
+}
+
+
+/* ── Tokens (mirror DESIGN.md) ───────────────────────────────────────────── */
+:root {
+  --color-canvas: #000000;
+  --color-surface: #161617;
+  --color-surface-raised: #1d1d1f;
+  --color-text: #f5f5f7;
+  --color-text-secondary: #a1a1a6;
+  --color-hairline: rgb(255 255 255 / 0.1);
+  --color-field-border: #86868b;
+  --color-action: #f5f5f7;
+  --color-on-action: #000000;
+  --color-link: #2997ff;
+  --color-danger: #ff453a;
+  --color-glass: rgb(22 22 23 / 0.8);
+
+  --font: "Geologica", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+
+  --type-hero-size: 80px;     --type-hero-lh: 1.05;
+  --type-headline-size: 56px; --type-headline-lh: 1.07;
+  --type-title-size: 40px;    --type-title-lh: 1.1;
+  --type-intro-size: 28px;    --type-intro-lh: 1.18;
+  --type-lead-size: 21px;     --type-lead-lh: 1.4;
+  --type-body-size: 17px;     --type-body-lh: 1.5;
+  --type-small-size: 14px;    --type-small-lh: 1.43;
+  --type-caption-size: 12px;  --type-caption-lh: 1.33;
+
+  --space-4: 4px; --space-8: 8px; --space-12: 12px; --space-16: 16px; --space-20: 20px;
+  --space-24: 24px; --space-32: 32px; --space-40: 40px; --space-48: 48px; --space-64: 64px;
+  --space-80: 80px; --space-120: 120px;
+
+  --radius-tile: 28px; --radius-field: 12px; --radius-pill: 9999px;
+
+  --btn-md: 44px; --btn-sm: 32px; --field-h: 44px; --row-h: 56px; --nav-h: 52px;
+  --container: 1200px;
+  /* Declared optical offset (pixel-measured with Geologica loaded): 14–17px labels center
+     on their caps within 0.5px; the 21px wordmark sits 1.5px high, so it gets 3px top padding. */
+  --optical-cap-lead: 3px;
+
+  --motion-micro: 200ms; --motion-small: 300ms; --motion-scene: 700ms;
+  --ease-standard: cubic-bezier(0.28, 0.11, 0.32, 1);
+  --ease-color: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  /* interaction kit → DESIGN.md roles */
+  --ui-focus-ring: var(--color-link);
+  --ui-seg-track: var(--color-surface);
+  --ui-seg-indicator: var(--color-surface-raised);
+
+  --section-pad: var(--space-120);
+  --gutter: var(--space-24);
+  --tile-pad: var(--space-40);
+}
+@media (max-width: 733px) {
+  :root {
+    --type-hero-size: 48px; --type-headline-size: 40px; --type-title-size: 32px;
+    --type-intro-size: 21px; --type-intro-lh: 1.24; --type-lead-size: 19px;
+    --section-pad: var(--space-80); --tile-pad: var(--space-24);
+  }
+}
+
+/* ── Base ────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: var(--space-80); -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--color-canvas); color: var(--color-text);
+  font-family: var(--font); font-size: var(--type-body-size); line-height: var(--type-body-lh); font-weight: 340;
+  font-variation-settings: "CRSV" 0, "SHRP" 0, "slnt" 0;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+h1, h2, h3, p, ol, ul, dl, dd, figure { margin: 0; padding: 0; }
+ol, ul { list-style: none; }
+a { color: var(--color-link); }
+button, input, select { font: inherit; color: inherit; }
+.num { font-variant-numeric: tabular-nums; }
+.wrap { width: 100%; max-width: calc(var(--container) + 2 * var(--gutter)); margin-inline: auto; padding-inline: var(--gutter); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.t-hero { font-size: var(--type-hero-size); line-height: var(--type-hero-lh); font-weight: 500; letter-spacing: -0.035em; }
+.t-headline { font-size: var(--type-headline-size); line-height: var(--type-headline-lh); font-weight: 500; letter-spacing: -0.03em; }
+.t-title { font-size: var(--type-title-size); line-height: var(--type-title-lh); font-weight: 500; letter-spacing: -0.025em; }
+.t-intro { font-size: var(--type-intro-size); line-height: var(--type-intro-lh); font-weight: 340; letter-spacing: -0.01em; }
+.t-lead { font-size: var(--type-lead-size); line-height: var(--type-lead-lh); font-weight: 340; }
+.t-small { font-size: var(--type-small-size); line-height: var(--type-small-lh); font-weight: 400; letter-spacing: 0.005em; }
+.t-caption { font-size: var(--type-caption-size); line-height: var(--type-caption-lh); font-weight: 400; letter-spacing: 0.01em; }
+.muted { color: var(--color-text-secondary); }
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-8);
+  height: var(--btn-md); padding: 0 22px; border: 0; border-radius: var(--radius-pill);
+  font-size: var(--type-body-size); line-height: 1; font-weight: 400; text-decoration: none; cursor: pointer; white-space: nowrap;
+}
+/* Button-like links are not drag sources: a press that slides off must not start a link drag. */
+.btn, .textlink { -webkit-user-drag: none; user-select: none; }
+.btn--primary { background: var(--color-action); color: var(--color-on-action); }
+.btn--sm { height: var(--btn-sm); padding: 0 var(--space-16); font-size: var(--type-small-size); }
+.textlink {
+  display: inline-flex; align-items: center; gap: var(--space-4); min-height: var(--btn-md); padding-inline: var(--space-8); margin-inline: calc(-1 * var(--space-8));
+  color: var(--color-link); text-decoration: none; font-size: var(--type-body-size); line-height: 1; font-weight: 400;
+}
+.textlink .ui-icon-nudge { font-size: 1.2em; line-height: 1; transform: translateY(-0.04em); }
+@media (hover: hover) and (pointer: fine) { .textlink:hover .ui-icon-nudge { transform: translate(3px, -0.04em); } }
+
+/* ── Nav ─────────────────────────────────────────────────────────────────── */
+.nav {
+  position: sticky; top: 0; z-index: 10; height: var(--nav-h);
+  background: transparent; border-bottom: 1px solid transparent;
+  transition: background-color var(--motion-small) var(--ease-color), border-color var(--motion-small) var(--ease-color);
+}
+.nav[data-scrolled] { background: var(--color-glass); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); border-bottom-color: var(--color-hairline); }
+.nav .wrap { height: 100%; display: flex; align-items: center; gap: var(--space-24); }
+.wordmark { font-size: var(--type-lead-size); font-weight: 500; letter-spacing: -0.02em; color: var(--color-text); text-decoration: none; margin-right: auto; display: inline-flex; align-items: center; min-height: var(--btn-md); padding: var(--optical-cap-lead) var(--space-8) 0; margin-left: calc(-1 * var(--space-8)); }
+.nav__links { display: flex; gap: var(--space-8); }
+.nav__links a { color: var(--color-text-secondary); text-decoration: none; font-size: var(--type-small-size); line-height: 1; display: inline-flex; align-items: center; min-height: var(--btn-md); padding-inline: var(--space-8); }
+@media (hover: hover) and (pointer: fine) { .nav__links a:hover { color: var(--color-text); } .wordmark:hover { color: var(--color-text-secondary); } }
+.nav__cta { opacity: 0; visibility: hidden; transition: opacity var(--motion-small) var(--ease-color), visibility 0s linear var(--motion-small), transform var(--ui-release) var(--ui-spring-pop), filter var(--ui-hover) var(--ui-ease-color), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.nav[data-cta] .nav__cta { opacity: 1; visibility: visible; transition-delay: 0s; }
+@media (max-width: 733px) { .nav__links { display: none; } }
+
+/* ── Hero ────────────────────────────────────────────────────────────────── */
+.hero { padding-block: var(--space-80) var(--section-pad); }
+.hero .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-64); align-items: center; }
+.hero__copy { display: flex; flex-direction: column; }
+.hero__intro { margin-top: var(--space-16); color: var(--color-text-secondary); max-width: 30ch; }
+.hero__actions { margin-top: var(--space-32); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-24); }
+@media (max-width: 1067px) { .hero .wrap { grid-template-columns: 1fr; gap: var(--space-48); } }
+
+/* ── Oven board ──────────────────────────────────────────────────────────── */
+.board { background: var(--color-surface); border-radius: var(--radius-tile); padding: var(--tile-pad); }
+.board__head { display: flex; flex-direction: column; gap: var(--space-4); margin-bottom: var(--space-16); }
+.board__list { position: relative; }
+.board__bar {
+  position: absolute; left: calc(-1 * var(--space-12)); right: calc(-1 * var(--space-12)); top: 0; height: var(--row-h);
+  border-radius: var(--radius-field); background: var(--color-surface-raised);
+  transform: translateY(var(--bar-y, 0)); opacity: 0;
+  transition: transform var(--motion-scene) var(--ease-standard), opacity var(--motion-small) var(--ease-color);
+}
+.board__bar[data-on] { opacity: 1; }
+.batch {
+  position: relative; display: grid; grid-template-columns: 64px 1fr auto; align-items: center; column-gap: var(--space-16);
+  min-height: var(--row-h); border-top: 1px solid var(--color-hairline);
+  transition: color var(--motion-small) var(--ease-color), border-color var(--motion-small) var(--ease-color);
+}
+.batch:first-child { border-top-color: transparent; }
+.batch.is-next, .batch.is-next + .batch { border-top-color: transparent; }
+.batch__time { font-size: var(--type-lead-size); font-weight: 400; line-height: 1; }
+.batch__name { line-height: 1.25; }
+.batch__state { display: inline-flex; align-items: center; gap: var(--space-8); color: var(--color-text-secondary); white-space: nowrap; }
+.batch__state svg { width: 16px; height: 16px; flex: none; }
+.batch.is-past { color: var(--color-text-secondary); }
+.batch.is-next .batch__state { color: var(--color-text); }
+.hero .wrap > * { min-width: 0; }
+@media (max-width: 733px) {
+  .batch { grid-template-columns: 56px 1fr; padding-block: var(--space-8); }
+  .batch__state { grid-column: 2; }
+  .batch__state:empty { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .board__bar { transition-duration: 0.01ms, var(--motion-small); } }
+
+/* ── Sections ───────────────────────────────────────────────────────────── */
+.section { padding-block: var(--section-pad); border-top: 1px solid var(--color-hairline); }
+.section__head { display: flex; flex-direction: column; gap: var(--space-16); max-width: 980px; margin-bottom: var(--space-48); }
+
+/* Menu */
+.menu__bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-16); margin-bottom: var(--space-24); }
+.menu__tabs > button { min-height: var(--btn-md); padding: 0 var(--space-20); font-size: var(--type-small-size); line-height: 1; }
+/* The selected tab outranks the kit's :active rule; restate the press for it. */
+.menu__tabs > button[aria-selected="true"]:active { transform: scale(0.95); opacity: 0.55; transition-duration: var(--ui-hover), var(--ui-press-down), var(--ui-focus), var(--ui-focus); }
+.menu__panels { display: grid; }
+.menu__panel { grid-area: 1 / 1; transition: opacity var(--motion-small) var(--ease-color), transform var(--motion-small) var(--ease-standard); }
+.menu__panel[hidden] { display: block; visibility: hidden; opacity: 0; transform: translateY(8px); pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .menu__panel, .menu__panel[hidden] { transform: none; } }
+.item {
+  display: grid; grid-template-columns: 1fr 96px 96px; column-gap: var(--space-24); align-items: baseline;
+  padding-block: var(--space-20); border-top: 1px solid var(--color-hairline);
+}
+.item:last-child { border-bottom: 1px solid var(--color-hairline); }
+.item__name { font-size: var(--type-lead-size); line-height: 1.3; font-weight: 400; }
+.item__desc { margin-top: var(--space-4); color: var(--color-text-secondary); }
+.item__weight { color: var(--color-text-secondary); text-align: right; }
+.item__price { text-align: right; }
+@media (max-width: 733px) {
+  .item { grid-template-columns: 1fr auto; row-gap: var(--space-4); }
+  .item__main { grid-column: 1 / -1; }
+  .item__weight { text-align: left; }
+}
+
+/* Dough day */
+.day { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-24); }
+.step { display: flex; flex-direction: column; gap: var(--space-12); padding-top: var(--space-24); border-top: 1px solid var(--color-field-border); position: relative; }
+.step::before { content: ""; position: absolute; top: -5px; left: 0; width: 9px; height: 9px; border-radius: 50%; background: var(--color-text); }
+.step__text { color: var(--color-text-secondary); max-width: 28ch; }
+@media (max-width: 1067px) { .day { grid-template-columns: repeat(2, 1fr); row-gap: var(--space-48); } }
+@media (max-width: 733px) {
+  .day { grid-template-columns: 1fr; row-gap: 0; gap: 0; }
+  .step { border-top: 0; border-left: 1px solid var(--color-field-border); padding: 0 0 var(--space-40) var(--space-24); }
+  .step:last-child { padding-bottom: 0; }
+  .step::before { top: 0; left: -5px; }
+}
+
+/* Pre-order */
+.order { display: grid; grid-template-columns: 5fr 7fr; gap: var(--space-64); align-items: start; }
+.order__tile { background: var(--color-surface); border-radius: var(--radius-tile); padding: var(--tile-pad); }
+.form { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-24); }
+.field { display: flex; flex-direction: column; gap: var(--space-8); min-width: 0; }
+.field--wide { grid-column: 1 / -1; }
+.field label { font-size: var(--type-small-size); line-height: var(--type-small-lh); color: var(--color-text-secondary); }
+.field input, .field select {
+  height: var(--field-h); padding: 0 var(--space-16); width: 100%;
+  background: var(--color-surface-raised); border: 1px solid var(--color-field-border); border-radius: var(--radius-field);
+  font-size: var(--type-body-size); font-weight: 340;
+}
+.field select { appearance: none; padding-right: var(--space-40);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%23a1a1a6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right var(--space-16) center; }
+.field input::placeholder { color: var(--color-text-secondary); }
+.field[data-invalid] input, .field[data-invalid] select { border-color: var(--color-danger); }
+.field__error { display: none; align-items: center; gap: var(--space-8); color: var(--color-danger); font-size: var(--type-small-size); line-height: var(--type-small-lh); }
+.field__error svg { width: 16px; height: 16px; flex: none; }
+.field[data-invalid] .field__error { display: flex; }
+.form__foot { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-24); }
+.form__status { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--motion-small) var(--ease-standard); grid-column: 1 / -1; }
+.form__status[data-open] { grid-template-rows: 1fr; }
+.form__status > div { overflow: hidden; }
+.form__status p { display: flex; gap: var(--space-12); align-items: flex-start; padding: var(--space-16); border-radius: var(--radius-field); background: var(--color-surface-raised); }
+.form__status svg { width: 20px; height: 20px; flex: none; margin-top: 2px; }
+@media (max-width: 1067px) { .order { grid-template-columns: 1fr; gap: var(--space-48); } }
+@media (max-width: 733px) { .form { grid-template-columns: 1fr; } }
+
+/* Visit */
+.visit { display: grid; grid-template-columns: 5fr 7fr; gap: var(--space-64); align-items: start; }
+.facts { display: grid; grid-template-columns: 160px 1fr; align-items: baseline; }
+.facts dt, .facts dd { padding-block: var(--space-20); border-top: 1px solid var(--color-hairline); }
+.facts dt { color: var(--color-text-secondary); }
+.facts dd { font-size: var(--type-lead-size); line-height: 1.3; }
+.facts dd .t-caption { display: block; margin-top: var(--space-4); }
+@media (max-width: 1067px) { .visit { grid-template-columns: 1fr; gap: var(--space-48); } }
+@media (max-width: 733px) { .facts { grid-template-columns: 1fr; } .facts dt { padding-bottom: 0; } .facts dd { border-top: 0; padding-top: var(--space-4); } }
+
+/* Footer */
+.footer { padding-block: var(--space-48); border-top: 1px solid var(--color-hairline); }
+.footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-16); }
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav" data-ui-edge>
+  <div class="wrap">
+    <a class="wordmark ui-dim ui-focus" href="#top" aria-label="Тесто, наверх"><span>Тесто</span></a>
+    <nav class="nav__links" aria-label="Разделы">
+      <a class="ui-dim ui-focus" href="#menu"><span>Меню</span></a>
+      <a class="ui-dim ui-focus" href="#day"><span>Сутки теста</span></a>
+      <a class="ui-dim ui-focus" href="#visit"><span>Адрес и часы</span></a>
+    </nav>
+    <a class="btn btn--primary btn--sm ui-press ui-focus nav__cta" href="#order" tabindex="-1"><span>Предзаказ</span></a>
+  </div>
+</header>
+
+<main id="top" data-ui-edge>
+  <section class="hero" data-ui-edge aria-labelledby="hero-title">
+    <div class="wrap">
+      <div class="hero__copy">
+        <h1 class="t-hero" id="hero-title">Тёплый хлеб к&nbsp;вашему часу</h1>
+        <p class="t-intro hero__intro">Казанская пекарня у дома. Смотрите, что выходит из печи сегодня, и забирайте горячим.</p>
+        <div class="hero__actions">
+          <a class="btn btn--primary ui-press ui-focus" id="hero-cta" href="#order"><span>Сделать предзаказ</span></a>
+        </div>
+      </div>
+
+      <section class="board" aria-labelledby="board-title">
+        <div class="board__head">
+          <h2 class="t-intro" id="board-title">Из печи сегодня</h2>
+          <p class="t-small muted"><span id="clock">Казань</span> · расписание — образец</p>
+        </div>
+        <div class="board__list">
+        <span class="board__bar" id="board-bar" aria-hidden="true" data-ui-role="decor"></span>
+        <ol id="board">
+          <li class="batch" data-t="07:30"><span class="batch__time num">07:30</span><span class="batch__name">Пшеничный на закваске</span><span class="batch__state t-small"></span></li>
+          <li class="batch" data-t="09:00"><span class="batch__time num">09:00</span><span class="batch__name">Эчпочмак</span><span class="batch__state t-small"></span></li>
+          <li class="batch" data-t="11:00"><span class="batch__time num">11:00</span><span class="batch__name">Круассаны</span><span class="batch__state t-small"></span></li>
+          <li class="batch" data-t="13:30"><span class="batch__time num">13:30</span><span class="batch__name">Ржаной с кориандром</span><span class="batch__state t-small"></span></li>
+          <li class="batch" data-t="16:00"><span class="batch__time num">16:00</span><span class="batch__name">Губадия</span><span class="batch__state t-small"></span></li>
+          <li class="batch" data-t="18:30"><span class="batch__time num">18:30</span><span class="batch__name">Багет</span><span class="batch__state t-small"></span></li>
+        </ol>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section class="section" id="menu" data-ui-edge aria-labelledby="menu-title">
+    <div class="wrap">
+      <div class="section__head">
+        <h2 class="t-headline" id="menu-title">Меню</h2>
+      </div>
+      <div class="menu__bar">
+        <div class="menu__tabs" role="tablist" aria-label="Разделы меню" id="menu-tabs">
+          <button class="ui-focus" role="tab" id="tab-bread" aria-controls="panel-bread" aria-selected="true">Хлеб</button>
+          <button class="ui-focus" role="tab" id="tab-tatar" aria-controls="panel-tatar" aria-selected="false">Татарская выпечка</button>
+          <button class="ui-focus" role="tab" id="tab-sweet" aria-controls="panel-sweet" aria-selected="false">Сладкое</button>
+        </div>
+        <p class="t-caption muted">Ассортимент и цены — образец</p>
+      </div>
+      <div class="menu__panels">
+        <ul class="menu__panel" role="tabpanel" id="panel-bread" aria-labelledby="tab-bread">
+          <li class="item"><div class="item__main"><p class="item__name">Пшеничный на закваске</p><p class="item__desc t-small">Мука высшего сорта, закваска, соль</p></div><span class="item__weight num t-small">700 г</span><span class="item__price num">— ₽</span></li>
+          <li class="item"><div class="item__main"><p class="item__name">Ржаной с кориандром</p><p class="item__desc t-small">Ржаная обдирная мука, солод, кориандр</p></div><span class="item__weight num t-small">600 г</span><span class="item__price num">— ₽</span></li>
+          <li class="item"><div class="item__main"><p class="item__name">Багет</p><p class="item__desc t-small">Тонкая корка, крупные поры</p></div><span class="item__weight num t-small">250 г</span><span class="item__price num">— ₽</span></li>
+        </ul>
+        <ul class="menu__panel" role="tabpanel" id="panel-tatar" aria-labelledby="tab-tatar" hidden>
+          <li class="item"><div class="item__main"><p class="item__name">Эчпочмак</p><p class="item__desc t-small">Говядина, картофель, лук</p></div><span class="item__weight num t-small">180 г</span><span class="item__price num">— ₽</span></li>
+          <li class="item"><div class="item__main"><p class="item__name">Губадия</p><p class="item__desc t-small">Рис, корт, изюм, яйцо</p></div><span class="item__weight num t-small">кусок, 200 г</span><span class="item__price num">— ₽</span></li>
+          <li class="item"><div class="item__main"><p class="item__name">Чак-чак</p><p class="item__desc t-small">Тесто на яйцах, мёд</p></div><span class="item__weight num t-small">300 г</span><span class="item__price num">— ₽</span></li>
+        </ul>
+        <ul class="menu__panel" role="tabpanel" id="panel-sweet" aria-labelledby="tab-sweet" hidden>
+          <li class="item"><div class="item__main"><p class="item__name">Круассан</p><p class="item__desc t-small">Сливочное масло, слоёное тесто</p></div><span class="item__weight num t-small">80 г</span><span class="item__price num">— ₽</span></li>
+          <li class="item"><div class="item__main"><p class="item__name">Синнабон с кардамоном</p><p class="item__desc t-small">Сдобное тесто, кардамон, сливочная глазурь</p></div><span class="item__weight num t-small">120 г</span><span class="item__price num">— ₽</span></li>
+          <li class="item"><div class="item__main"><p class="item__name">Медовик</p><p class="item__desc t-small">Кусок от целого торта</p></div><span class="item__weight num t-small">150 г</span><span class="item__price num">— ₽</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="day" data-ui-edge aria-labelledby="day-title">
+    <div class="wrap">
+      <div class="section__head">
+        <h2 class="t-headline" id="day-title">Сутки теста</h2>
+        <p class="t-intro muted">От замеса до прилавка проходит ночь. Время ниже — образец.</p>
+      </div>
+      <ol class="day">
+        <li class="step"><p class="t-title num">20:00</p><p class="t-lead">Замес</p><p class="step__text">Мука, вода и закваска с прошлого дня.</p></li>
+        <li class="step"><p class="t-title num">ночь</p><p class="t-lead">Брожение</p><p class="step__text">Тесто зреет в холоде и набирает вкус.</p></li>
+        <li class="step"><p class="t-title num">05:30</p><p class="t-lead">Формовка</p><p class="step__text">Каждую буханку делят и формуют руками.</p></li>
+        <li class="step"><p class="t-title num">07:30</p><p class="t-lead">Первая печь</p><p class="step__text">Дальше партии выходят по расписанию на табло.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" id="order" data-ui-edge aria-labelledby="order-title">
+    <div class="wrap order">
+      <div class="section__head">
+        <h2 class="t-headline" id="order-title">Предзаказ</h2>
+        <p class="t-intro muted">Отложим к выходу партии, оплата при получении.</p>
+      </div>
+      <div class="order__tile">
+        <form class="form" id="order-form" novalidate>
+          <div class="field">
+            <label for="f-name">Имя</label>
+            <input class="ui-field" id="f-name" name="name" autocomplete="given-name" required aria-describedby="e-name">
+            <p class="field__error" id="e-name"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6.25"/><path d="M8 4.75v3.75M8 11h.01" stroke-linecap="round"/></svg>Укажите имя</p>
+          </div>
+          <div class="field">
+            <label for="f-phone">Телефон</label>
+            <input class="ui-field" id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 900 000-00-00" required aria-describedby="e-phone">
+            <p class="field__error" id="e-phone"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6.25"/><path d="M8 4.75v3.75M8 11h.01" stroke-linecap="round"/></svg>Нужно 10 цифр после +7</p>
+          </div>
+          <div class="field">
+            <label for="f-item">Что отложить</label>
+            <select class="ui-field" id="f-item" name="item" required aria-describedby="e-item">
+              <option value="">Выберите</option>
+              <option>Пшеничный на закваске</option>
+              <option>Ржаной с кориандром</option>
+              <option>Багет</option>
+              <option>Эчпочмак</option>
+              <option>Губадия</option>
+              <option>Чак-чак</option>
+              <option>Круассан</option>
+              <option>Синнабон с кардамоном</option>
+              <option>Медовик</option>
+            </select>
+            <p class="field__error" id="e-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6.25"/><path d="M8 4.75v3.75M8 11h.01" stroke-linecap="round"/></svg>Выберите позицию</p>
+          </div>
+          <div class="field">
+            <label for="f-time">К партии</label>
+            <select class="ui-field" id="f-time" name="time" required aria-describedby="e-time">
+              <option value="">Выберите время</option>
+            </select>
+            <p class="field__error" id="e-time"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6.25"/><path d="M8 4.75v3.75M8 11h.01" stroke-linecap="round"/></svg>Выберите время</p>
+          </div>
+          <div class="form__foot">
+            <button class="btn btn--primary ui-press ui-focus" type="submit"><span>Отложить</span></button>
+          </div>
+          <div class="form__status" id="order-status" role="status" aria-live="polite">
+            <div><p class="t-small"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10" cy="10" r="7.25"/><path d="M10 9v4.5M10 6.5h.01" stroke-linecap="round"/></svg><span id="order-status-text"></span></p></div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="visit" data-ui-edge aria-labelledby="visit-title">
+    <div class="wrap visit">
+      <div class="section__head">
+        <h2 class="t-headline" id="visit-title">Адрес и часы</h2>
+      </div>
+      <dl class="facts">
+        <dt class="t-small">Адрес</dt>
+        <dd>Казань<span class="t-caption muted">Улица и дом — уточняются</span></dd>
+        <dt class="t-small">Часы</dt>
+        <dd class="num">Ежедневно, 07:00–21:00<span class="t-caption muted">Образец</span></dd>
+        <dt class="t-small">Телефон</dt>
+        <dd>Уточняется</dd>
+      </dl>
+    </div>
+  </section>
+</main>
+
+<footer class="footer" data-ui-edge>
+  <div class="wrap">
+    <p class="t-caption muted">© Тесто, Казань</p>
+    <p class="t-caption muted">Макет: расписание, ассортимент, цены и адрес — заглушки до данных пекарни.</p>
+  </div>
+</footer>
+
+<script>
+/*
+ * better-design · interaction kit (JS, no dependencies)
+ *   BetterUI.init(root)                 press/bloom/keyboard feedback for .ui-press, .ui-switch
+ *   BetterUI.segmented(el, opts)        sliding indicator for a segmented control or tabs
+ *   BetterUI.runWithState(btn, task)    pending → done → idle on a .ui-btn-state button
+ *   BetterUI.shake(el)                  one error shake (pair it with visible error text)
+ *   BetterUI.swap(el, ms)               icon swap (copy → check) that returns after ms
+ *   BetterUI.originFrom(popover, trigger)  grow a popover/menu from its trigger
+ * In React/Vue/Svelte call init once at the app root (it uses event delegation), or port
+ * the handlers into a shared Button component. Keep the timing rules below.
+ */
+(function (root) {
+  'use strict';
+
+  var MIN_PRESS_MS = 90;   // a tap shorter than this still shows a full press
+  var reduceMq = root.matchMedia ? root.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+  var PRESSABLE = '.ui-press, .ui-switch, .ui-dim';
+
+  function disabled(el) { return el.disabled || el.getAttribute('aria-disabled') === 'true'; }
+
+  // Constant visual depth: about 4 px off the perimeter whatever the element's size.
+  function pressScale(el) {
+    if (el.classList.contains('ui-press--surface')) return 0.985;
+    var r = el.getBoundingClientRect();
+    return clamp(1 - 8 / (r.width + r.height), 0.9, 0.985).toFixed(4);
+  }
+
+  function pressOn(el, x, y) {
+    if (disabled(el)) return;
+    var r = el.getBoundingClientRect();
+    el.style.setProperty('--ui-press-scale', pressScale(el));
+    if (x != null) {
+      el.style.setProperty('--ui-px', ((x - r.left) / r.width * 100).toFixed(1) + '%');
+      el.style.setProperty('--ui-py', ((y - r.top) / r.height * 100).toFixed(1) + '%');
+    } else {
+      el.style.setProperty('--ui-px', '50%'); el.style.setProperty('--ui-py', '50%');
+    }
+    el._uiPressAt = performance.now();
+    clearTimeout(el._uiPressTimer);
+    el.setAttribute('data-pressed', '');
+  }
+  function pressOff(el) {
+    if (!el || !el.hasAttribute('data-pressed')) return;
+    var held = performance.now() - (el._uiPressAt || 0);
+    var wait = Math.max(0, MIN_PRESS_MS - held);
+    clearTimeout(el._uiPressTimer);
+    el._uiPressTimer = setTimeout(function () { el.removeAttribute('data-pressed'); }, wait);
+  }
+
+  function init(scope) {
+    scope = scope || document;
+    var active = null;
+    function down(e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      var el = e.target.closest && e.target.closest(PRESSABLE);
+      if (!el || !scope.contains(el)) return;
+      active = el; pressOn(el, e.clientX, e.clientY);
+    }
+    function up() { pressOff(active); active = null; }
+    function key(e) {
+      if (e.repeat) return;
+      var el = e.target.closest && e.target.closest(PRESSABLE);
+      if (!el) return;
+      if (e.key === ' ' || e.key === 'Enter') { if (e.type === 'keydown') pressOn(el); else pressOff(el); }
+    }
+    scope.addEventListener('pointerdown', down, { passive: true });
+    root.addEventListener('pointerup', up, { passive: true });
+    root.addEventListener('pointercancel', up, { passive: true });
+    scope.addEventListener('keydown', key);
+    scope.addEventListener('keyup', key);
+    scope.addEventListener('focusout', function (e) { var el = e.target.closest && e.target.closest(PRESSABLE); if (el) pressOff(el); });
+    return { destroy: function () { scope.removeEventListener('pointerdown', down); root.removeEventListener('pointerup', up); root.removeEventListener('pointercancel', up); scope.removeEventListener('keydown', key); scope.removeEventListener('keyup', key); } };
+  }
+
+  /* Segmented control: buttons with aria-selected (tabs) or aria-pressed; one indicator
+     element is created and slides to the selected option. Arrow keys move selection. */
+  function segmented(el, opts) {
+    var o = Object.assign({ onChange: null }, opts || {});
+    el.classList.add('ui-segmented');
+    var ind = document.createElement('span');
+    ind.className = 'ui-segmented__indicator'; ind.setAttribute('aria-hidden', 'true');
+    el.insertBefore(ind, el.firstChild);
+    var items = Array.prototype.slice.call(el.querySelectorAll(':scope > button'));
+    var attr = items[0] && items[0].hasAttribute('aria-pressed') ? 'aria-pressed' : 'aria-selected';
+    function place(animate) {
+      var cur = items.filter(function (b) { return b.getAttribute(attr) === 'true'; })[0] || items[0];
+      if (!cur) return;
+      if (!animate) ind.style.transition = 'none';
+      el.style.setProperty('--ui-seg-x', cur.offsetLeft + 'px');
+      el.style.setProperty('--ui-seg-w', cur.offsetWidth + 'px');
+      if (!animate) { void ind.offsetWidth; ind.style.transition = ''; }
+    }
+    function select(b) {
+      items.forEach(function (x) { x.setAttribute(attr, String(x === b)); if (attr === 'aria-selected') x.tabIndex = x === b ? 0 : -1; });
+      place(true);
+      if (o.onChange) o.onChange(items.indexOf(b), b);
+    }
+    items.forEach(function (b) { b.addEventListener('click', function () { select(b); }); });
+    el.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!d) return;
+      var i = items.findIndex(function (x) { return x.getAttribute(attr) === 'true'; });
+      var n = items[(i + d + items.length) % items.length];
+      e.preventDefault(); select(n); n.focus();
+    });
+    var ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(function () { place(false); }) : null;
+    if (ro) ro.observe(el);
+    place(false);
+    return { select: function (i) { select(items[i]); }, destroy: function () { if (ro) ro.disconnect(); ind.remove(); } };
+  }
+
+  /* Button states. The button keeps its width, ignores repeat presses while pending,
+     announces busy state, shows done for doneMs, then returns. task returns a promise. */
+  function runWithState(btn, task, opts) {
+    var o = Object.assign({ doneMs: 1600, onError: null }, opts || {});
+    var box = btn.querySelector('.ui-btn-state') || btn;
+    if (box.getAttribute('data-state') === 'pending') return Promise.resolve();
+    btn.style.minWidth = btn.getBoundingClientRect().width + 'px';
+    box.setAttribute('data-state', 'pending');
+    btn.setAttribute('aria-busy', 'true');
+    return Promise.resolve().then(task).then(function (v) {
+      box.setAttribute('data-state', 'done');
+      btn.removeAttribute('aria-busy');
+      setTimeout(function () { box.removeAttribute('data-state'); btn.style.minWidth = ''; }, o.doneMs);
+      return v;
+    }, function (err) {
+      box.removeAttribute('data-state'); btn.removeAttribute('aria-busy'); btn.style.minWidth = '';
+      shake(btn);
+      if (o.onError) o.onError(err);
+      throw err;
+    });
+  }
+
+  function shake(el) {
+    if (reduceMq.matches) return;
+    el.classList.remove('ui-shake'); void el.offsetWidth; el.classList.add('ui-shake');
+    el.addEventListener('animationend', function () { el.classList.remove('ui-shake'); }, { once: true });
+  }
+
+  function swap(el, ms) {
+    el.setAttribute('data-swapped', '');
+    clearTimeout(el._uiSwap);
+    if (ms) el._uiSwap = setTimeout(function () { el.removeAttribute('data-swapped'); }, ms);
+  }
+
+  // Sets transform-origin so a popover/menu grows out of the control that opened it.
+  function originFrom(pop, trigger) {
+    var p = pop.getBoundingClientRect(), t = trigger.getBoundingClientRect();
+    var x = clamp(t.left + t.width / 2 - p.left, 0, p.width), y = t.top + t.height / 2 < p.top ? 0 : p.height;
+    pop.style.setProperty('--ui-origin', x + 'px ' + y + 'px');
+  }
+
+  var api = root.BetterUI = root.BetterUI || {};
+  api.init = init; api.segmented = segmented; api.runWithState = runWithState;
+  api.shake = shake; api.swap = swap; api.originFrom = originFrom; api.pressScale = pressScale;
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+})(typeof globalThis !== 'undefined' ? globalThis : window);
+
+</script>
+<script>
+(function () {
+  'use strict';
+  BetterUI.init(document);
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+
+  /* Nav: glass after scroll; the nav CTA appears once the hero CTA has left the view. */
+  var nav = document.getElementById('nav');
+  var navCta = nav.querySelector('.nav__cta');
+  function onScroll() { if (scrollY > 8) nav.setAttribute('data-scrolled', ''); else nav.removeAttribute('data-scrolled'); }
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (e) {
+      var gone = !e[0].isIntersecting && e[0].boundingClientRect.top < 0;
+      if (gone) { nav.setAttribute('data-cta', ''); navCta.removeAttribute('tabindex'); }
+      else { nav.removeAttribute('data-cta'); navCta.setAttribute('tabindex', '-1'); }
+    }).observe(document.getElementById('hero-cta'));
+  }
+
+  /* Oven board: batch states by Kazan time (UTC+3). */
+  var rows = Array.prototype.slice.call(document.querySelectorAll('.batch'));
+  var bar = document.getElementById('board-bar');
+  var clock = document.getElementById('clock');
+  var oven = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M5 7.5h6M5 10h6"/></svg>';
+  function kazanMinutes() {
+    var parts = new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date());
+    var h = +parts.find(function (p) { return p.type === 'hour'; }).value;
+    var m = +parts.find(function (p) { return p.type === 'minute'; }).value;
+    return { total: h * 60 + m, label: String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') };
+  }
+  function toMin(t) { var a = t.split(':'); return +a[0] * 60 + +a[1]; }
+  function inText(d) {
+    if (d < 60) return 'через ' + d + ' мин';
+    var h = Math.floor(d / 60), m = d % 60;
+    return 'через ' + h + ' ч' + (m ? ' ' + m + ' мин' : '');
+  }
+  function render() {
+    var now = kazanMinutes();
+    clock.textContent = 'Казань, сейчас ' + now.label;
+    var next = -1;
+    rows.forEach(function (r, i) {
+      var t = toMin(r.dataset.t), st = r.querySelector('.batch__state');
+      r.classList.remove('is-past', 'is-next');
+      if (t <= now.total) { r.classList.add('is-past'); st.textContent = 'вышел'; }
+      else if (next < 0) { next = i; r.classList.add('is-next'); st.innerHTML = oven + '<span>' + inText(t - now.total) + '</span>'; }
+      else { st.textContent = ''; }
+    });
+    if (next < 0) {
+      bar.removeAttribute('data-on');
+      rows[rows.length - 1].querySelector('.batch__state').textContent = 'вышел, на сегодня всё';
+    } else {
+      bar.style.setProperty('--bar-y', rows[next].offsetTop + 'px');
+      bar.style.height = rows[next].offsetHeight + 'px';
+      bar.setAttribute('data-on', '');
+    }
+    fillTimes(now.total);
+  }
+
+  /* Pre-order time options: today's remaining batches, then tomorrow's. */
+  var timeSel = document.getElementById('f-time');
+  var lastKey = '';
+  function fillTimes(nowMin) {
+    var opts = [];
+    rows.forEach(function (r) { if (toMin(r.dataset.t) > nowMin + 30) opts.push({ v: 'Сегодня ' + r.dataset.t, t: 'Сегодня, ' + r.dataset.t }); });
+    rows.forEach(function (r) { opts.push({ v: 'Завтра ' + r.dataset.t, t: 'Завтра, ' + r.dataset.t }); });
+    var key = opts.map(function (o) { return o.v; }).join('|');
+    if (key === lastKey) return;
+    lastKey = key;
+    var cur = timeSel.value;
+    timeSel.length = 1;
+    opts.forEach(function (o) { var op = new Option(o.t, o.v); timeSel.add(op); });
+    if (cur) timeSel.value = cur;
+  }
+
+  render();
+  var timer = setInterval(render, 30000);
+  document.addEventListener('visibilitychange', function () {
+    clearInterval(timer);
+    if (!document.hidden) { render(); timer = setInterval(render, 30000); }
+  });
+  addEventListener('resize', function () { var n = document.querySelector('.batch.is-next'); if (n) { bar.style.transition = 'none'; bar.style.setProperty('--bar-y', n.offsetTop + 'px'); void bar.offsetWidth; bar.style.transition = ''; } });
+
+  /* Menu tabs */
+  var panels = ['panel-bread', 'panel-tatar', 'panel-sweet'].map(function (id) { return document.getElementById(id); });
+  BetterUI.segmented(document.getElementById('menu-tabs'), {
+    onChange: function (i) { panels.forEach(function (p, j) { p.hidden = j !== i; }); }
+  });
+
+  /* Pre-order form: validation; no backend in this mock, said honestly. */
+  var form = document.getElementById('order-form');
+  var status = document.getElementById('order-status');
+  var statusText = document.getElementById('order-status-text');
+  function check(field, ok) {
+    var wrap = field.closest('.field');
+    if (ok) { wrap.removeAttribute('data-invalid'); field.removeAttribute('aria-invalid'); }
+    else { wrap.setAttribute('data-invalid', ''); field.setAttribute('aria-invalid', 'true'); }
+    return ok;
+  }
+  function phoneOk(v) { var d = v.replace(/\D/g, ''); if (d.length === 11 && (d[0] === '7' || d[0] === '8')) d = d.slice(1); return d.length === 10; }
+  function validate(f) {
+    if (f.name === 'phone') return check(f, phoneOk(f.value));
+    return check(f, f.value.trim() !== '');
+  }
+  Array.prototype.forEach.call(form.elements, function (f) {
+    if (!f.name) return;
+    f.addEventListener(f.tagName === 'SELECT' ? 'change' : 'blur', function () { if (f.value || f.closest('.field').hasAttribute('data-invalid')) validate(f); });
+    f.addEventListener('input', function () { if (f.closest('.field').hasAttribute('data-invalid')) validate(f); });
+  });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var fields = ['name', 'phone', 'item', 'time'].map(function (n) { return form.elements.namedItem(n); });
+    var bad = fields.filter(function (f) { return !validate(f); });
+    if (bad.length) {
+      status.removeAttribute('data-open');
+      bad[0].focus();
+      BetterUI.shake(bad[0]);
+      return;
+    }
+    statusText.textContent = 'Заявка «' + fields[2].value + ', ' + fields[3].value.toLowerCase() + '» не отправлена: у макета нет приёма заказов. Подключите его перед запуском.';
+    status.setAttribute('data-open', '');
+  });
+})();
+</script>
+</body>
+</html>

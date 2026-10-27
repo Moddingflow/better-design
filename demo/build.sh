@@ -1,5 +1,6 @@
 #!/bin/sh
 # Assemble the GitHub Pages demo: the hub page, the before/after builds in demo/compare,
+# the v1.6 vs v1.8 bench pages in demo/bench,
 # and the skill's live pages and README images.
 # Usage: sh demo/build.sh [output-dir]   (default: _site)
 set -eu
@@ -14,4 +15,5 @@ cp skills/better-design/assets/house-style.html "$out/assets/"
 cp -R skills/better-design/assets/motion skills/better-design/assets/effects "$out/assets/"
 cp docs/images/house-style.png demo/previews/* "$out/images/"
 cp -R demo/compare "$out/compare"
+cp -R demo/bench "$out/bench"
 echo "Demo site written to $out"

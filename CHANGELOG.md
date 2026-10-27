@@ -1,5 +1,37 @@
 # Changelog
 
+## 1.8.0 — 2026-10-27
+
+No visual direction is no longer a style. Until 1.7, a request with no visual cue got the house style every time, so unrelated products came out as one black page: in the bench, five of six v1.6 pages for a bakery, an API, a ceramics school, a finance app, and an admin were grouped by two blind judges into one template. 1.8 deals a direction instead. [Bench report](docs/evaluations/bench-v1.8.0.md) · [live comparison](https://moddingflow.github.io/better-design/#v18).
+
+### Changed
+
+- **The house style is used on request.** It applies when the user asks for it ("minimal", "premium", "like Apple", "the house style") or when the deal hands it out as one material among many. The product's domain is still not a visual cue, and untouched scaffold defaults (shadcn/ui, Tailwind, starters, Bootstrap, MUI, Chakra) are still not a system to inherit; both now mean "deal a direction", with the component library kept and the dealt tokens mapped onto it. The 1.7 scaffold token mapping and "start from the reference" apply when the house style is chosen.
+- **Art direction with no cue** (`art-direction.md`, `SKILL.md` sections 1 and 3): replaced by the dealt-direction procedure. Colour posture (restrained, committed, full, drenched) is chosen before colours, and light or dark ground comes from a scene sentence, not habit or category.
+- **Fresh-context critique.** When the environment can start a subagent, the critique of a created expressive surface is done by a reviewer given only the screenshots and the direction card.
+- **Acceptance.** With no cue and nothing to inherit, skipping the deal, building the agent's own top-two direction, or shipping a calibrated look the deal did not hand out is an error.
+
+### Added
+
+- **Dealt direction** (`references/direction-deal.md`): a scene sentence, a material inventory (real / pictures / absent), the visitor's job, the rut and calibration clusters to refuse, a deal, seven ranked directions and a roll that builds #3 to #7 (#2 or #3 for working tools), a drawn structure, the mirror test, a direction card said once, a log entry, a six-axis pre-emit critique, and "craft before boldness" checks (nav on the content column, no clipped cells, no sample banners on the first screen).
+- **`scripts/deal_direction.mjs`**: deals three materials from different families and a page structure (shape, first-screen posture, nav, footer, opener, two compositions to leave out, the job's action and sections), cleared against a rotation log (`~/.better-design/log.json`, `--log`, `--no-log`) of recent materials, axes, display faces, hues, and grounds. No dependencies.
+- **Materials** (`references/materials.md`): 29 starting materials with ground, display class, accent, posture, family, sample faces (distinct per row), and routing keywords.
+- **Page anatomy** (`references/page-anatomy.md`): the action, the category's own sections, and the close for ten visitor jobs; eight first-screen postures; a shape vocabulary; budgets for expressive pages (headline, sentence, and action visible at 1280×800, about 80 words per screen, six to nine sections with mass, the page ending on the job's action).
+- **Fonts** (`references/fonts.md`): reflex and saturated faces, alternatives by class with Cyrillic coverage marked, wordmark and loading rules, themed browser surfaces.
+- **Slop catalog, about 25 entries**: template page, reflex split hero, stock email close, numbered section labels, thin sections, walls of words, fake browser chrome, counting marks, calibrated looks, category hues, framework swatches, glow shadows, tracked-caps labels, accented words, mono as costume, template punctuation (middle dots, glued arrows), reflex fonts, emoji icons, wireframe pages, placeholder names, aphoristic cadence, echoed facts, decoration text, sample banners.
+- **`scripts/bench_metrics.mjs`**: renders pages in headless Chrome and reports convergence (hero layout similarity, colour distance, distinct grounds, faces, and accent hues) and a mechanical slop subset (eyebrows, tracked caps, accented words, template punctuation, AI gradients, glows, reflex display fonts, sample banners, hero fold, phone overflow). An A/B protocol against the previous version is in `references/evaluations.md`.
+- **Live demo**: the six bench briefs built with v1.6 and v1.8, both live and switchable in place, with the blind judge's scores and reason per brief, and a results table.
+
+### Credits
+
+Ideas adapted from [Hallmark](https://github.com/Nutlope/hallmark) (MIT) and [Impeccable](https://github.com/pbakaus/impeccable) (Apache-2.0), rewritten in Better Design's own words and code; no files were copied. Details in `references/sources.md`.
+
+### Known limits
+
+- Two changes made after the second bench iteration are not re-measured: the "paper + one red stamp ink" and "place souvenir as palette" clusters, and the ground-rotation hint.
+- Execution scored slightly below v1.6 in blind judgement (3.7 against 3.8–4.0 of 5): bolder directions are harder to finish than a tuned preset.
+- On the demo hub, the motion probe reports no press feedback on the first segmented tab of each switch; the same finding exists on 1.7.1's hub.
+
 ## 1.7.1 — 2026-10-23
 
 ### Fixed

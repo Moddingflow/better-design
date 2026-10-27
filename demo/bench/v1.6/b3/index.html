@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Шамот — школа керамики для взрослых</title>
+<meta name="description" content="Вечерние курсы гончарного круга, ручной лепки и глазурей для взрослых.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300..500&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: dark;
+  /* color roles (DESIGN.md › Color) */
+  --color-canvas: #000000;
+  --color-surface: #161617;
+  --color-surface-raised: #1d1d1f;
+  --color-text: #f5f5f7;
+  --color-text-secondary: #a1a1a6;
+  --color-hairline: rgb(255 255 255 / 0.1);
+  --color-field-border: #86868b;
+  --color-action: #f5f5f7;
+  --color-on-action: #000000;
+  --color-link: #2997ff;
+  --color-focus: #2997ff;
+  --color-danger: #ff453a;
+  --color-glass: rgb(22 22 23 / 0.8);
+  /* content colors: glazes and clay */
+  --clay: #b59a7c;
+  /* spacing */
+  --space-4: 4px; --space-8: 8px; --space-12: 12px; --space-16: 16px; --space-20: 20px;
+  --space-24: 24px; --space-32: 32px; --space-40: 40px; --space-48: 48px; --space-64: 64px;
+  --space-80: 80px; --space-120: 120px; --space-160: 160px;
+  /* radii */
+  --radius-tile: 28px; --radius-card: 18px; --radius-field: 12px; --radius-pill: 9999px;
+  /* type */
+  --font: "Geologica", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+  --type-hero: 80px; --type-headline: 56px; --type-title: 40px; --type-intro: 28px;
+  --type-lead: 21px; --type-body: 17px; --type-small: 14px; --type-caption: 12px;
+  /* layout */
+  --container: 980px; --gutter: 24px; --section-pad: 120px; --nav-h: 52px;
+  /* motion */
+  --motion-micro: 200ms; --motion-small: 300ms; --motion-scene: 1000ms;
+  --ease-standard: cubic-bezier(0.28, 0.11, 0.32, 1);
+  --ease-color: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  /* interaction kit, mapped to roles */
+  --ui-press-down: 80ms; --ui-release: 520ms; --ui-hover: var(--motion-micro); --ui-focus: 160ms; --ui-state: 260ms;
+  --ui-ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ui-ease-color: var(--ease-color);
+  --ui-spring-pop: linear(0, 0.044, 0.155, 0.307, 0.475, 0.642, 0.794, 0.922, 1.023, 1.094, 1.139, 1.16, 1.162, 1.15, 1.129, 1.103, 1.075, 1.049, 1.025, 1.006, 0.991, 0.981, 0.976, 0.973, 0.974, 0.977, 0.981, 0.985, 0.989, 0.994, 0.997, 1, 1.002, 1.003, 1.004, 1.004, 1.004, 1.004, 1.003, 1.002, 1);
+  --ui-spring-snap: linear(0, 0.03, 0.105, 0.207, 0.32, 0.435, 0.545, 0.644, 0.732, 0.806, 0.867, 0.915, 0.953, 0.981, 1.001, 1.015, 1.023, 1.027, 1.028, 1.028, 1.026, 1.023, 1.02, 1.016, 1.013, 1.01, 1.008, 1.006, 1.004, 1.003, 1);
+  --ui-focus-ring: var(--color-focus);
+  --ui-highlight: rgb(255 255 255 / 0.22);
+  --ui-highlight-on-light: rgb(0 0 0 / 0.12);
+  interpolate-size: allow-keywords;
+}
+@media (max-width: 733px) {
+  :root {
+    --type-hero: 48px; --type-headline: 40px; --type-title: 32px; --type-intro: 21px; --type-lead: 19px;
+    --section-pad: 80px; --gutter: 16px;
+  }
+}
+
+/* ── interaction kit (better-design), parts used on this page ───────────────────────── */
+.ui-press { position: relative; isolation: isolate; overflow: hidden; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transform: scale(1);
+  transition: transform var(--ui-release) var(--ui-spring-pop), background-color var(--ui-hover) var(--ui-ease-color), color var(--ui-hover) var(--ui-ease-color), box-shadow var(--ui-hover) var(--ui-ease-color), filter var(--ui-hover) var(--ui-ease-color), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.ui-press:active:not(:disabled):not([aria-disabled="true"]), .ui-press[data-pressed] { transform: scale(var(--ui-press-scale, 0.96)); filter: brightness(var(--ui-press-brightness, 0.92)); transition-duration: var(--ui-press-down); transition-timing-function: var(--ui-ease-out); }
+.ui-press--on-dark { --ui-press-brightness: 1.18; }
+.ui-press--surface { --ui-press-scale: 0.985; }
+.ui-press::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(circle at var(--ui-px, 50%) var(--ui-py, 50%), var(--ui-bloom, var(--ui-highlight-on-light)) 0%, transparent var(--ui-bloom-r, 70%)); opacity: 0; transition: opacity 600ms var(--ui-ease-out); }
+.ui-press--on-dark::after { --ui-bloom: var(--ui-highlight); }
+.ui-press[data-pressed]::after { opacity: 1; transition-duration: 90ms; }
+@media (hover: hover) and (pointer: fine) {
+  .ui-press:hover:not(:disabled) { filter: brightness(var(--ui-hover-brightness, 0.96)); }
+  .ui-press--on-dark:hover:not(:disabled) { --ui-hover-brightness: 1.1; }
+  .ui-press:hover .ui-icon-nudge { transform: translateX(3px); }
+}
+.ui-icon-nudge { display: inline-block; transition: transform 300ms var(--ui-spring-snap); }
+.ui-focus { outline: 2px solid transparent; outline-offset: 6px; }
+.ui-focus:not(.ui-press, .ui-dim, .ui-link, .ui-field) { transition: outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.ui-focus:focus-visible { outline-color: var(--ui-focus-ring); outline-offset: 2px; }
+.ui-link { color: inherit; text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 320ms var(--ui-ease-out), opacity 120ms linear, outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+@media (hover: hover) and (pointer: fine) { .ui-link:hover { background-size: 100% 1px; } }
+.ui-link:focus-visible { background-size: 100% 1px; }
+.ui-link:active { opacity: 0.6; transition-duration: 320ms, 40ms, var(--ui-focus), var(--ui-focus); }
+.ui-dim { transition: opacity 320ms var(--ui-ease-out), color var(--ui-hover) var(--ui-ease-color), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.ui-dim:active, .ui-dim[data-pressed] { opacity: 0.5; transition-duration: 40ms, var(--ui-hover), var(--ui-focus), var(--ui-focus); }
+@media (hover: hover) and (pointer: fine) { .ui-dim:hover .ui-icon-nudge { transform: translateX(3px); } }
+.ui-field { transition: border-color var(--ui-hover) var(--ui-ease-color), box-shadow var(--ui-focus) var(--ui-ease-out); }
+.ui-field:focus-visible, .ui-field:focus { outline: none; border-color: var(--ui-focus-ring); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ui-focus-ring) 35%, transparent); }
+@keyframes ui-shake { 0%, 100% { transform: none; } 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+.ui-shake { animation: ui-shake 320ms var(--ui-ease-out); }
+.ui-pop-in { transform-origin: var(--ui-origin, top center); transition: opacity 200ms var(--ui-ease-out), transform 260ms var(--ui-spring-snap), overlay 200ms allow-discrete, display 200ms allow-discrete; }
+.ui-pop-in:not(:popover-open):not([open]) { opacity: 0; transform: scale(0.96) translateY(-4px); transition-duration: 140ms; }
+.ui-pop-in:popover-open, .ui-pop-in[open] { opacity: 1; transform: none; }
+@starting-style { .ui-pop-in:popover-open, .ui-pop-in[open] { opacity: 0; transform: scale(0.96) translateY(-4px); } }
+.ui-disclosure::details-content { block-size: 0; overflow: clip; transition: block-size 320ms var(--ui-ease-out), content-visibility 320ms allow-discrete; }
+.ui-disclosure[open]::details-content { block-size: auto; }
+.ui-disclosure summary { transition: background-color var(--ui-hover) var(--ui-ease-color), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+@media (hover: hover) and (pointer: fine) { .ui-disclosure summary:hover { background-color: rgb(255 255 255 / 0.04); } }
+.ui-disclosure summary:active { background-color: rgb(255 255 255 / 0.08); transition-duration: 60ms, var(--ui-focus), var(--ui-focus); }
+.ui-disclosure summary .ui-chevron { display: inline-block; transition: transform 320ms var(--ui-spring-snap); }
+.ui-disclosure[open] summary .ui-chevron { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) {
+  .ui-press, .ui-icon-nudge { transition-property: background-color, color, filter, opacity, box-shadow, outline-offset, outline-color; }
+  .ui-press:active:not(:disabled):not([aria-disabled="true"]), .ui-press[data-pressed] { transform: none; }
+  .ui-pop-in, .ui-disclosure::details-content { transition-duration: 0.01ms; }
+  .ui-shake { animation: none; }
+}
+
+/* ── base ────────────────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + var(--space-16)); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; background: var(--color-canvas); color: var(--color-text); font-family: var(--font);
+  font-size: var(--type-body); line-height: 1.5; font-weight: 340; font-variation-settings: "CRSV" 0, "SHRP" 0, "slnt" 0;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+h1, h2, h3, p, dl, dd, ol, ul, figure { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
+button, input, select, textarea { font: inherit; color: inherit; font-variation-settings: inherit; }
+.num { font-variant-numeric: tabular-nums; }
+.container { width: min(var(--container), 100% - 2 * var(--space-24)); margin-inline: auto; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+.t-hero { font-size: var(--type-hero); line-height: 1.05; font-weight: 500; letter-spacing: -0.035em; }
+.t-headline { font-size: var(--type-headline); line-height: 1.07; font-weight: 500; letter-spacing: -0.03em; }
+.t-title { font-size: var(--type-title); line-height: 1.1; font-weight: 500; letter-spacing: -0.025em; }
+.t-intro { font-size: var(--type-intro); line-height: 1.18; font-weight: 340; letter-spacing: -0.01em; }
+.t-lead { font-size: var(--type-lead); line-height: 1.4; font-weight: 340; }
+.t-small { font-size: var(--type-small); line-height: 1.43; font-weight: 400; letter-spacing: 0.005em; }
+.t-caption { font-size: var(--type-caption); line-height: 1.33; font-weight: 400; letter-spacing: 0.01em; }
+.muted { color: var(--color-text-secondary); }
+
+/* buttons */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-8); border: 0; cursor: pointer;
+  border-radius: var(--radius-pill); text-decoration: none; font-weight: 400; white-space: nowrap; text-box: trim-both cap alphabetic; }
+.btn--sm { height: 32px; padding-inline: var(--space-16); font-size: var(--type-small); }
+.btn--md { height: 44px; padding-inline: 22px; font-size: var(--type-body); }
+.btn--lg { height: 56px; padding-inline: 28px; font-size: var(--type-body); }
+.btn--primary { background: var(--color-action); color: var(--color-on-action); }
+.btn--ghost { background: transparent; color: var(--color-text); box-shadow: inset 0 0 0 1px var(--color-field-border); }
+.textlink { color: var(--color-link); text-decoration: none; display: inline-flex; align-items: center; gap: var(--space-4); min-height: 44px; padding-inline: var(--space-4); text-box: trim-both cap alphabetic; }
+
+/* ── nav ─────────────────────────────────────────────────────────────────────────────── */
+.nav { position: sticky; top: 0; z-index: 10; height: var(--nav-h); background: transparent;
+  transition: background-color var(--motion-small) var(--ease-color), box-shadow var(--motion-small) var(--ease-color); }
+.nav[data-scrolled] { background: var(--color-glass); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); box-shadow: inset 0 -1px 0 var(--color-hairline); }
+.nav__in { height: 100%; display: flex; align-items: center; gap: var(--space-32); }
+.brand { display: inline-flex; align-items: center; gap: var(--space-8); color: var(--color-text); text-decoration: none; font-weight: 500; font-size: var(--type-body); letter-spacing: -0.01em; min-height: 44px; }
+@media (hover: hover) and (pointer: fine) { .brand:hover:not(:active):not([data-pressed]) { opacity: 0.72; } }
+.brand svg { width: 20px; height: 20px; flex: none; }
+.nav__links { display: flex; gap: var(--space-24); margin-left: auto; }
+.nav__links a { color: var(--color-text-secondary); text-decoration: none; font-size: var(--type-small); display: inline-flex; align-items: center; min-height: 44px; }
+@media (hover: hover) and (pointer: fine) { .nav__links a:hover { color: var(--color-text); } }
+.nav__cta { opacity: 0; visibility: hidden; transition: opacity var(--motion-small) var(--ease-color), visibility 0s linear var(--motion-small), transform var(--ui-release) var(--ui-spring-pop), filter var(--ui-hover) var(--ui-ease-color), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.nav[data-cta] .nav__cta { opacity: 1; visibility: visible; transition-delay: 0s; }
+.nav__menu-btn { display: none; }
+.menu { margin: 0; inset: auto; position: fixed; top: calc(var(--nav-h) + var(--space-8)); right: var(--space-16); left: auto;
+  min-width: 220px; padding: var(--space-8); border: 0; border-radius: var(--radius-card); background: var(--color-surface-raised); color: var(--color-text);
+  box-shadow: 0 0 0 1px var(--color-hairline); }
+.menu ul { display: grid; gap: 0; }
+.menu a { display: flex; align-items: center; min-height: 44px; padding-inline: var(--space-16); border-radius: var(--radius-field); color: var(--color-text); text-decoration: none; }
+@media (max-width: 733px) {
+  .nav__links { display: none; }
+  .nav__in { gap: var(--space-16); }
+  .nav__cta { margin-left: auto; }
+  .nav__menu-btn { display: inline-flex; width: 44px; padding: 0; background: transparent; color: var(--color-text); }
+  .nav__menu-btn svg { width: 20px; height: 20px; }
+}
+
+/* ── hero ────────────────────────────────────────────────────────────────────────────── */
+.hero { padding-top: var(--space-80); text-align: center; }
+.hero h1 { max-width: 12ch; margin-inline: auto; }
+.hero .t-intro { margin-top: var(--space-16); color: var(--color-text-secondary); max-width: 36ch; margin-inline: auto; }
+.hero__actions { margin-top: var(--space-32); display: flex; justify-content: center; align-items: center; gap: var(--space-24); flex-wrap: wrap; }
+.drawing { margin: var(--space-64) auto 0; width: min(440px, 100%); }
+.drawing svg { display: block; width: 100%; height: auto; overflow: visible; }
+.drawing figcaption { margin-top: var(--space-16); color: var(--color-text-secondary); }
+.dw-line { fill: none; stroke: var(--color-text); stroke-width: 0.85; stroke-linejoin: round; stroke-linecap: round; }
+.dw-thin { fill: none; stroke: var(--color-text-secondary); stroke-width: 0.55; }
+.dw-axis { stroke-dasharray: 8 2.5 1.5 2.5; }
+.dw-hatch { fill: url(#hatch); }
+.dw-label { fill: var(--color-text-secondary); font-family: var(--font); font-size: 8px; font-weight: 400; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.draw { stroke-dasharray: 1; stroke-dashoffset: 0; animation: dw-draw var(--motion-scene) var(--ease-standard) 200ms backwards; }
+.draw--late { animation-delay: 500ms; }
+.dw-axis.draw { stroke-dasharray: 8 2.5 1.5 2.5; animation-name: dw-fade; }
+.fade-late { animation: dw-fade 600ms var(--ease-color) 900ms backwards; }
+@keyframes dw-draw { from { stroke-dashoffset: 1; } }
+@keyframes dw-fade { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .draw, .fade-late { animation: none; } }
+
+/* ── sections ────────────────────────────────────────────────────────────────────────── */
+.section { padding-block: var(--section-pad); }
+.section__head { max-width: 680px; }
+.section__head .t-lead { margin-top: var(--space-16); color: var(--color-text-secondary); }
+.section__body { margin-top: var(--space-64); }
+.note { margin-top: var(--space-24); color: var(--color-text-secondary); }
+
+/* courses */
+.courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-24); }
+.course { background: var(--color-surface); border-radius: var(--radius-tile); padding: var(--space-40); display: flex; flex-direction: column; }
+.course--first { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--space-24); align-items: end; }
+.course p { margin-top: var(--space-12); color: var(--color-text-secondary); }
+.course dl { margin-top: auto; padding-top: var(--space-32); display: grid; grid-template-columns: auto auto; }
+.course--first dl { padding-top: 0; }
+.course dl > div { display: contents; }
+.course dt, .course dd { padding-block: var(--space-12); border-top: 1px solid var(--color-hairline); font-size: var(--type-small); }
+.course dt { color: var(--color-text-secondary); }
+.course dd { text-align: right; font-variant-numeric: tabular-nums; }
+@media (max-width: 733px) {
+  .courses { grid-template-columns: minmax(0, 1fr); gap: var(--space-16); }
+  .course { padding: var(--space-24); border-radius: var(--radius-card); }
+  .course--first { grid-template-columns: minmax(0, 1fr); }
+  .course--first dl { padding-top: var(--space-32); }
+}
+
+/* process: the way of clay */
+.steps { counter-reset: step; border-top: 1px solid var(--color-hairline); }
+.step { display: grid; grid-template-columns: 40px minmax(0, 1fr) minmax(0, 1.4fr) 140px; column-gap: var(--space-24); align-items: baseline;
+  padding-block: var(--space-24); border-bottom: 1px solid var(--color-hairline); }
+.step__n { color: var(--color-text-secondary); font-size: var(--type-small); font-variant-numeric: tabular-nums; }
+.step__name { font-size: var(--type-lead); line-height: 1.4; font-weight: 400; }
+.step__text { color: var(--color-text-secondary); }
+.step__val { text-align: right; font-size: var(--type-small); font-variant-numeric: tabular-nums; }
+.step--fire .step__val { color: var(--color-text); }
+@media (max-width: 733px) {
+  .step { grid-template-columns: 32px minmax(0, 1fr) auto; row-gap: var(--space-4); column-gap: var(--space-12); padding-block: var(--space-20); }
+  .step__text { grid-column: 2 / -1; grid-row: 2; }
+}
+
+/* glazes */
+.glaze { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-64); align-items: center; }
+.glaze__list { display: grid; gap: var(--space-8); }
+.glaze-opt { display: grid; grid-template-columns: 44px minmax(0, 1fr) 20px; align-items: center; column-gap: var(--space-16); width: 100%;
+  min-height: 72px; padding: var(--space-12) var(--space-16); border: 0; border-radius: var(--radius-card); background: transparent; text-align: left; cursor: pointer; }
+.glaze-opt[aria-pressed="true"] { background: var(--color-surface-raised); }
+.glaze-opt__name { display: block; font-size: var(--type-body); font-weight: 400; line-height: 1.3; }
+.glaze-opt__prop { display: block; font-size: var(--type-small); color: var(--color-text-secondary); line-height: 1.43; }
+.glaze-opt__check { width: 20px; height: 20px; color: var(--color-text); opacity: 0; transition: opacity var(--motion-micro) var(--ease-color); }
+.glaze-opt[aria-pressed="true"] .glaze-opt__check { opacity: 1; }
+.tile { width: 44px; height: 44px; border-radius: var(--radius-field); background: var(--g-base); position: relative; overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08); }
+.tile::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 0 55%, var(--g-pool) 100%); }
+.tile::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 10px; background: var(--clay); }
+.glaze__stage { text-align: center; }
+.glaze__stage svg { width: min(360px, 100%); height: auto; display: block; margin-inline: auto; overflow: visible; }
+.glaze__stage figcaption { margin-top: var(--space-16); }
+.glaze__name { display: block; }
+.glaze__stage .t-small { color: var(--color-text-secondary); margin-top: var(--space-4); }
+@media (max-width: 1067px) { .glaze { gap: var(--space-40); } }
+@media (max-width: 733px) {
+  .glaze { grid-template-columns: minmax(0, 1fr); gap: var(--space-32); }
+  .glaze__stage { order: -1; }
+  .glaze__stage svg { width: min(240px, 100%); }
+}
+
+/* schedule */
+.sched { width: 100%; border-collapse: collapse; font-size: var(--type-small); }
+.sched caption { text-align: left; }
+.sched th, .sched td { padding: var(--space-16) var(--space-16) var(--space-16) 0; text-align: left; border-bottom: 1px solid var(--color-hairline); vertical-align: middle; }
+.sched thead th { color: var(--color-text-secondary); font-weight: 400; padding-top: 0; }
+.sched tbody th { font-weight: 400; font-size: var(--type-body); }
+.sched td { font-variant-numeric: tabular-nums; }
+.sched td:last-child, .sched th:last-child { text-align: right; padding-right: 0; }
+.lbl { display: none; }
+.seats-few { display: inline-flex; align-items: center; gap: var(--space-4); }
+.seats-few svg { width: 12px; height: 12px; }
+@media (max-width: 733px) {
+  .sched thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .sched, .sched tbody, .sched tr, .sched th, .sched td { display: block; }
+  .sched tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--space-16); row-gap: var(--space-4); align-items: center;
+    padding-block: var(--space-16); border-bottom: 1px solid var(--color-hairline); }
+  .sched th, .sched td { border: 0; padding: 0; }
+  .sched tbody th { grid-column: 1; }
+  .sched td[data-l] { grid-column: 1; color: var(--color-text-secondary); }
+  .sched .lbl { display: inline; }
+  .sched td:last-child { grid-column: 2; grid-row: 1 / span 4; }
+}
+
+/* faq */
+.faq { border-top: 1px solid var(--color-hairline); max-width: 760px; }
+.faq details { border-bottom: 1px solid var(--color-hairline); }
+.faq summary { list-style: none; display: grid; grid-template-columns: minmax(0, 1fr) 20px; align-items: center; gap: var(--space-16);
+  min-height: 64px; padding-block: var(--space-16); cursor: pointer; font-size: var(--type-lead); line-height: 1.4; }
+.faq .ui-disclosure summary:hover, .faq .ui-disclosure summary:active { background-color: transparent; }
+.faq summary .ui-chevron { transition: transform 320ms var(--ui-spring-snap), color var(--motion-micro) var(--ease-color); }
+@media (hover: hover) and (pointer: fine) { .faq summary:hover .ui-chevron { color: var(--color-text); } }
+.faq summary { transition: opacity 320ms var(--ui-ease-out), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.faq summary:active { opacity: 0.6; transition-duration: 40ms, var(--ui-focus), var(--ui-focus); }
+.faq summary::-webkit-details-marker { display: none; }
+.faq .ui-chevron { width: 20px; height: 20px; color: var(--color-text-secondary); }
+.faq .ans { padding: 0 var(--space-40) var(--space-24) 0; color: var(--color-text-secondary); max-width: 62ch; }
+
+/* sign-up */
+.signup { background: var(--color-surface); border-radius: var(--radius-tile); padding: var(--space-64); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: var(--space-64); }
+.signup .t-lead { margin-top: var(--space-16); color: var(--color-text-secondary); }
+.form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-20) var(--space-16); }
+.field { display: grid; gap: var(--space-8); align-content: start; }
+.field--wide { grid-column: 1 / -1; }
+.field label { font-size: var(--type-small); color: var(--color-text-secondary); line-height: 1.43; }
+.field input, .field select, .field textarea { width: 100%; height: 44px; padding: 0 14px; background: var(--color-surface-raised);
+  border: 1px solid var(--color-field-border); border-radius: var(--radius-field); font-size: var(--type-body); font-weight: 340; }
+.field select { appearance: none; padding-right: 40px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23a1a1a6' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 16px center; }
+.field textarea { height: 120px; padding-block: 12px; resize: vertical; line-height: 1.5; }
+.field input::placeholder, .field textarea::placeholder { color: var(--color-text-secondary); opacity: 1; }
+.field[data-invalid] input { border-color: var(--color-danger); }
+.err { display: none; align-items: center; gap: var(--space-8); color: var(--color-danger); font-size: var(--type-small); }
+.err svg { width: 16px; height: 16px; flex: none; }
+.field[data-invalid] .err { display: flex; }
+.form__foot { grid-column: 1 / -1; display: flex; align-items: center; gap: var(--space-24); flex-wrap: wrap; margin-top: var(--space-8); }
+.status { display: none; grid-column: 1 / -1; grid-template-columns: 20px minmax(0, 1fr); gap: var(--space-12); align-items: start;
+  padding: var(--space-16); border-radius: var(--radius-field); background: var(--color-surface-raised); font-size: var(--type-small); }
+.status svg { width: 20px; height: 20px; }
+.status[data-show] { display: grid; animation: status-in var(--motion-small) var(--ease-standard); }
+@keyframes status-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { @keyframes status-in { from { opacity: 0; } to { opacity: 1; } } }
+@media (max-width: 1067px) { .signup { grid-template-columns: minmax(0, 1fr); gap: var(--space-40); padding: var(--space-48); } }
+@media (max-width: 733px) {
+  .signup { padding: var(--space-24); border-radius: var(--radius-card); }
+  .form { grid-template-columns: minmax(0, 1fr); }
+  .form__foot .btn { width: 100%; }
+}
+
+/* footer */
+.footer { padding-block: var(--space-48) var(--space-64); border-top: 1px solid var(--color-hairline); color: var(--color-text-secondary); }
+.footer__in { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-24); flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="container nav__in">
+    <a class="brand ui-dim ui-focus" href="#top" aria-label="Шамот, в начало страницы">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7 2.5h6M8 2.5c0 2-3.5 3.5-3.5 8.5 0 3.5 2 6.5 5.5 6.5s5.5-3 5.5-6.5C15.5 6 12 4.5 12 2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Шамот
+    </a>
+    <nav class="nav__links" aria-label="Разделы">
+      <a class="ui-dim ui-focus" href="#courses">Курсы</a>
+      <a class="ui-dim ui-focus" href="#glazes">Глазури</a>
+      <a class="ui-dim ui-focus" href="#schedule">Расписание</a>
+      <a class="ui-dim ui-focus" href="#faq">Вопросы</a>
+    </nav>
+    <a class="btn btn--sm btn--primary nav__cta ui-press ui-focus" href="#signup" tabindex="-1" aria-hidden="true">Записаться</a>
+    <button class="btn nav__menu-btn ui-press ui-press--on-dark ui-focus" type="button" popovertarget="menu" aria-label="Меню разделов">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6.5h14M3 13.5h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+<div class="menu ui-pop-in" id="menu" popover>
+  <nav aria-label="Разделы">
+    <ul>
+      <li><a class="ui-press ui-press--surface ui-press--on-dark ui-focus" href="#courses">Курсы</a></li>
+      <li><a class="ui-press ui-press--surface ui-press--on-dark ui-focus" href="#glazes">Глазури</a></li>
+      <li><a class="ui-press ui-press--surface ui-press--on-dark ui-focus" href="#schedule">Расписание</a></li>
+      <li><a class="ui-press ui-press--surface ui-press--on-dark ui-focus" href="#faq">Вопросы</a></li>
+      <li><a class="ui-press ui-press--surface ui-press--on-dark ui-focus" href="#signup">Записаться</a></li>
+    </ul>
+  </nav>
+</div>
+
+<main id="main" data-ui-edge>
+  <section data-ui-edge class="hero container" id="top" aria-labelledby="hero-h">
+    <h1 class="t-hero" id="hero-h">Керамика по&nbsp;вечерам</h1>
+    <p class="t-intro">Курсы для взрослых: от&nbsp;первого цилиндра на&nbsp;круге до&nbsp;собственного обжига.</p>
+    <div class="hero__actions" id="hero-actions">
+      <a class="btn btn--lg btn--primary ui-press ui-focus" href="#signup">Записаться на пробное</a>
+      <a class="textlink ui-dim ui-focus" href="#courses">Программы курсов <span class="ui-icon-nudge" aria-hidden="true" data-ui-ignore>›</span></a>
+    </div>
+
+    <figure class="drawing" id="drawing">
+      <svg viewBox="0 0 240 320" role="img" aria-labelledby="dw-title">
+        <title id="dw-title">Чертёж вазы: слева вид, справа разрез стенки</title>
+        <defs>
+          <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="5" stroke="#a1a1a6" stroke-width="0.8"/>
+          </pattern>
+        </defs>
+        <!-- wall section (right half) -->
+        <path class="dw-hatch fade-late" d="M154 22 C146 30 140 44 142 54 C150 80 196 108 200 150 C204 200 176 240 148 262 C150 266 152 270 152 276 L120 276 L120 254 L144 254 C170 236 196 196 193 150 C190 110 144 82 136 56 C134 46 139 34 147 24 Z"/>
+        <path class="dw-thin draw draw--late" pathLength="1" d="M147 24 C139 34 134 46 136 56 C144 82 190 110 193 150 C196 196 170 236 144 254 L120 254"/>
+        <!-- outline -->
+        <path class="dw-line draw" pathLength="1" d="M88 276 L152 276 C152 270 150 266 148 262 C176 240 204 200 200 150 C196 108 150 80 142 54 C140 44 146 30 154 22 L86 22 C94 30 100 44 98 54 C90 80 44 108 40 150 C36 200 64 240 92 262 C90 266 88 270 88 276 Z"/>
+        <!-- axis -->
+        <line class="dw-thin dw-axis draw" x1="120" y1="6" x2="120" y2="292"/>
+        <!-- dimensions -->
+        <g class="fade-late">
+          <line class="dw-thin" x1="40" y1="300" x2="200" y2="300"/>
+          <line class="dw-thin" x1="40" y1="296" x2="40" y2="304"/>
+          <line class="dw-thin" x1="200" y1="296" x2="200" y2="304"/>
+          <text class="dw-label" x="120" y="314" text-anchor="middle">Ø 160</text>
+          <line class="dw-thin" x1="18" y1="22" x2="18" y2="276"/>
+          <line class="dw-thin" x1="14" y1="22" x2="22" y2="22"/>
+          <line class="dw-thin" x1="14" y1="276" x2="22" y2="276"/>
+          <text class="dw-label" x="10" y="149" text-anchor="middle" transform="rotate(-90 10 149)">h 254</text>
+        </g>
+      </svg>
+      <figcaption class="t-caption">Ваза с&nbsp;узким горлом — работа последних занятий базового курса. Размеры в&nbsp;мм.</figcaption>
+    </figure>
+  </section>
+
+  <section data-ui-edge class="section" id="courses" aria-labelledby="courses-h">
+    <div class="container">
+      <div class="section__head">
+        <h2 class="t-headline" id="courses-h">Четыре программы</h2>
+        <p class="t-lead">Начните с&nbsp;пробного вечера, а&nbsp;потом выберите круг или ручную лепку.</p>
+      </div>
+      <div class="section__body courses">
+        <article class="course course--first">
+          <div>
+            <h3 class="t-title">Пробное занятие</h3>
+            <p>Отцентруете глину на&nbsp;круге и&nbsp;вытянете первый цилиндр. Изделие обожжём и&nbsp;отдадим.</p>
+          </div>
+          <dl>
+            <div><dt>Встреч</dt><dd>1</dd></div>
+            <div><dt>Длительность</dt><dd>3 ч</dd></div>
+            <div><dt>Стоимость</dt><dd>2&nbsp;500 ₽</dd></div>
+          </dl>
+        </article>
+        <article class="course">
+          <h3 class="t-title">Гончарный круг</h3>
+          <p>Центровка, вытягивание, обточка. Цилиндр, чаша, тарелка, ваза с&nbsp;горлом.</p>
+          <dl>
+            <div><dt>Занятий</dt><dd>8 × 3 ч</dd></div>
+            <div><dt>Группа</dt><dd>до 8 человек</dd></div>
+            <div><dt>Стоимость</dt><dd>18&nbsp;000 ₽</dd></div>
+          </dl>
+        </article>
+        <article class="course">
+          <h3 class="t-title">Ручная лепка</h3>
+          <p>Пласт, жгут, щипок. Кружка с&nbsp;ручкой, блюдо, набор плитки.</p>
+          <dl>
+            <div><dt>Занятий</dt><dd>6 × 3 ч</dd></div>
+            <div><dt>Группа</dt><dd>до 10 человек</dd></div>
+            <div><dt>Стоимость</dt><dd>13&nbsp;000 ₽</dd></div>
+          </dl>
+        </article>
+        <article class="course course--first">
+          <div>
+            <h3 class="t-title">Глазури и обжиг</h3>
+            <p>Смешиваете глазури по&nbsp;рецептам, делаете тестовые плитки, загружаете печь вместе с&nbsp;мастером. После круга или лепки.</p>
+          </div>
+          <dl>
+            <div><dt>Занятий</dt><dd>4 × 3 ч</dd></div>
+            <div><dt>Группа</dt><dd>до 6 человек</dd></div>
+            <div><dt>Стоимость</dt><dd>11&nbsp;000 ₽</dd></div>
+          </dl>
+        </article>
+      </div>
+      <p class="note t-caption">Пример наполнения: название школы, цены, размеры групп и&nbsp;даты на&nbsp;странице условные.</p>
+    </div>
+  </section>
+
+  <section data-ui-edge class="section" id="process" aria-labelledby="process-h">
+    <div class="container">
+      <div class="section__head">
+        <h2 class="t-headline" id="process-h">Путь глины</h2>
+        <p class="t-lead">Чашку с&nbsp;круга вы&nbsp;заберёте не&nbsp;в&nbsp;тот же&nbsp;вечер: между первым касанием и&nbsp;готовой вещью два обжига.</p>
+      </div>
+      <ol class="section__body steps">
+        <li class="step"><span class="step__n">01</span><span class="step__name">Формовка</span><span class="step__text">Центруете ком и&nbsp;вытягиваете стенки на&nbsp;круге.</span><span class="step__val">занятие</span></li>
+        <li class="step"><span class="step__n">02</span><span class="step__name">Обточка</span><span class="step__text">Подсохшее до&nbsp;кожетвёрдого изделие срезаете по&nbsp;профилю и&nbsp;формуете ножку.</span><span class="step__val">через 1–2 дня</span></li>
+        <li class="step"><span class="step__n">03</span><span class="step__name">Сушка</span><span class="step__text">Изделие сохнет на&nbsp;полке медленно, чтобы не&nbsp;треснуть.</span><span class="step__val">около недели</span></li>
+        <li class="step step--fire"><span class="step__n">04</span><span class="step__name">Утельный обжиг</span><span class="step__text">Глина становится черепком и&nbsp;перестаёт размокать.</span><span class="step__val">900–950 °C</span></li>
+        <li class="step"><span class="step__n">05</span><span class="step__name">Глазурование</span><span class="step__text">Окунаете или поливаете глазурью, ножку оставляете чистой.</span><span class="step__val">занятие</span></li>
+        <li class="step step--fire"><span class="step__n">06</span><span class="step__name">Политой обжиг</span><span class="step__text">Глазурь плавится в&nbsp;стекло, черепок спекается.</span><span class="step__val">1220–1260 °C</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section data-ui-edge class="section" id="glazes" aria-labelledby="glazes-h">
+    <div class="container">
+      <div class="section__head">
+        <h2 class="t-headline" id="glazes-h">Глазурь выбираете сами</h2>
+        <p class="t-lead">На&nbsp;полке мастерской висят тестовые плитки каждой глазури. Примерьте их&nbsp;на&nbsp;вазу.</p>
+      </div>
+      <div class="section__body glaze">
+        <div class="glaze__list" role="group" aria-label="Глазури">
+          <button data-ui-align="start" class="glaze-opt ui-press ui-press--surface ui-press--on-dark ui-focus" type="button" aria-pressed="true" data-glaze="celadon">
+            <span class="tile" style="--g-base:#8fae98; --g-pool:#5f8a72" aria-hidden="true"></span>
+            <span><span class="glaze-opt__name">Селадон</span><span class="glaze-opt__prop">Прозрачная зелёная, темнеет в&nbsp;рельефе</span></span>
+            <svg class="glaze-opt__check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button data-ui-align="start" class="glaze-opt ui-press ui-press--surface ui-press--on-dark ui-focus" type="button" aria-pressed="false" data-glaze="tenmoku">
+            <span class="tile" style="--g-base:#3a2216; --g-pool:#8a4a22" aria-hidden="true"></span>
+            <span><span class="glaze-opt__name">Тэммоку</span><span class="glaze-opt__prop">Почти чёрная, рыжеет на&nbsp;кромках</span></span>
+            <svg class="glaze-opt__check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button data-ui-align="start" class="glaze-opt ui-press ui-press--surface ui-press--on-dark ui-focus" type="button" aria-pressed="false" data-glaze="shino">
+            <span class="tile" style="--g-base:#e2c4a4; --g-pool:#c8763c" aria-hidden="true"></span>
+            <span><span class="glaze-opt__name">Шино</span><span class="glaze-opt__prop">Молочная с&nbsp;оранжевыми пятнами</span></span>
+            <svg class="glaze-opt__check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button data-ui-align="start" class="glaze-opt ui-press ui-press--surface ui-press--on-dark ui-focus" type="button" aria-pressed="false" data-glaze="cobalt">
+            <span class="tile" style="--g-base:#26418f; --g-pool:#162a66" aria-hidden="true"></span>
+            <span><span class="glaze-opt__name">Кобальт</span><span class="glaze-opt__prop">Глубокая синяя, глянцевая</span></span>
+            <svg class="glaze-opt__check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button data-ui-align="start" class="glaze-opt ui-press ui-press--surface ui-press--on-dark ui-focus" type="button" aria-pressed="false" data-glaze="chalk">
+            <span class="tile" style="--g-base:#e9e5dc; --g-pool:#cfc8b9" aria-hidden="true"></span>
+            <span><span class="glaze-opt__name">Меловая</span><span class="glaze-opt__prop">Белая матовая, бархатная на&nbsp;ощупь</span></span>
+            <svg class="glaze-opt__check" viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10.5l3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <figure class="glaze__stage">
+          <svg viewBox="30 14 180 270" role="img" aria-labelledby="vase-title">
+            <title id="vase-title">Ваза под выбранной глазурью</title>
+            <defs>
+              <clipPath id="vessel-clip"><path d="M88 276 L152 276 C152 270 150 266 148 262 C176 240 204 200 200 150 C196 108 150 80 142 54 C140 44 146 30 154 22 L86 22 C94 30 100 44 98 54 C90 80 44 108 40 150 C36 200 64 240 92 262 C90 266 88 270 88 276 Z"/></clipPath>
+              <linearGradient id="g-old" x1="0" y1="0" x2="0" y2="1"><stop offset="0.55" stop-color="#8fae98"/><stop offset="1" stop-color="#5f8a72"/></linearGradient>
+              <linearGradient id="g-new" x1="0" y1="0" x2="0" y2="1"><stop offset="0.55" stop-color="#8fae98"/><stop offset="1" stop-color="#5f8a72"/></linearGradient>
+              <linearGradient id="shade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity="0.35"/><stop offset="0.38" stop-color="#000" stop-opacity="0"/><stop offset="0.62" stop-color="#fff" stop-opacity="0.08"/><stop offset="1" stop-color="#000" stop-opacity="0.45"/></linearGradient>
+            </defs>
+            <g clip-path="url(#vessel-clip)">
+              <rect x="30" y="14" width="180" height="270" fill="#b59a7c"/>
+              <path id="glaze-old" fill="url(#g-old)" d="M30 -300 H210 V250 C190 254 176 247 160 252 C146 257 132 249 118 254 C102 259 90 250 74 254 C58 258 44 251 30 254 Z"/>
+              <g id="glaze-new-wrap"><path id="glaze-new" fill="url(#g-new)" d="M30 -300 H210 V250 C190 254 176 247 160 252 C146 257 132 249 118 254 C102 259 90 250 74 254 C58 258 44 251 30 254 Z"/></g>
+              <rect x="30" y="14" width="180" height="270" fill="url(#shade)"/>
+            </g>
+          </svg>
+          <figcaption>
+            <span class="t-title glaze__name" id="glaze-name" aria-live="polite">Селадон</span>
+            <p class="t-small">Ножка остаётся без глазури, иначе изделие прилипнет к&nbsp;полке печи.</p>
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section data-ui-edge class="section" id="schedule" aria-labelledby="schedule-h">
+    <div class="container">
+      <div class="section__head">
+        <h2 class="t-headline" id="schedule-h">Ближайшие группы</h2>
+        <p class="t-lead">Занятия с&nbsp;19:00 до&nbsp;22:00 по&nbsp;будням и&nbsp;с&nbsp;12:00 до&nbsp;15:00 в&nbsp;субботу.</p>
+      </div>
+      <div class="section__body">
+        <table class="sched">
+          <caption class="sr-only">Расписание групп</caption>
+          <thead data-ui-ignore><tr><th scope="col">Программа</th><th scope="col">Старт</th><th scope="col">Дни</th><th scope="col">Свободно мест</th><th scope="col"><span class="sr-only">Действие</span></th></tr></thead>
+          <tbody>
+            <tr><th scope="row" data-ui-align="start">Пробное занятие</th><td data-l="Старт" data-ui-align="start"><span class="lbl">Старт: </span>6 ноября</td><td data-l="Дни" data-ui-align="start"><span class="lbl">Дни: </span>четверг</td><td data-l="Мест" data-ui-align="start"><span class="lbl">Мест: </span>5 из 8</td>
+              <td><button class="btn btn--sm btn--ghost ui-press ui-press--on-dark ui-focus" type="button" data-course="trial" data-group="trial-1106" aria-label="Выбрать: пробное занятие, 6 ноября">Выбрать</button></td></tr>
+            <tr><th scope="row" data-ui-align="start">Гончарный круг</th><td data-l="Старт" data-ui-align="start"><span class="lbl">Старт: </span>10 ноября</td><td data-l="Дни" data-ui-align="start"><span class="lbl">Дни: </span>пн, чт</td><td data-l="Мест" data-ui-align="start"><span class="lbl">Мест: </span>2 из 8</td>
+              <td><button class="btn btn--sm btn--ghost ui-press ui-press--on-dark ui-focus" type="button" data-course="wheel" data-group="wheel-1110" aria-label="Выбрать: гончарный круг, 10 ноября">Выбрать</button></td></tr>
+            <tr><th scope="row" data-ui-align="start">Ручная лепка</th><td data-l="Старт" data-ui-align="start"><span class="lbl">Старт: </span>15 ноября</td><td data-l="Дни" data-ui-align="start"><span class="lbl">Дни: </span>суббота</td><td data-l="Мест" data-ui-align="start"><span class="lbl">Мест: </span>7 из 10</td>
+              <td><button class="btn btn--sm btn--ghost ui-press ui-press--on-dark ui-focus" type="button" data-course="hand" data-group="hand-1115" aria-label="Выбрать: ручная лепка, 15 ноября">Выбрать</button></td></tr>
+            <tr><th scope="row" data-ui-align="start">Гончарный круг</th><td data-l="Старт" data-ui-align="start"><span class="lbl">Старт: </span>1 декабря</td><td data-l="Дни" data-ui-align="start"><span class="lbl">Дни: </span>вт, пт</td><td data-l="Мест" data-ui-align="start"><span class="lbl">Мест: </span>8 из 8</td>
+              <td><button class="btn btn--sm btn--ghost ui-press ui-press--on-dark ui-focus" type="button" data-course="wheel" data-group="wheel-1201" aria-label="Выбрать: гончарный круг, 1 декабря">Выбрать</button></td></tr>
+            <tr><th scope="row" data-ui-align="start">Глазури и обжиг</th><td data-l="Старт" data-ui-align="start"><span class="lbl">Старт: </span>3 декабря</td><td data-l="Дни" data-ui-align="start"><span class="lbl">Дни: </span>среда</td><td data-l="Мест" data-ui-align="start"><span class="lbl">Мест: </span>4 из 6</td>
+              <td><button class="btn btn--sm btn--ghost ui-press ui-press--on-dark ui-focus" type="button" data-course="glaze" data-group="glaze-1203" aria-label="Выбрать: глазури и обжиг, 3 декабря">Выбрать</button></td></tr>
+          </tbody>
+        </table>
+        <p class="note t-caption">Даты и&nbsp;количество мест — пример наполнения.</p>
+      </div>
+    </div>
+  </section>
+
+  <section data-ui-edge class="section" id="faq" aria-labelledby="faq-h">
+    <div class="container">
+      <div class="section__head">
+        <h2 class="t-headline" id="faq-h">Перед первым занятием</h2>
+      </div>
+      <div class="section__body faq">
+        <details class="ui-disclosure">
+          <summary class="ui-focus"><span>Нужен ли опыт или умение рисовать?</span><svg class="ui-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+          <p class="ans" data-ui-ignore>Нет. Пробное занятие и&nbsp;оба базовых курса рассчитаны на&nbsp;тех, кто глину раньше не&nbsp;трогал.</p>
+        </details>
+        <details class="ui-disclosure">
+          <summary class="ui-focus"><span>В чём приходить?</span><svg class="ui-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+          <p class="ans" data-ui-ignore>В&nbsp;одежде, которую не&nbsp;жалко испачкать, и&nbsp;с&nbsp;коротко остриженными ногтями: длинные ногти режут стенку на&nbsp;круге. Фартук выдаём.</p>
+        </details>
+        <details class="ui-disclosure">
+          <summary class="ui-focus"><span>Что входит в стоимость?</span><svg class="ui-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+          <p class="ans" data-ui-ignore>Глина, глазури, инструменты и&nbsp;два обжига ваших изделий.</p>
+        </details>
+        <details class="ui-disclosure">
+          <summary class="ui-focus"><span>Что, если пропущу занятие?</span><svg class="ui-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="M8 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+          <p class="ans" data-ui-ignore>Его можно отработать с&nbsp;другой группой той&nbsp;же программы, если там есть свободный круг.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section data-ui-edge class="section" id="signup" aria-labelledby="signup-h">
+    <div class="container">
+      <div class="signup">
+        <div>
+          <h2 class="t-headline" id="signup-h">Запись в группу</h2>
+          <p class="t-lead">Мастер перезвонит, подтвердит место и&nbsp;расскажет, как добраться.</p>
+        </div>
+        <form class="form" id="form" novalidate>
+          <div class="field" id="f-name">
+            <label for="name">Имя</label>
+            <input class="ui-field" id="name" name="name" autocomplete="given-name" required aria-describedby="name-err">
+            <p class="err" id="name-err"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5v4.5M8 11v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>Напишите, как к вам обращаться</span></p>
+          </div>
+          <div class="field" id="f-contact">
+            <label for="contact">Телефон или Telegram</label>
+            <input class="ui-field" id="contact" name="contact" autocomplete="tel" inputmode="tel" placeholder="+7 900 000-00-00 или @ник" required aria-describedby="contact-err">
+            <p class="err" id="contact-err"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5v4.5M8 11v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>Нужен номер из 10–11 цифр или ник с @</span></p>
+          </div>
+          <div class="field">
+            <label for="course">Программа</label>
+            <select class="ui-field" id="course" name="course">
+              <option value="trial">Пробное занятие</option>
+              <option value="wheel">Гончарный круг</option>
+              <option value="hand">Ручная лепка</option>
+              <option value="glaze">Глазури и обжиг</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="group">Группа</label>
+            <select class="ui-field" id="group" name="group"></select>
+          </div>
+          <div class="field field--wide">
+            <label for="comment">Комментарий</label>
+            <textarea class="ui-field" id="comment" name="comment" placeholder="Например, удобнее по выходным"></textarea>
+          </div>
+          <div class="status" id="status" role="status">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 9v5M10 6v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span id="status-text"></span>
+          </div>
+          <div class="form__foot">
+            <button class="btn btn--lg btn--primary ui-press ui-focus" type="submit">Отправить заявку</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container footer__in t-small">
+    <span>Шамот, школа керамики для взрослых</span>
+    <span class="t-caption">Демонстрационная страница: название, цены, даты и&nbsp;форма записи условные.</span>
+  </div>
+</footer>
+
+<script>
+/* interaction kit (better-design): press, bloom, keyboard press */
+(function (root) {
+  'use strict';
+  var MIN_PRESS_MS = 90;
+  var reduceMq = root.matchMedia('(prefers-reduced-motion: reduce)');
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+  var PRESSABLE = '.ui-press, .ui-dim';
+  function disabled(el) { return el.disabled || el.getAttribute('aria-disabled') === 'true'; }
+  function pressScale(el) {
+    if (el.classList.contains('ui-press--surface')) return 0.985;
+    var r = el.getBoundingClientRect();
+    return clamp(1 - 8 / (r.width + r.height), 0.9, 0.985).toFixed(4);
+  }
+  function pressOn(el, x, y) {
+    if (disabled(el)) return;
+    var r = el.getBoundingClientRect();
+    el.style.setProperty('--ui-press-scale', pressScale(el));
+    if (x != null) {
+      el.style.setProperty('--ui-px', ((x - r.left) / r.width * 100).toFixed(1) + '%');
+      el.style.setProperty('--ui-py', ((y - r.top) / r.height * 100).toFixed(1) + '%');
+    } else { el.style.setProperty('--ui-px', '50%'); el.style.setProperty('--ui-py', '50%'); }
+    el._uiPressAt = performance.now();
+    clearTimeout(el._uiPressTimer);
+    el.setAttribute('data-pressed', '');
+  }
+  function pressOff(el) {
+    if (!el || !el.hasAttribute('data-pressed')) return;
+    var wait = Math.max(0, MIN_PRESS_MS - (performance.now() - (el._uiPressAt || 0)));
+    clearTimeout(el._uiPressTimer);
+    el._uiPressTimer = setTimeout(function () { el.removeAttribute('data-pressed'); }, wait);
+  }
+  function init(scope) {
+    var active = null;
+    scope.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      var el = e.target.closest && e.target.closest(PRESSABLE);
+      if (!el) return; active = el; pressOn(el, e.clientX, e.clientY);
+    }, { passive: true });
+    var up = function () { pressOff(active); active = null; };
+    root.addEventListener('pointerup', up, { passive: true });
+    root.addEventListener('pointercancel', up, { passive: true });
+    var key = function (e) {
+      if (e.repeat) return;
+      var el = e.target.closest && e.target.closest(PRESSABLE);
+      if (!el) return;
+      if (e.key === ' ' || e.key === 'Enter') { if (e.type === 'keydown') pressOn(el); else pressOff(el); }
+    };
+    scope.addEventListener('keydown', key); scope.addEventListener('keyup', key);
+    scope.addEventListener('focusout', function (e) { var el = e.target.closest && e.target.closest(PRESSABLE); if (el) pressOff(el); });
+  }
+  function shake(el) {
+    if (reduceMq.matches) return;
+    el.classList.remove('ui-shake'); void el.offsetWidth; el.classList.add('ui-shake');
+    el.addEventListener('animationend', function () { el.classList.remove('ui-shake'); }, { once: true });
+  }
+  function originFrom(pop, trigger) {
+    var p = pop.getBoundingClientRect(), t = trigger.getBoundingClientRect();
+    var x = clamp(t.left + t.width / 2 - p.left, 0, p.width), y = t.top + t.height / 2 < p.top ? 0 : p.height;
+    pop.style.setProperty('--ui-origin', x + 'px ' + y + 'px');
+  }
+  root.BetterUI = { init: init, shake: shake, originFrom: originFrom };
+})(window);
+
+(function () {
+  'use strict';
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  document.documentElement.classList.add('js');
+  BetterUI.init(document);
+
+  /* nav: glass after scroll; its CTA appears only once the hero action has left the view */
+  var nav = document.getElementById('nav');
+  var cta = nav.querySelector('.nav__cta');
+  var onScroll = function () { nav.toggleAttribute('data-scrolled', scrollY > 8); };
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  new IntersectionObserver(function (entries) {
+    var gone = !entries[0].isIntersecting && entries[0].boundingClientRect.top < 0;
+    nav.toggleAttribute('data-cta', gone);
+    cta.tabIndex = gone ? 0 : -1;
+    if (gone) cta.removeAttribute('aria-hidden'); else cta.setAttribute('aria-hidden', 'true');
+  }, { rootMargin: '-52px 0px 0px 0px' }).observe(document.getElementById('hero-actions'));
+
+  /* phone menu: grows from its button, closes on choice */
+  var menu = document.getElementById('menu');
+  var menuBtn = nav.querySelector('.nav__menu-btn');
+  menu.addEventListener('beforetoggle', function (e) { if (e.newState === 'open') requestAnimationFrame(function () { BetterUI.originFrom(menu, menuBtn); }); });
+  menu.addEventListener('click', function (e) { if (e.target.closest('a')) menu.hidePopover(); });
+
+
+  /* glazes: the chosen glaze pours down the vessel from rim to foot */
+  var GLAZES = {
+    celadon: ['#8fae98', '#5f8a72', 'Селадон'],
+    tenmoku: ['#3a2216', '#8a4a22', 'Тэммоку'],
+    shino:   ['#e2c4a4', '#c8763c', 'Шино'],
+    cobalt:  ['#26418f', '#162a66', 'Кобальт'],
+    chalk:   ['#e9e5dc', '#cfc8b9', 'Меловая']
+  };
+  var current = 'celadon', anim = null;
+  var oldStops = document.querySelectorAll('#g-old stop'), newStops = document.querySelectorAll('#g-new stop');
+  var pour = document.getElementById('glaze-new-wrap');
+  var nameEl = document.getElementById('glaze-name');
+  function paint(stops, key) { stops[0].setAttribute('stop-color', GLAZES[key][0]); stops[1].setAttribute('stop-color', GLAZES[key][1]); }
+  pour.style.opacity = 0;
+  document.querySelectorAll('.glaze-opt').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.dataset.glaze;
+      document.querySelectorAll('.glaze-opt').forEach(function (b) { b.setAttribute('aria-pressed', String(b === btn)); });
+      nameEl.textContent = GLAZES[key][2];
+      if (key === current) return;
+      if (anim) anim.finish();
+      paint(oldStops, current); paint(newStops, key); current = key;
+      anim = reduce.matches
+        ? pour.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'linear' })
+        : pour.animate([{ opacity: 1, transform: 'translateY(-280px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 900, easing: 'cubic-bezier(0.28, 0.11, 0.32, 1)' });
+      anim.onfinish = function () { paint(oldStops, key); pour.style.opacity = 0; anim = null; };
+    });
+  });
+
+  /* schedule → form */
+  var GROUPS = {
+    trial: [['trial-1106', '6 ноября, четверг']],
+    wheel: [['wheel-1110', '10 ноября, пн и чт'], ['wheel-1201', '1 декабря, вт и пт']],
+    hand:  [['hand-1115', '15 ноября, суббота']],
+    glaze: [['glaze-1203', '3 декабря, среда']]
+  };
+  var course = document.getElementById('course'), group = document.getElementById('group');
+  function fillGroups(sel) {
+    group.innerHTML = '';
+    GROUPS[course.value].forEach(function (g) { var o = new Option(g[1], g[0]); if (g[0] === sel) o.selected = true; group.add(o); });
+  }
+  course.addEventListener('change', function () { fillGroups(); });
+  fillGroups();
+  document.querySelectorAll('[data-group]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      course.value = btn.dataset.course; fillGroups(btn.dataset.group);
+      document.getElementById('signup').scrollIntoView({ behavior: reduce.matches ? 'auto' : 'smooth', block: 'start' });
+      document.getElementById('name').focus({ preventScroll: true });
+    });
+  });
+
+  /* form: validation keeps entered data; without a server the page says so instead of faking success */
+  var form = document.getElementById('form'), status = document.getElementById('status'), statusText = document.getElementById('status-text');
+  var rules = {
+    name: function (v) { return v.trim().length > 0; },
+    contact: function (v) { v = v.trim(); return /^@[A-Za-z0-9_]{5,32}$/.test(v) || /^\d{10,11}$/.test(v.replace(/[\s()+-]/g, '')); }
+  };
+  function check(id) {
+    var input = document.getElementById(id), ok = rules[id](input.value), wrap = input.closest('.field');
+    wrap.toggleAttribute('data-invalid', !ok);
+    input.setAttribute('aria-invalid', String(!ok));
+    return ok;
+  }
+  ['name', 'contact'].forEach(function (id) {
+    document.getElementById(id).addEventListener('blur', function (e) { if (e.target.value) check(id); });
+    document.getElementById(id).addEventListener('input', function () { if (document.getElementById('f-' + id).hasAttribute('data-invalid')) check(id); });
+  });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var bad = ['name', 'contact'].filter(function (id) { return !check(id); });
+    status.removeAttribute('data-show');
+    if (bad.length) {
+      var first = document.getElementById(bad[0]);
+      first.focus(); BetterUI.shake(first);
+      return;
+    }
+    statusText.textContent = 'Заявка не отправлена: это демонстрационная страница без сервера. Введённые данные остались в форме.';
+    void status.offsetWidth; status.setAttribute('data-show', '');
+  });
+})();
+</script>
+</body>
+</html>

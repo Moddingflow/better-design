@@ -110,3 +110,22 @@ DESIGN.md is this skill's project convention, not an external standard.
   A model critic is an additional signal, not an oracle.
 - Do not repeat an unidentified claim about an "August pattern-completion paper" as a
   verified fact. Assess usability through tasks and evidence.
+
+## Adapted design-skill sources (v1.8)
+
+- [Hallmark](https://github.com/Nutlope/hallmark) by Together AI and contributors, MIT
+  licence. Adapted, rewritten in our words: dealing a starting material instead of a fixed
+  default, drawing structure (shape, first-screen posture, nav, footer) against a log of
+  recent builds, page anatomy by the visitor's job, the material inventory (real / pictures /
+  absent), the mirror test, the six-axis pre-emit critique, page budgets (first screen at
+  1280×800, about 80 words per screen), and several slop gates (eyebrows, tracked-caps
+  labels, accented words, template punctuation, the stock close, the calibrated looks, fake
+  chrome, counting marks). No theme files, photographs, or scripts were copied.
+- [Impeccable](https://github.com/pbakaus/impeccable) by Paul Bakaus, Apache License 2.0.
+  Adapted as ideas, not files: ranking seven candidate directions and building one below the
+  top two, naming the category's rut and its obvious opposite, the physical-scene sentence
+  that decides light or dark, colour posture (restrained, committed, full, drenched), reflex
+  font lists, the "guessable from the category" test, fresh-context review, and anti-patterns
+  such as numbered section labels, aphoristic cadence, and glow shadows.
+- Materials in [materials.md](materials.md), the deal and bench scripts, and all wording are
+  Better Design's own.

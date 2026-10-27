@@ -19,6 +19,11 @@ the sentence is the correct replacement when the existing label already does its
 - Use entry IDs (such as `slop:icon-tile`) in findings and `distinctiveness` evidence.
 - An exception must follow from the product, content, or DESIGN.md, not "it looks nice."
   An intentional visual brand pattern recorded in DESIGN.md is not slop.
+- Entries added in v1.8 (template page, stock close, tracked-caps labels, accented words,
+  template punctuation, calibrated looks, and others) are adapted from Hallmark's gates (MIT)
+  and Impeccable's anti-pattern catalog (Apache-2.0), rewritten as Better Design entries.
+  `node scripts/bench_metrics.mjs measure <page.html>` flags a mechanical subset of them on a
+  rendered page; a clean run is a signal, not a pass of the whole catalog.
 - The [house style](house-style.md), when DESIGN.md records it, is an intentional choice: its
   centered hero and monochrome palette are not `centered-everything` or a generic palette;
   its font (Geologica, tuned light and tight) is a recorded choice, not `default-font`. Its swap test judges content, imagery, composition,
@@ -49,6 +54,14 @@ the sentence is the correct replacement when the existing label already does its
 | `marketing-in-tool` — a hero and promotional sections inside a working tool | Open directly on the work: data, next action, and current context | No general exception |
 | `centered-everything` — everything centered at similar sizes | One dominant element, a stepped scale, and deliberate axes/asymmetry | A short, single-purpose screen such as sign-in or an empty state |
 | `decorative-grid-bg` — a grid/dot background that measures nothing | A plain background or a motif from the concept | A canvas, map, or editor needs a grid for alignment/measurement |
+| `template-page` — hero, three features, a call-to-action band, footer; or the same page shape as the last builds | The visitor's job and the category's own sections ([page-anatomy.md](page-anatomy.md)); a dealt structure ([direction-deal.md](direction-deal.md)) | No general exception on an expressive page |
+| `split-hero-reflex` — head on the left, a picture or mock on the right, on every brief | A first-screen posture taken from the job: counter, index, poster, ledge, corridor | The picture really is the brief's strongest material, and the posture is recorded |
+| `stock-close` — the page ends on an email sign-up band whatever the product is | End on the job's action or its facts (booking and hours, tickets, the download) | The job is subscribe, join, attend, listen, or visit, or the user asked for it |
+| `numbered-section-label` — 01 / 02 / 03 above or inside section headings | Headings that state the section's fact; numbers only for real sequences the user follows | A real procedure, chapter list, or programme order |
+| `thin-section` — a section that is a heading and a paragraph, with no mass | A visual, three or more real items, a table, or a statement at section size; or merge it | A one-line band with a single action, once per page |
+| `wall-of-words` — more than about 80 words on one screen of an expressive page, or a hero with more than a head, a sentence, and actions | One idea per screen; move detail to where it is needed or cut it | Documentation, long documents, and letters whose purpose is reading |
+| `fake-chrome` — a hand-drawn browser bar with traffic lights, an OS title bar, or a styled-div "product UI" outside a marked slot | The real product captured or built at full fidelity in a marked slot, or no frame | The product does not exist yet and the slot is marked as a stand-in |
+| `counting-marks` — rows of identical dots, ticks, or squares standing for a quantity | Set the number in type, with its unit and context | A chart whose marks differ by real values |
 
 ## Color and light
 
@@ -59,6 +72,10 @@ the sentence is the correct replacement when the existing label already does its
 | `lazy-cool` — glass panels, neon edges, and glowing borders accumulate without a function | Dark surfaces distinguished by lightness, with a purposeful accent | Light belongs to the concept's world, such as a HUD or instrument panel, and is restrained |
 | `background-glow` — a radial halo behind the hero, spotlights behind sections, orbs, or bokeh | Spacing, contrast, a clear heading, or real product imagery | Light is part of the photograph/illustration rather than an added decorative effect |
 | `beige-default` — cream/beige as a substitute for choosing a palette | Keep cream when it comes from the subject, such as paper, flour, or linen; choose the other colors with equal care | It follows from the concept and is recorded in the direction |
+| `calibrated-look` — one of the looks every model ships: cream + high-contrast serif + terracotta; near-black + one neon; broadsheet hairlines + italic serif + mono labels; hard-offset-shadow neo-brutalism; black + one blue without a request | Move one axis first (accent, then ground, then display), or take a dealt direction ([direction-deal.md](direction-deal.md)) | The brief pins the look, or the deal handed out that material |
+| `category-hue` — a hue picked because of the category: blue for software and finance, green for health, pink for beauty | A signal colour with an origin in the product's own world | The brand already owns that hue |
+| `stock-swatch` — a framework's default palette (Tailwind indigo-500, violet-600, slate-900) as the system | A colour mixed for the product, ideally in OKLCH, with tinted neutrals | The project already uses that palette |
+| `glow-shadow` — a coloured zero-offset glow on dark, or a hairline plus a wide soft shadow on every card in a row | Elevation by lightness steps; real shadows with offset and blur, only on overlays | A HUD or instrument world where light is the material, restrained |
 
 ## Typography
 
@@ -69,7 +86,12 @@ Font selection is covered in SKILL.md section 4 and [art-direction.md](art-direc
 | `default-font` — habitual Inter/Geist/system sans everywhere, or an unexplained switch to the next trend | Three candidates derived from the concept and a reasoned choice | The brand/DESIGN.md font, or a dense tool where numerals and required language coverage justify the choice |
 | `flat-hierarchy` — headings and body are nearly the same size and weight; the page cannot be scanned | A stepped DESIGN.md scale with distinct size, weight, and spacing. Use these before adding another family | No general exception |
 | `italic-serif-display` — a huge italic serif headline used as an editorial shortcut | Type derived from the product's character | An editorial/brand direction that deliberately selected this serif |
-| `eyebrow-and-badge` — a small label or pill above the heading, such as "NEW" or "Features," repeating it | Remove it if it adds nothing; move useful words into the heading/subheading. Avoid making a non-action badge look clickable | The label conveys navigation, a real category, date, or status |
+| `eyebrow-and-badge` — a small label or pill above the heading, such as "NEW" or "Features," repeating it | Remove it if it adds nothing; move useful words into the heading/subheading. Avoid making a non-action badge look clickable | The label conveys navigation, a real category, date, or status (a `<time>`, a byline, a live status) |
+| `tracked-caps-label` — labels, captions, tags, table heads, or nav links at 15px or under set in capitals or small caps, or letter-spaced past ~0.03em | The body face a step smaller, sentence case, untracked | A wordmark; a material whose display itself is uppercase |
+| `accented-word` — one word of a heading set apart by colour, weight, italic, a highlight, or an underline | The whole heading one weight, one style, one colour; a line break or a second line at a second size | A direction whose signature is that device, used once, in the first screen, recorded in DESIGN.md |
+| `mono-costume` — monospace on labels, captions, or meta rows when the content is not code, a figure, or a measurement | Labels in the body face | The material is mono (a receipt, a terminal), or the text is code |
+| `template-punctuation` — meta strings joined by middle dots (A · B · C), arrows glued to link text ("Learn more →"), decorative status dots before labels | Line breaks, columns, or a plain link whose words name the destination | One dot in a byline or caption; an arrow that is an icon with its own hit area |
+| `reflex-font` — a reflex or saturated face from [fonts.md](fonts.md) chosen without a reason | A face from the class the idea calls for, chosen by setting the real headline | The brand, the brief, or a written reason no other face could satisfy |
 
 ## Motion
 
@@ -87,6 +109,8 @@ See [motion.md](motion.md), sections 6 and 10.
 | --- | --- | --- |
 | `rough-svg` — a hastily drawn mascot or scene makes a finished page feel unfinished | A crafted illustration or photograph with an intentional crop, or no image | The illustration has the same level of craft as the rest of the interface |
 | `stock-imagery` — a generic person at a laptop, random emoji, or mixed icon sets | Specific product imagery and one icon set | No general exception |
+| `emoji-icon` — an emoji standing in for an icon | One icon set, a custom SVG, or typography | Emoji are the content (a chat, a reaction picker) |
+| `wireframe-page` — more than five empty image slots, or four or more blank slots in a row | Carry the set in type (names, facts in a list or table); keep slots only for pictures the user will supply, clearly marked | The user asked for that many slots and named them |
 | `sparkles-ai` — sparkles/a magic wand are the only indication of an AI feature | Name the operation and show its input and result | No general exception |
 
 ## Copy
@@ -101,6 +125,11 @@ See [motion.md](motion.md), sections 6 and 10.
 | `forced-contrast` — repeated "Not a feature. A platform." slogans | State useful information directly; explain a distinction only when it matters | One deliberate brand headline using the device |
 | `dash-overuse` — an em dash in every sentence joins unrelated thoughts | Separate distinct thoughts with periods or use natural punctuation. Preserve punctuation required by the language | No general exception |
 | `fake-content` — lorem ipsum, fabricated testimonials, metrics, customer logos, or avatars | Real content; clearly labeled fixtures in prototypes | No general exception |
+| `placeholder-names` — Jane Doe, Acme, Nexus, "Lorem Bakery" | The product's own nouns; marked samples where facts are missing | No general exception |
+| `sample-banner` — a full-width "sample page" notice, dashed "sample" chips, or "example data" captions on the first screen of a prototype | Mark samples in the handoff, DESIGN.md, and `data-sample`; one quiet footer line on the page; unknown facts in a neutral form or left out | A working tool's persistent "demo data" indicator in its status area |
+| `aphoristic-cadence` — three or more sections closing on clipped aphorisms ("X. No Y.", "Just Z.") | Close a section on its fact or its action | One deliberate brand line |
+| `echo` — the same fact (a price, a time, a count) printed in four or more sections, or a section whose last line restates its heading | Say each fact once, where it does work | A ledger or table whose rows repeat a value by nature |
+| `decoration-text` — rotated vertical text, scroll cues, a version or BETA pill in the hero, a locale/weather strip, "01 / 04" counters on tiles | Delete it; a lost fact becomes a caption or a footer line | The text is a real fact of a launch, venue, or distributed studio |
 
 ### Require every explanation to add information
 

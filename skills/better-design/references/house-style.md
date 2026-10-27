@@ -1,30 +1,31 @@
-# House style: premium ultra-minimal (the default direction)
+# House style: premium ultra-minimal (on request)
 
-The direction to use when nobody chose one. A new app, site, or tool with no DESIGN.md, no
-brand, no code tokens, and no visual instruction from the user is built in this style: dark,
-monochrome, quiet, and precise, in the spirit of Apple's product pages and system apps.
-It is a starting point that saves a guess, not a cage: the user's words and an existing
-system always come first.
+A ready direction: dark, monochrome, quiet, and precise, in the spirit of Apple's product
+pages and system apps. Until v1.7 it was the default for every unstyled request; that made
+unrelated products converge on one black page. Since v1.8 it is used when someone asks for
+it, and otherwise only when the deal ([direction-deal.md](direction-deal.md)) hands it out
+as one material among many.
 
 ## 1. When it applies
 
 Decide in this order and stop at the first match:
 
-1. **The user asked for something visual** (colors, mood, theme, brand, reference site,
+1. **The user asks for this style** ("minimal", "premium", "like Apple", "dark and clean",
+   "house style", "our usual style"): use it and record it in DESIGN.md from the preset
+   [DESIGN.house-style.md](../assets/DESIGN.house-style.md).
+2. **The user asked for something else visual** (colors, mood, theme, brand, reference site,
    audience style such as "playful", "for kids", "retro", "bright", "light theme"): follow the
-   request. The house style is not applied. Run [art-direction.md](art-direction.md) inside
-   the request's constraints. Exception: a request that matches this style ("minimal",
-   "premium", "like Apple", "dark and clean") selects it explicitly.
-2. **A system exists** (DESIGN.md, brand guidelines, code tokens, a live UI): inherit it.
+   request with [art-direction.md](art-direction.md). The house style is not applied.
+3. **A system exists** (DESIGN.md, brand guidelines, code tokens, a live UI): inherit it.
    The house style never restyles an existing product unless the user asks for a redesign
    in this style.
-3. **Otherwise** (new surface, no cues): use the house style and record it in DESIGN.md from
-   the preset [DESIGN.house-style.md](../assets/DESIGN.house-style.md).
+4. **Otherwise** (new surface, no cues): deal a direction
+   ([direction-deal.md](direction-deal.md)). If the deal hands out the `house` material and
+   the roll builds it, use this file as its full specification.
 
-Partial requests: when the user fixes only some aspects ("make the accent green", "use
-Montserrat"), apply exactly those on top of the house style and keep the rest; record the
-change in DESIGN.md. A request that contradicts the style's character (a children's game,
-a festival poster, a brutalist portfolio) replaces it entirely.
+Partial requests: when the user asks for the house style and fixes some aspects ("make the
+accent green", "use Montserrat"), apply exactly those on top of it and keep the rest; record
+the change in DESIGN.md.
 
 Scope: websites, web apps, desktop and mobile apps, dashboards and tools. Games use their
 own world's art direction; their launchers, stores, and account pages may use the house
@@ -32,23 +33,18 @@ style when no cue exists.
 
 ### What is not a cue, and what is not a system
 
-Most failures to apply this style come from reading one of these as a reason to skip it:
-
-- **Not a visual cue:** the product's domain, industry, audience, price level, or name.
-  "A coffee roastery", "a SaaS for accountants", "a fitness app", "for developers", "a
-  premium brand" describe what to build, not how it should look. They feed the concept
-  (section 10), imagery, and copy; palette, type, shape, and motion stay the house style.
-  Only words about appearance count: colors, mood, theme, a named reference or brand,
-  "playful", "retro", "light", "for kids", and the like.
+- **Not a request for this style:** the product's domain, industry, audience, price level,
+  or name. "A coffee roastery", "a SaaS for accountants", "for developers", "a premium
+  brand" describe what to build, not how it should look; with nothing else they mean "no
+  visual cue", which deals a direction (section 1, step 4), not this style. Only words about
+  appearance select it.
 - **Not a system:** defaults nobody chose. A fresh shadcn/ui install with its default theme
-  (neutral, zinc, or slate base color and its stock `--radius`), Tailwind's default palette and type
-  scale, the create-next-app, Vite, Astro, or Expo starter styles, and untouched Bootstrap,
-  MUI, Chakra, Mantine, or Material defaults are scaffolding. Keep the component library and
-  map the house style onto its tokens (table below). A theme becomes a system once someone
-  customized it for this product: a brand color, a chosen font, a DESIGN.md, or shipped
-  screens that use it.
-- **Not a reason to leave it:** a product without photos (use the imagery path in
-  section 5), a dense catalog or shop (section 6), or a dark style the agent finds plain.
+  (neutral, zinc, or slate base color and its stock `--radius`), Tailwind's default palette
+  and type scale, the create-next-app, Vite, Astro, or Expo starter styles, and untouched
+  Bootstrap, MUI, Chakra, Mantine, or Material defaults are scaffolding. Keep the component
+  library and map the chosen direction onto its tokens: the dealt one, or this style through
+  the table below. A theme becomes a system once someone customized it for this product: a
+  brand color, a chosen font, a DESIGN.md, or shipped screens that use it.
 
 Mapping onto common scaffolds (dark values; light ones from section 3):
 

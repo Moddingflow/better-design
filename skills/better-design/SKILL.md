@@ -1,9 +1,9 @@
 ---
 name: better-design
-description: "Design, improve, and validate UI/UX for applications, websites, native interfaces, and games: an art direction derived from the product, a coherent visual system kept in the project's DESIGN.md (read first, created when missing, the single source of interface values), measured layout geometry (equal spacing, shared alignment lines, content centered inside small controls, nothing clipped or touching its container edge), a catalog of AI-slop patterns that rejects page narration and redundant helper text, a living motion language (press feedback, transitions, choreography, reduced motion), an Apple-like ultra-minimal default style, an opt-in pool of signature effects, clear actions, accessibility, drag and drop anticipated from the start (drop zones for every upload), and real states (including skeleton loaders and loading splash) without AI slop. Use for interface creation, redesigns, focused UI changes, animation and interaction polish, design plans, and UX audits; not for backend-only tasks."
+description: "Design, improve, and validate UI/UX for apps, websites, native interfaces, and games: an art direction derived from the product (dealt from materials and a structure drawn against recent builds when the user gives no visual cue, never the model's top-two habit; an Apple-like house style on request), a coherent visual system kept in the project's DESIGN.md, measured layout geometry, page anatomy by the visitor's job, an AI-slop catalog (template pages, eyebrows, tracked-caps labels, calibrated looks, narration and redundant helper text), a living motion language with an interaction kit, an opt-in pool of signature effects, accessibility, drop zones for every upload, and real states including skeletons. Use for interface creation, redesigns, focused UI changes, motion polish, design plans, and UX audits; not for backend-only tasks."
 license: MIT
 metadata:
-  version: "1.7.1"
+  version: "1.8.0"
 ---
 
 # Better Design
@@ -38,25 +38,25 @@ Evaluate coherence, expressiveness, and accessibility separately. Do not promise
 - Make decisions in this order: explicit task and constraints → DESIGN.md and the existing system →
   platform conventions → domain tasks → this skill's configurable baseline.
   Functionality and applicable accessibility requirements apply at every level.
-- **Default visual direction.** When the user names no visual style and the project has no
-  DESIGN.md, brand, code tokens, or live UI to inherit, build in the house style: premium
-  ultra-minimal in the spirit of Apple (black canvas, near-white Geologica at weights 500 and
-  340, two grays, one blue for links and focus, pill actions, surfaces separated by tone,
-  real content as the only color). Rules and the ready DESIGN.md preset are
-  in [house-style.md](references/house-style.md); read it whole before writing any style.
-  Two misreadings send agents elsewhere, so check them explicitly (house-style.md section 1):
-  the product's domain, industry, audience, or name is not a visual cue ("a coffee roastery",
-  "for developers"), and untouched scaffold defaults are not a system to inherit (the
-  shadcn/ui default theme, Tailwind's default palette, create-next-app, Vite, or Expo
-  starters, Bootstrap, MUI, or Chakra defaults); map the house style onto them instead.
-  When it applies, start from the reference file
-  [house-style.html](assets/house-style.html), not a blank page: take its tokens, type
-  classes, nav, buttons, tiles, and section rhythm (or port them into the stack's
-  components), then replace its content (house-style.md section 1). Any visual cue from the
-  user (colors, mood, theme, reference, brand, audience style) overrides it: follow the
-  request, and apply only the parts of the house style the request leaves open and does not
-  contradict. Never restyle an existing product into it unless asked. Games keep their own
-  art direction.
+- **No visual direction is not a style.** When the user names no visual style and the
+  project has no DESIGN.md, brand, code tokens, or live UI to inherit, do not fall back to a
+  fixed look: deal a direction with [direction-deal.md](references/direction-deal.md)
+  (`scripts/deal_direction.mjs`). It deals three starting materials from
+  [materials.md](references/materials.md) and a page structure, cleared against recent
+  builds; you rank seven directions of your own and build the one the roll names (#3–#7,
+  never your top two; #2–#3 for working tools, where execution outranks novelty), so
+  unrelated briefs stop converging on one page. Two things are not cues and not systems:
+  the product's domain, industry, audience, or name ("a coffee roastery", "for developers")
+  feeds the concept, not the look; untouched scaffold defaults (the shadcn/ui default theme,
+  Tailwind's default palette, create-next-app, Vite, or Expo starters, Bootstrap, MUI, or
+  Chakra defaults) are not a system to inherit. Both mean "no cue": deal, keep the
+  component library, and map the dealt tokens onto it. Any visual cue from
+  the user (colors, mood, theme, reference, brand, audience style) replaces the deal: follow
+  the request with art-direction.md. The Apple-like [house style](references/house-style.md)
+  is used when the user asks for it ("minimal", "premium", "like Apple", "house style") or
+  when the deal hands it out; then start from its reference file
+  [house-style.html](assets/house-style.html), not a blank page. Never restyle an existing product unless asked. Games keep
+  their own art direction.
 - Preserve the established brand, density, game-like, editorial, or expressive composition.
   Do not replace them with a generic gray CRM. For a real conflict, choose the smallest
   accessible adjustment and explain the specific deviation.
@@ -85,10 +85,14 @@ Evaluate coherence, expressiveness, and accessibility separately. Do not promise
 Negative rules only move output to the next most common template; character comes from a
 process. When creating or redesigning a surface whose identity is part of the task (brand,
 landing, portfolio, consumer app, game, editorial, launcher), follow
-[art-direction.md](references/art-direction.md) before choosing tokens. When the house style
-applies (section 1), palette, type, shape, and motion tokens come from its preset; still write
-the concept, and let it choose the imagery, each section's leading element, and one signature
-detail (house-style.md section 10). Otherwise:
+[art-direction.md](references/art-direction.md) before choosing tokens. With no cue and
+nothing to inherit, start with [direction-deal.md](references/direction-deal.md): scene
+sentence, material inventory, the visitor's job ([page-anatomy.md](references/page-anatomy.md)),
+the rut and calibration clusters you refuse, the deal, seven ranked directions and the roll,
+the drawn structure, the mirror test, and a direction card said once before building. When
+the house style applies (asked for or dealt), palette, type, shape, and motion tokens come
+from its preset; still write the concept, and let it choose the imagery, each section's
+leading element, and one signature detail (house-style.md section 10). Otherwise:
 
 - Derive a one-sentence concept from the product's domain, audience, and content — an object,
   place, or craft from that world — not from adjectives such as "modern, clean, minimal".
@@ -97,16 +101,23 @@ detail (house-style.md section 10). Otherwise:
   for each exactly what is taken: rhythm, density, number presentation, material, light.
 - Sketch 2–3 directions that differ by their leading device (typographic, image-led,
   structural), then choose one with a reason tied to the task and audience.
-- Derive palette and type from the concept: a palette with a stated origin and tinted
-  neutrals; three type candidates and a reasoned choice. Plan one or two signature details;
+- Derive palette and type from the concept: a colour posture (restrained, committed, full,
+  drenched), a palette with a stated origin and tinted neutrals; three type candidates past
+  the reflex faces in [fonts.md](references/fonts.md) and a reasoned choice, with Cyrillic
+  coverage checked when needed. Plan one or two signature details;
   the optional pool in [effects-library.md](references/effects-library.md) holds tested ones.
 - Derive the motion character from the same concept: how things in that world move (tempo,
   weight, physics, whether anything springs) plus one signature motion detail. Palette, type,
   and motion must read as one voice; see [motion.md](references/motion.md).
 - Within DESIGN.md, an existing brand, or a design system the direction is inherited: take it
   from DESIGN.md or state it in one sentence from the live surface, and work inside it. Dense working tools express character
-  through precision and data typography; with no system and no user cue they take the house
-  style's app scale and palette with the neutral fallback's density.
+  through precision and data typography; with no system and no user cue they deal with
+  `--surface app` (ground, type voice, signal) and take the neutral fallback's density.
+- For landing, event, shop, and portfolio pages, build from the visitor's job and hold the
+  page budgets in [page-anatomy.md](references/page-anatomy.md): headline, one sentence, and
+  the primary action visible at 1280×800; about 80 words per screen; six to nine sections,
+  each with mass; the page ends on the job's action, not a reflex email band.
+- After building, log the direction (`deal_direction.mjs log`) so the next deal moves away.
 - Record the direction in the contract (`direction`, including `direction.motion`) and plan
   `distinctiveness` and `motion` checks. Write the chosen direction and its tokens into
   DESIGN.md so later screens and sessions build from the same values.
@@ -122,7 +133,8 @@ detail (house-style.md section 10). Otherwise:
   is a system decision: add the role to DESIGN.md and the code tokens in the same change.
 - Create DESIGN.md from the [template](assets/DESIGN.template.md) when creating an interface
   from scratch (from the [house-style preset](assets/DESIGN.house-style.md) when the house
-  style applies), or when a redesign or multi-component change finds none; derive it from the
+  style applies; with the direction card in its Direction section after a deal), or when a
+  redesign or multi-component change finds none; derive it from the
   live code tokens rather than inventing values, and record contradictions instead of silently
   fixing them. Do not create it for a one-element fix unless asked; offer it in one line.
   Keep DESIGN.md and code tokens in sync within every change that touches either.
@@ -269,11 +281,15 @@ only produces a blander template. The catalog groups, by ID:
 - **Composition and cards**: identical icon-heading-text card grids, icon tiles stacked above
   headings and oversized icons, nested card layers, colored side stripes and thick accent
   borders on rounded cards, hero-metric layouts, display-size hero headlines, marketing
-  sections inside working tools, everything centered, decorative grid backgrounds.
+  sections inside working tools, everything centered, decorative grid backgrounds, the
+  template page (hero, three features, CTA band, footer), the reflex split hero, the stock
+  email close, numbered section labels, thin sections, walls of words, fake browser chrome.
 - **Color and light**: the AI palette (purple-to-blue gradients, cyan on dark), gradient
-  text, glass and neon "lazy cool", radial halos, spotlights and orbs, default cream/beige.
-- **Typography**: habitual default fonts, flat hierarchy, italic serif display headlines,
-  eyebrow labels and pill badges above headings.
+  text, glass and neon "lazy cool", radial halos, spotlights and orbs, default cream/beige,
+  the calibrated looks every model ships, hues chosen by category, framework swatches, glows.
+- **Typography**: reflex fonts, flat hierarchy, italic serif display headlines, eyebrow
+  labels and pill badges above headings, tracked-capital labels, one accented word in a
+  heading, mono as costume, middle-dot meta strings and arrows glued to links.
 - **Motion**: everything asking for attention at once, pulsing status dots, scroll reveals
   on every section (details in motion.md).
 - **Imagery**: rough hand-drawn SVG scenes and mascots, stock imagery and mixed icon sets,
@@ -282,7 +298,8 @@ only produces a blander template. The catalog groups, by ID:
   that paraphrase their labels, helper text added to every row by default, the same meaning
   repeated within one task region, generic
   marketing claims, forced "Not X. Y." contrasts, a dash in every sentence, fake content,
-  dead controls and fake success.
+  placeholder names, aphoristic section endings, a fact echoed across sections, decoration
+  text, emoji as icons, dead controls and fake success.
 
 A pattern that DESIGN.md records as an intentional brand choice is not slop. These are constraints on mindless use, not a ban on color, type, cards, or expression.
 Evaluate semantics: a nested DOM container is not automatically a decorative card.
@@ -396,7 +413,15 @@ well as expressive pages. Documentation may explain features when that is its ac
   screenshots after it works: the swap test (would it fit a competitor unchanged?), the squint
   test (does a blurred grayscale capture still show hierarchy and one dominant element?), and
   a comparison against the concept and references, and the slop scan from ai-slop.md with
-  pattern IDs. Rework whatever reads as "from any template".
+  pattern IDs. Rework whatever reads as "from any template". Run
+  `node scripts/bench_metrics.mjs measure <page.html> --label check --out <scratch>/m.json`
+  for the mechanical subset (eyebrows, tracked-caps labels, accented words, template
+  punctuation, AI gradients, glows, reflex display fonts, hero fold, phone overflow); fix its
+  flags or record why one is intended. When the environment can start a subagent, the
+  critique of a created expressive surface is done by a fresh-context reviewer given only the
+  screenshots and the direction card, not by the builder; act on its findings and recapture.
+  Check craft before boldness (direction-deal.md): nav edges on the content column, no
+  clipped cell or status text, first screen free of sample banners and notices.
 - The offline helper [validate_design.py](scripts/validate_design.py) validates its own
   contract format and a limited token subset; instructions are in [validation.md](references/validation.md).
   Its PASS confirms only the listed structural/color checks.
@@ -416,7 +441,9 @@ well as expressive pages. Documentation may explain features when that is its ac
   optical offset; a file or image upload has no drop zone, its drop zone
   has no visible drag-over state, or drag is the only way to add or reorder;
   or, when identity is part of the task, the result fails
-  the swap test or contradicts the recorded direction; a created or redesigned surface is
+  the swap test or contradicts the recorded direction; with no visual cue and nothing to
+  inherit, the build skipped the deal, built its own top-two direction, or shipped one of the
+  calibrated looks without the deal handing it out; a created or redesigned surface is
   dead (controls without press feedback, overlays and list changes that hard-cut), or the
   motion probe reports errors or was not run on a created/changed page; a pool
   effect is adopted without its fallback, reduced-motion, or pause path, or exceeds the page
