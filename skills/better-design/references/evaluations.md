@@ -94,3 +94,58 @@ usually needs a targeted scenario and evidence, not an unnecessary statistical p
 Change the skill in response to reproducible failures. Do not turn one reviewer's preference
 into a universal ban. Test the helper through its actual CLI and negative inputs, including
 a broken→fixed proof; checking that a rule's text exists does not measure its quality.
+
+## A/B against the previous version
+
+A change to direction, slop rules, or defaults is proven against the previous skill
+version, not against "no skill". Protocol used for v1.8:
+
+1. **Briefs with no visual cue**, several jobs and one working tool, e.g. a bakery, a webhook
+   API, a ceramics school, a couples' finance app, a jazz festival, a dispatcher's dashboard.
+   Undirected briefs are where convergence shows.
+2. **Arms:** a frozen copy of the previous version and the new one, each read from its own
+   path by a fresh agent per brief (no shared context, no Skill tool, an empty project
+   folder), with identical constraints: one self-contained page, no external images, no
+   invented facts, the user unavailable for questions.
+3. **Measure** each arm with `node scripts/bench_metrics.mjs measure runs/<arm>/*/index.html
+   --label <arm> --out <arm>.json --shots shots/` and compare with
+   `node scripts/bench_metrics.mjs compare old.json new.json`:
+   - *convergence*: mean pairwise hero-thumbnail correlation (lower is more varied), mean
+     pairwise colour-histogram distance (higher is more varied), distinct ground bands,
+     display fonts, accent hue families, and how many pages land in the black + blue look;
+   - *mechanical slop*: flags per page (a subset of ai-slop.md), hero fold at 1280×800,
+     words on the first screen, horizontal overflow on a 390px phone.
+   The mechanical flags include rules the new version adds, so they favour it by design;
+   report them, but do not let them stand alone.
+4. **Blind judgement:** a fresh agent sees the hero and phone screenshots of both arms per
+   brief in random A/B order, without arm names, and scores philosophy, hierarchy,
+   execution, specificity, restraint, and variety 1–5 plus an overall 1–10, and says which
+   page a design lead would ship. Unblind only after scoring.
+5. **Report** the numbers, the judge's preferences per brief, regressions (especially in the
+   working tool), and the sample's limits: one generation per brief per arm is a signal, not
+   a statistic.
+
+### v1.8 results (2026-10-27)
+
+Six briefs with no visual cue (bakery, webhook API, ceramics school, couples' finance app,
+jazz festival, dispatcher admin), one fresh agent per brief and arm, Claude Opus 5.5.
+
+| | v1.6 | v1.8, iteration 1 | v1.8, iteration 2 (shipped) |
+| --- | --- | --- | --- |
+| Pages on black #000 in the house look | 5 of 6 | 0 | 0 |
+| Distinct display fonts | 2 | 4 | 6 |
+| Hero colour distance, mean pairwise | 0.12 | 0.85 | 0.77 |
+| Mechanical slop flags per page | 1.83 | 0.83 (sample banners) | 0 |
+| Words on the first screen, mean | 78 | 108 | 84 |
+| Blind pairs won against v1.6 | | 3 of 6 | 4 of 6 |
+| Blind overall, mean (1–10) | 6.33 / 5.83 | 6.33 | 6.83 |
+| Blind variety / execution (1–5) | 2.0 / 3.8 | 4.2 / 3.0 | 3.2 / 3.7 |
+
+Two independent blind judges each grouped five of v1.6's six pages into one cluster
+("the same dark Apple template with different words"). Iteration 1 fixed convergence but
+lost on execution (sample banners on the first screen, a clipped dashboard) and converged
+on one Cyrillic display face and a saffron ground; iteration 2 added face/hue rotation,
+"craft before boldness", the #2–#3 roll for tools, and won 4 of 6. Its own new cluster
+(three pages of light paper with a brick-red signal) and a repeated place cliché (amber
+for Kaliningrad) were added to the calibration clusters afterwards, untested. One
+generation per cell: a signal, not a statistic; judges vary by about one point.

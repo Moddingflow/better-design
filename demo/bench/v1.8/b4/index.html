@@ -1,0 +1,1037 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Поровну — общие траты пары</title>
+<meta name="description" content="Мобильное приложение для общих финансов пары: общие траты, доли, регулярные платежи и итог месяца.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400;500;600&family=Jost:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/*
+ * better-design · interaction kit (CSS)
+ * The baseline motion every interactive element ships with. Not optional and not a polish
+ * pass: adopt it at the start of a UI, map the --ui-* tokens to DESIGN.md motion roles,
+ * then build components on top. Pair with interaction-kit.js (pointer highlight, size-aware
+ * press depth, keyboard press, segmented indicator, button states).
+ *
+ * Press model (all three layers together; one layer alone reads as "dead"):
+ *   1. Down, immediately (≤ 90 ms): the element compresses by a constant ~3 px per side
+ *      (scale set per element by JS; CSS fallback 0.96) and its fill shifts one step.
+ *   2. A soft highlight blooms from the exact press point.
+ *   3. Release: it springs back with a small overshoot (~16% of the travel, ≈ 1.006 scale),
+ *      settling in ~500 ms. The action itself never waits for the animation.
+ */
+
+:root {
+  /* Durations */
+  --ui-press-down: 80ms;
+  --ui-release: 520ms;
+  --ui-hover: 200ms;
+  --ui-focus: 160ms;
+  --ui-state: 260ms;
+  /* Easing */
+  --ui-ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ui-ease-color: cubic-bezier(0.25, 0.1, 0.25, 1);
+  /* Damped springs as linear() curves (zeta 0.5 → 16% overshoot; zeta 0.75 → 3%). */
+  --ui-spring-pop: linear(0, 0.044, 0.155, 0.307, 0.475, 0.642, 0.794, 0.922, 1.023, 1.094, 1.139, 1.16, 1.162, 1.15, 1.129, 1.103, 1.075, 1.049, 1.025, 1.006, 0.991, 0.981, 0.976, 0.973, 0.974, 0.977, 0.981, 0.985, 0.989, 0.994, 0.997, 1, 1.002, 1.003, 1.004, 1.004, 1.004, 1.004, 1.003, 1.002, 1);
+  --ui-spring-snap: linear(0, 0.03, 0.105, 0.207, 0.32, 0.435, 0.545, 0.644, 0.732, 0.806, 0.867, 0.915, 0.953, 0.981, 1.001, 1.015, 1.023, 1.027, 1.028, 1.028, 1.026, 1.023, 1.02, 1.016, 1.013, 1.01, 1.008, 1.006, 1.004, 1.003, 1);
+  /* Colors (map to DESIGN.md roles) */
+  --ui-focus-ring: #2997ff;
+  --ui-highlight: rgb(255 255 255 / 0.22);      /* bloom on dark fills */
+  --ui-highlight-on-light: rgb(0 0 0 / 0.12);   /* bloom on light fills */
+}
+
+/* ── Press: the base for every button, link-button, chip, tile and icon button ──────── */
+.ui-press {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transform: scale(1);
+  transition:
+    transform var(--ui-release) var(--ui-spring-pop),
+    background-color var(--ui-hover) var(--ui-ease-color),
+    color var(--ui-hover) var(--ui-ease-color),
+    box-shadow var(--ui-hover) var(--ui-ease-color),
+    filter var(--ui-hover) var(--ui-ease-color),
+    outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out);
+}
+.ui-press:active:not(:disabled):not([aria-disabled="true"]),
+.ui-press[data-pressed] {
+  transform: scale(var(--ui-press-scale, 0.96));
+  filter: brightness(var(--ui-press-brightness, 0.92));
+  transition-duration: var(--ui-press-down);
+  transition-timing-function: var(--ui-ease-out);
+}
+/* Dark fills brighten instead of darkening. */
+.ui-press--on-dark { --ui-press-brightness: 1.18; }
+/* Large surfaces (tiles, cards, list rows) move less. */
+.ui-press--surface { --ui-press-scale: 0.985; }
+
+/* Highlight bloom from the press point (coordinates set by interaction-kit.js). */
+.ui-press::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--ui-px, 50%) var(--ui-py, 50%), var(--ui-bloom, var(--ui-highlight-on-light)) 0%, transparent var(--ui-bloom-r, 70%));
+  opacity: 0;
+  transition: opacity 600ms var(--ui-ease-out);
+}
+.ui-press--on-dark::after { --ui-bloom: var(--ui-highlight); }
+.ui-press[data-pressed]::after { opacity: 1; transition-duration: 90ms; }
+
+/* Hover: a fill step and the content's own micro-motion, never a lift. */
+@media (hover: hover) and (pointer: fine) {
+  .ui-press:hover:not(:disabled) { filter: brightness(var(--ui-hover-brightness, 0.96)); }
+  .ui-press--on-dark:hover:not(:disabled) { --ui-hover-brightness: 1.1; }
+  .ui-press:hover .ui-icon-nudge { transform: translateX(3px); }
+}
+.ui-icon-nudge { display: inline-block; transition: transform 300ms var(--ui-spring-snap); }
+
+/* Disabled: no press, no hover, visibly unavailable. */
+.ui-press:disabled, .ui-press[aria-disabled="true"] { cursor: not-allowed; opacity: 0.45; filter: none; }
+
+/* ── Focus: the ring grows into place instead of popping ─────────────────────────────── */
+.ui-focus { outline: 2px solid transparent; outline-offset: 6px; }
+/* Components below list the ring in their own transition; a bare .ui-focus gets its own.
+   Never give an element a second `transition` shorthand: the later one wins and silently
+   deletes the press and release animation. */
+.ui-focus:not(.ui-press, .ui-dim, .ui-switch, .ui-check, .ui-link, .ui-field, .ui-segmented > button) { transition: outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.ui-focus:focus-visible { outline-color: var(--ui-focus-ring); outline-offset: 2px; }
+
+/* ── Link: underline draws from the reading start; press dims ───────────────────────── */
+.ui-link {
+  color: inherit; text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 320ms var(--ui-ease-out), opacity 120ms linear, outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out);
+}
+@media (hover: hover) and (pointer: fine) { .ui-link:hover { background-size: 100% 1px; } }
+.ui-link:focus-visible { background-size: 100% 1px; }
+.ui-link:active { opacity: 0.6; transition-duration: 320ms, 40ms, var(--ui-focus), var(--ui-focus); }
+
+/* ── Text action (nav links, "Learn more ›"): dims under the finger, eases back ───── */
+.ui-dim { transition: opacity 320ms var(--ui-ease-out), color var(--ui-hover) var(--ui-ease-color), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.ui-dim:active, .ui-dim[data-pressed] { opacity: 0.5; transition-duration: 40ms, var(--ui-hover), var(--ui-focus), var(--ui-focus); }
+@media (hover: hover) and (pointer: fine) { .ui-dim:hover .ui-icon-nudge { transform: translateX(3px); } }
+
+/* ── Switch: the thumb stretches under the finger, then travels with a snap spring ───── */
+.ui-switch { position: relative; width: 51px; height: 31px; border-radius: 99px; border: 0; padding: 0; cursor: pointer; flex: none;
+  background: var(--ui-switch-off, #39393d); transition: background-color var(--ui-state) var(--ui-ease-color), filter var(--ui-hover) var(--ui-ease-color), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.ui-switch[aria-checked="true"] { background: var(--ui-switch-on, #30d158); }
+.ui-switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 99px; background: #fff;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.25); transition: left 420ms var(--ui-spring-snap), width 160ms var(--ui-ease-out); }
+.ui-switch[aria-checked="true"]::after { left: 22px; }
+.ui-switch:active::after, .ui-switch[data-pressed]::after { width: 33px; }
+.ui-switch[aria-checked="true"]:active::after, .ui-switch[aria-checked="true"][data-pressed]::after { left: 16px; }
+
+/* ── Checkbox: the box compresses on press; the tick draws itself ───────────────────── */
+.ui-check { position: relative; display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 7px; flex: none; cursor: pointer;
+  border: 1.5px solid var(--ui-check-border, #86868b); background: transparent;
+  transition: background-color 180ms var(--ui-ease-color), border-color 180ms var(--ui-ease-color), transform var(--ui-release) var(--ui-spring-pop), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out), box-shadow 300ms var(--ui-ease-out); }
+.ui-check:active { transform: scale(0.88); box-shadow: 0 0 0 5px var(--ui-check-halo, rgb(255 255 255 / 0.14)); transition-duration: 180ms, 180ms, var(--ui-press-down), var(--ui-focus), var(--ui-focus), 60ms; }
+.ui-check[aria-checked="true"] { background: var(--ui-check-on, #2997ff); border-color: var(--ui-check-on, #2997ff); }
+.ui-check svg { width: 14px; height: 14px; overflow: visible; }
+.ui-check path { fill: none; stroke: #fff; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 20; stroke-dashoffset: 20; transition: stroke-dashoffset 120ms var(--ui-ease-out); }
+.ui-check[aria-checked="true"] path { stroke-dashoffset: 0; transition: stroke-dashoffset 260ms var(--ui-ease-out) 60ms; }
+
+/* ── Segmented control / tabs: one indicator slides between options ─────────────────── */
+.ui-segmented { position: relative; display: inline-flex; padding: 3px; border-radius: 99px; background: var(--ui-seg-track, rgb(255 255 255 / 0.08)); isolation: isolate; }
+.ui-segmented > button { position: relative; z-index: 1; border: 0; background: none; color: inherit; font: inherit; padding: 8px 16px; border-radius: 99px; cursor: pointer;
+  opacity: 0.7; transition: opacity var(--ui-hover) var(--ui-ease-color), transform var(--ui-release) var(--ui-spring-pop), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+.ui-segmented > button[aria-selected="true"], .ui-segmented > button[aria-pressed="true"] { opacity: 1; }
+.ui-segmented > button:active { transform: scale(0.95); opacity: 0.55; transition-duration: var(--ui-hover), var(--ui-press-down), var(--ui-focus), var(--ui-focus); }
+.ui-segmented__indicator { position: absolute; z-index: 0; top: 3px; bottom: 3px; left: 0; width: 0; border-radius: 99px; background: var(--ui-seg-indicator, rgb(255 255 255 / 0.16));
+  transform: translateX(var(--ui-seg-x, 0)); width: var(--ui-seg-w, 0); transition: transform 460ms var(--ui-spring-snap), width 460ms var(--ui-spring-snap); }
+
+@media (hover: hover) and (pointer: fine) {
+  .ui-switch:hover { filter: brightness(1.12); }
+  .ui-check:hover:not([aria-checked="true"]) { border-color: var(--ui-check-hover, #c7c7cc); }
+  .ui-segmented > button:hover:not([aria-selected="true"]):not([aria-pressed="true"]) { opacity: 0.9; }
+  /* A hover rule with :not() chains outranks a plain :active rule: restate the press after
+     it with the same chain, or the press is invisible while the pointer is over the item. */
+  .ui-segmented > button:hover:not([aria-selected="true"]):not([aria-pressed="true"]):active { opacity: 0.55; }
+}
+
+/* ── Button states: pending keeps its width; success confirms once ──────────────────── */
+.ui-btn-state { display: inline-grid; place-items: center; }
+.ui-btn-state > * { grid-area: 1 / 1; transition: opacity 180ms var(--ui-ease-out), transform 260ms var(--ui-spring-snap); }
+.ui-btn-state > .ui-state-pending, .ui-btn-state > .ui-state-done { opacity: 0; transform: translateY(6px) scale(0.9); }
+.ui-btn-state[data-state="pending"] > .ui-state-label, .ui-btn-state[data-state="done"] > .ui-state-label { opacity: 0; transform: translateY(-6px) scale(0.96); }
+.ui-btn-state[data-state="pending"] > .ui-state-pending, .ui-btn-state[data-state="done"] > .ui-state-done { opacity: 1; transform: none; }
+.ui-spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: ui-spin 700ms linear infinite; }
+@keyframes ui-spin { to { transform: rotate(360deg); } }
+
+/* ── Icon swap (copy → check, play → pause): the old icon leaves, the new one lands ─── */
+.ui-swap { display: inline-grid; place-items: center; }
+.ui-swap > * { grid-area: 1 / 1; transition: opacity 160ms var(--ui-ease-out), transform 380ms var(--ui-spring-pop); }
+.ui-swap > :last-child { opacity: 0; transform: scale(0.5) rotate(-30deg); }
+.ui-swap[data-swapped] > :first-child { opacity: 0; transform: scale(0.5) rotate(30deg); }
+.ui-swap[data-swapped] > :last-child { opacity: 1; transform: none; }
+
+/* ── Toggle icon pop (like, bookmark, star): one pop when it turns on ───────────────── */
+@keyframes ui-pop { 0% { transform: scale(1); } 35% { transform: scale(1.28); } 100% { transform: scale(1); } }
+[aria-pressed="true"] > .ui-pop-icon { animation: ui-pop 420ms var(--ui-ease-out); }
+
+/* ── Field: focus grows the ring; an error shakes once, with its text ───────────────── */
+.ui-field { transition: border-color var(--ui-hover) var(--ui-ease-color), box-shadow var(--ui-focus) var(--ui-ease-out); }
+.ui-field:focus-visible, .ui-field:focus { outline: none; border-color: var(--ui-focus-ring); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ui-focus-ring) 35%, transparent); }
+@keyframes ui-shake { 0%, 100% { transform: none; } 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+.ui-shake { animation: ui-shake 320ms var(--ui-ease-out); }
+
+/* ── Menus, popovers, dialogs: grow from their origin, leave faster ─────────────────── */
+.ui-pop-in {
+  transform-origin: var(--ui-origin, top center);
+  transition: opacity 200ms var(--ui-ease-out), transform 260ms var(--ui-spring-snap), overlay 200ms allow-discrete, display 200ms allow-discrete;
+}
+.ui-pop-in:not(:popover-open):not([open]) { opacity: 0; transform: scale(0.96) translateY(-4px); transition-duration: 140ms; }
+.ui-pop-in:popover-open, .ui-pop-in[open] { opacity: 1; transform: none; }
+@starting-style { .ui-pop-in:popover-open, .ui-pop-in[open] { opacity: 0; transform: scale(0.96) translateY(-4px); } }
+dialog.ui-pop-in::backdrop { background: rgb(0 0 0 / 0); transition: background-color 260ms var(--ui-ease-out), overlay 260ms allow-discrete, display 260ms allow-discrete; }
+dialog.ui-pop-in[open]::backdrop { background: rgb(0 0 0 / 0.5); }
+@starting-style { dialog.ui-pop-in[open]::backdrop { background: rgb(0 0 0 / 0); } }
+
+/* ── Disclosure: height animates to auto ────────────────────────────────────────────── */
+:root { interpolate-size: allow-keywords; }
+.ui-disclosure::details-content { block-size: 0; overflow: clip; transition: block-size 320ms var(--ui-ease-out), content-visibility 320ms allow-discrete; }
+.ui-disclosure[open]::details-content { block-size: auto; }
+.ui-disclosure summary { transition: background-color var(--ui-hover) var(--ui-ease-color), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out); }
+@media (hover: hover) and (pointer: fine) { .ui-disclosure summary:hover { background-color: var(--ui-row-hover, rgb(255 255 255 / 0.04)); } }
+.ui-disclosure summary:active { background-color: var(--ui-row-press, rgb(255 255 255 / 0.08)); transition-duration: 60ms, var(--ui-focus), var(--ui-focus); }
+.ui-disclosure summary .ui-chevron { display: inline-block; transition: transform 320ms var(--ui-spring-snap); }
+.ui-disclosure[open] summary .ui-chevron { transform: rotate(90deg); }
+
+/* ── Reduced motion: keep every state change visible, drop travel, scale and springs ── */
+@media (prefers-reduced-motion: reduce) {
+  .ui-press, .ui-check, .ui-segmented > button, .ui-icon-nudge, .ui-swap > *, .ui-btn-state > * { transition-property: background-color, color, filter, opacity, box-shadow, outline-offset, outline-color; }
+  .ui-press:active:not(:disabled):not([aria-disabled="true"]), .ui-press[data-pressed], .ui-check:active, .ui-segmented > button:active { transform: none; }
+  .ui-switch::after, .ui-segmented__indicator, .ui-pop-in, .ui-disclosure::details-content { transition-duration: 0.01ms; }
+  [aria-pressed="true"] > .ui-pop-icon, .ui-shake { animation: none; }
+  .ui-swap > :last-child, .ui-swap[data-swapped] > :first-child, .ui-btn-state > * { transform: none; }
+}
+
+
+/* ── Tokens (mirrors DESIGN.md) ─────────────────────────────────────────── */
+:root {
+  --paper: #F6F3F1;
+  --tile: #E9E3DF;
+  --screen: #FFFFFF;
+  --ink: #211A17;
+  --muted: #6B5F59;
+  --red: #B4321F;
+  --red-deep: #8E2414;
+  --on-red: #FFFFFF;
+  --on-red-muted: #FBE6DF;
+  --line: rgb(33 26 23 / 0.16);
+  --line-on-red: rgb(255 255 255 / 0.4);
+
+  --font-display: "Jost", "Commissioner", system-ui, sans-serif;
+  --font-text: "Commissioner", system-ui, sans-serif;
+
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s6: 24px; --s8: 32px;
+  --s12: 48px; --s16: 64px; --s24: 96px; --s32: 128px;
+
+  --r-control: 12px; --r-container: 24px; --r-phone: 44px; --r-screen: 34px; --r-pill: 999px;
+
+  --t-display: clamp(44px, 6vw, 80px);
+  --t-h2: clamp(32px, 3.8vw, 52px);
+  --t-h3: 24px;
+  --t-figure: clamp(40px, 5vw, 64px);
+  --t-lead: 19px;
+  --t-lead-lg: 21px;
+  --t-body: 16px;
+  --t-small: 14px;
+  --t-label: 15px;
+
+  --container: 1200px;
+  --gutter: clamp(16px, 4vw, 48px);
+
+  --m-micro: 140ms; --m-small: 200ms; --m-medium: 280ms; --m-large: 420ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+
+  --ui-focus-ring: var(--ink);
+  --ui-switch-off: #8A7D76;
+  --ui-switch-on: var(--red);
+  --ui-seg-track: var(--tile);
+  --ui-seg-indicator: var(--screen);
+}
+.on-red { --ui-focus-ring: var(--on-red); }
+.on-ink { --ui-focus-ring: var(--paper); }
+
+/* ── Base ─────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 400 var(--t-body)/1.55 var(--font-text);
+  font-synthesis: none; text-rendering: optimizeLegibility;
+}
+::selection { background: var(--red); color: var(--on-red); }
+h1, h2, h3, p, ul, ol, dl, dd, figure { margin: 0; }
+button, input, output, select, textarea { font: inherit; color: inherit; }
+ul, ol { padding: 0; list-style: none; }
+.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wrap { width: 100%; max-width: calc(var(--container) + 2 * var(--gutter)); margin-inline: auto; padding-inline: var(--gutter); }
+.h2 { font: 500 var(--t-h2)/1.08 var(--font-display); letter-spacing: -0.015em; text-wrap: balance; }
+.h3 { font: 500 var(--t-h3)/1.25 var(--font-display); }
+.lead { font-size: var(--t-lead); line-height: 1.5; }
+.muted { color: var(--muted); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ── Buttons ──────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
+  min-height: 48px; padding: 0 var(--s6); border: 0; border-radius: var(--r-control);
+  font: 600 var(--t-label)/1 var(--font-text); text-decoration: none; cursor: pointer;
+}
+.btn svg { width: 20px; height: 20px; flex: none; }
+.btn--ink { background: var(--ink); color: var(--paper); }
+.btn--white { background: var(--screen); color: var(--red-deep); }
+.btn--sm { min-height: 40px; padding: 0 var(--s4); }
+.store { min-height: 56px; padding: 0 var(--s6) 0 var(--s4); gap: var(--s3); text-align: left; }
+.store svg { width: 24px; height: 24px; }
+.store span { display: grid; gap: 2px; }
+.store small { font: 500 12px/1 var(--font-text); opacity: 0.8; }
+.store b { font: 600 17px/1 var(--font-text); }
+.store-row { display: flex; flex-wrap: wrap; gap: var(--s3); }
+.store-status { min-height: 1.5em; font-size: var(--t-small); }
+
+/* ── Nav ──────────────────────────────────────────────────────────────── */
+.nav { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); padding-block: var(--s6); }
+.mark { display: inline-flex; align-items: center; gap: var(--s2); color: inherit; text-decoration: none; font: 600 26px/1.25 var(--font-display); letter-spacing: -0.01em; }
+@media (hover: hover) and (pointer: fine) { .mark:hover:not(:active):not([data-pressed]) { opacity: 0.8; } }
+.mark svg { width: 34px; height: 22px; }
+
+/* ── Hero: corridor on red enamel, phone rising from the bottom ───────── */
+.hero { background: var(--red); color: var(--on-red); overflow: hidden; }
+.hero__corridor { max-width: 44ch; margin-inline: auto; text-align: center; padding-top: var(--s12); }
+.hero h1 { font: 500 var(--t-display)/1 var(--font-display); letter-spacing: -0.025em; text-wrap: balance; }
+.hero .lead { color: var(--on-red-muted); margin-top: var(--s6); max-width: 36ch; margin-inline: auto; }
+.hero .store-row { justify-content: center; margin-top: var(--s8); }
+.hero .store-status { color: var(--on-red); margin-top: var(--s3); }
+.hero__phone { margin: var(--s8) auto calc(-1 * var(--s32) - var(--s24)); width: min(340px, 84vw); }
+
+/* ── Phone stand-in (marked slot: screens are a design sample) ─────────── */
+.phone { position: relative; background: var(--ink); border-radius: var(--r-phone); padding: 10px; box-shadow: 0 30px 60px -20px rgb(33 26 23 / 0.45); }
+.phone__screen { position: relative; background: var(--screen); color: var(--ink); border-radius: var(--r-screen); overflow: hidden; aspect-ratio: 9 / 19; }
+.app { position: absolute; inset: 0; display: flex; flex-direction: column; gap: var(--s4); padding: var(--s8) var(--s6) var(--s6); text-align: left; }
+.app__top { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); }
+.app__title { font: 500 20px/1.2 var(--font-display); }
+.app__meta { font-size: 13px; color: var(--muted); }
+.app__owe { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); padding: var(--s3) 0; border-block: 1px solid var(--line); font-size: var(--t-small); }
+.app__owe b { font: 600 20px/1 var(--font-text); }
+.rows { display: grid; }
+.rows li { display: grid; grid-template-columns: 1fr auto; gap: 2px var(--s3); padding: var(--s3) 0; border-bottom: 1px solid var(--line); font-size: var(--t-small); }
+.rows li small { grid-column: 1; color: var(--muted); font-size: 13px; }
+.rows li .num { grid-row: 1 / span 2; grid-column: 2; align-self: center; font-weight: 600; }
+
+/* ── Scale (signature: the balance beam) ──────────────────────────────── */
+.scale { display: block; width: 100%; height: auto; overflow: visible; color: var(--ink); }
+.scale .post, .scale .string { stroke: currentColor; stroke-width: 3; stroke-linecap: round; fill: none; }
+.scale .string { stroke-width: 1.5; }
+.scale .base, .scale .beam, .scale .hub { fill: currentColor; }
+.scale .dial { fill: none; stroke: var(--line); stroke-width: 2; }
+.scale .tick { stroke: var(--muted); stroke-width: 2; stroke-linecap: round; }
+.scale .needle { stroke: var(--red); stroke-width: 3; stroke-linecap: round; }
+.scale .dish { fill: var(--tile); stroke: currentColor; stroke-width: 2; }
+.scale .who { font: 500 17px/1 var(--font-text); fill: var(--muted); text-anchor: middle; }
+.scale .amt { font: 600 22px/1 var(--font-text); fill: currentColor; text-anchor: middle; font-variant-numeric: tabular-nums; }
+
+/* ── Sections ─────────────────────────────────────────────────────────── */
+section { scroll-margin-top: var(--s4); }
+.split { padding: var(--s32) 0 var(--s24); }
+.diptych { display: grid; grid-template-columns: 5fr 7fr; gap: var(--s12); align-items: center; }
+.split .lead { margin-top: var(--s4); max-width: 34ch; }
+.split__controls { display: grid; gap: var(--s6); margin-top: var(--s8); }
+.seg { display: inline-flex; flex-wrap: wrap; font: 500 var(--t-small)/1.2 var(--font-text); }
+.seg > button { min-height: 40px; color: var(--ink); }
+.split .ui-segmented > button[aria-pressed="false"] { opacity: 0.78; }
+.share { display: grid; gap: var(--s2); max-width: 360px; }
+.share label { font-weight: 500; font-size: var(--t-small); display: flex; justify-content: space-between; gap: var(--s3); }
+input[type="range"] { width: 100%; height: 32px; margin: 0; accent-color: var(--red); cursor: pointer; transition: transform var(--m-micro) var(--ease-standard), filter var(--m-micro) var(--ease-standard); }
+input[type="range"]:hover { filter: brightness(0.92); }
+input[type="range"]:active { transform: scaleY(1.12); filter: brightness(0.85); }
+input[type="range"]:focus-visible { outline: 2px solid var(--ui-focus-ring); outline-offset: 4px; border-radius: var(--r-control); }
+.split__figure { background: var(--screen); border-radius: var(--r-container); padding: var(--s8) var(--s8) var(--s6); }
+.split__caption { display: flex; justify-content: space-between; gap: var(--s4); align-items: baseline; padding-bottom: var(--s4); border-bottom: 1px solid var(--line); }
+.split__caption b { font: 600 20px/1.2 var(--font-text); }
+
+.moments { background: var(--tile); padding: var(--s24) 0 var(--s24); }
+.moments__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--s6); }
+.moments .ui-segmented { --ui-seg-track: var(--paper); }
+.moments__body { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: var(--s16); align-items: center; margin-top: var(--s12); }
+.moments__phone { width: min(340px, 84vw); }
+.moments__phone .phone__screen { aspect-ratio: 9 / 16; }
+.panel { position: absolute; inset: 0; opacity: 0; visibility: hidden; transform: translateX(12px); transition: opacity var(--m-medium) var(--ease-standard), transform var(--m-medium) var(--ease-standard), visibility 0s linear var(--m-medium); }
+.panel.is-on { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.moments__text { position: relative; min-height: 220px; }
+.moments__text .panel p { margin-top: var(--s4); max-width: 34ch; }
+.moments__text .h3 { font-size: var(--t-h2); line-height: 1.08; }
+.moments__text .lead { font-size: var(--t-lead-lg); }
+.amount-big { font: 500 44px/1 var(--font-display); text-align: center; padding: var(--s6) 0 var(--s2); }
+.field { display: flex; justify-content: space-between; gap: var(--s3); padding: var(--s3) 0; border-bottom: 1px solid var(--line); font-size: var(--t-small); }
+.field span:first-child { color: var(--muted); }
+.field b { font-weight: 600; }
+.app .btn { width: 100%; margin-top: auto; background: var(--red); color: var(--on-red); }
+.goal { display: grid; gap: var(--s3); }
+.goal__bar { display: flex; height: 14px; border-radius: var(--r-pill); background: var(--tile); overflow: hidden; }
+.goal__bar i:first-child { background: var(--ink); }
+.goal__bar i:nth-child(2) { background: var(--red); background-image: repeating-linear-gradient(135deg, transparent 0 4px, rgb(255 255 255 / 0.35) 4px 6px); }
+.legend { display: grid; gap: var(--s2); font-size: var(--t-small); }
+.legend li { display: flex; align-items: center; gap: var(--s2); }
+.legend li .num { margin-left: auto; font-weight: 600; }
+.sw { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+.sw--a { background: var(--ink); }
+.sw--b { background: var(--red); background-image: repeating-linear-gradient(135deg, transparent 0 3px, rgb(255 255 255 / 0.45) 3px 5px); }
+.settle-line { margin-top: auto; padding: var(--s4); border-radius: var(--r-control); background: var(--paper); font-size: var(--t-small); display: flex; justify-content: space-between; gap: var(--s3); }
+.settle-line b { font-weight: 600; }
+
+.before { padding: var(--s32) 0 var(--s24); }
+.before__grid { display: grid; grid-template-columns: 4fr 7fr; gap: var(--s16); align-items: start; margin-top: var(--s12); }
+.chat { display: grid; gap: var(--s3); justify-items: start; }
+.chat p { background: var(--tile); padding: var(--s3) var(--s4); border-radius: 18px 18px 18px 6px; max-width: 30ch; }
+.chat p:nth-child(even) { justify-self: end; border-radius: 18px 18px 6px 18px; background: var(--screen); }
+.col-label { font: 500 var(--t-small)/1.2 var(--font-text); color: var(--muted); margin-bottom: var(--s4); }
+.ledger { background: var(--screen); border-radius: var(--r-container); padding: var(--s8); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s6) var(--s8); align-items: center; }
+.ledger__scale { grid-row: span 2; }
+.ledger__who { font: 500 var(--t-h3)/1.2 var(--font-display); }
+.ledger__fig { font: 500 var(--t-figure)/1 var(--font-display); letter-spacing: -0.02em; margin-top: var(--s2); }
+.ledger__actions { display: flex; flex-wrap: wrap; gap: var(--s3); align-items: center; }
+.linkbtn { background: none; border: 0; padding: var(--s2) var(--s1); font: 500 var(--t-small)/1.2 var(--font-text); color: var(--red-deep); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; border-radius: 6px; }
+.linkbtn[hidden] { display: none; }
+
+.private { padding: var(--s24) 0 var(--s32); }
+.private__grid { display: grid; grid-template-columns: 5fr 7fr; gap: var(--s12); align-items: start; }
+.private .lead { margin-top: var(--s4); max-width: 30ch; }
+.toggles { border-top: 1px solid var(--line); }
+.toggles li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: var(--s6); padding: var(--s4) 0; border-bottom: 1px solid var(--line); transition: opacity var(--m-small) var(--ease-standard); }
+.toggles li.is-off .t-name, .toggles li.is-off .num { color: var(--muted); }
+.t-name { font-weight: 500; }
+.t-name small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
+.toggles .num { font-weight: 600; min-width: 7.5ch; text-align: right; }
+.toggles .ui-switch { width: 51px; }
+.total { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4); padding-top: var(--s6); }
+.total b { font: 500 36px/1 var(--font-display); }
+
+.download { background: var(--red); color: var(--on-red); padding: var(--s24) 0; overflow: hidden; }
+.download__grid { display: grid; grid-template-columns: 7fr 5fr; gap: var(--s12); align-items: center; }
+.download .lead { color: var(--on-red-muted); margin-top: var(--s4); max-width: 34ch; }
+.download .store-row { margin-top: var(--s8); }
+.download .store-status { margin-top: var(--s3); }
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); margin-top: var(--s12); border-top: 1px solid var(--line-on-red); }
+.facts dt, .facts dd { padding: var(--s3) 0; border-bottom: 1px solid var(--line-on-red); }
+.facts dt { color: var(--on-red-muted); padding-right: var(--s8); }
+.download__phone { width: min(320px, 80vw); justify-self: center; grid-column: 2; grid-row: 1 / span 2; }
+.download__phone .phone__screen { aspect-ratio: 9 / 15; }
+.download .facts { grid-column: 1; margin-top: 0; align-self: start; }
+.code { font: 600 28px/1 var(--font-text); letter-spacing: 0.08em; text-align: center; padding: var(--s6) 0; border: 1px dashed var(--muted); border-radius: var(--r-control); }
+
+.colophon { background: var(--ink); color: var(--paper); padding: var(--s16) 0 var(--s12); font-size: var(--t-small); }
+.colophon__grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: var(--s8); }
+.colophon h2 { font: 600 var(--t-small)/1.4 var(--font-text); margin-bottom: var(--s2); }
+.colophon p { color: #CFC6C1; max-width: 34ch; }
+.colophon .mark { font-size: 22px; margin-bottom: var(--s3); }
+
+/* ── Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .diptych, .before__grid, .private__grid, .download__grid, .moments__body { grid-template-columns: minmax(0, 1fr); }
+  .moments__body { justify-items: center; gap: var(--s8); }
+  .moments__text { width: 100%; min-height: 220px; }
+  .download__phone, .download .facts { grid-column: 1; grid-row: auto; }
+  .before__grid { gap: var(--s8); }
+  .colophon__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .colophon__grid > :first-child { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .ledger { grid-template-columns: minmax(0, 1fr); padding: var(--s6); }
+  .ledger__scale { grid-row: auto; }
+  .split__figure { padding: var(--s6) var(--s4) var(--s4); }
+  .store-row { width: 100%; }
+  .store { flex: 1 1 100%; }
+  .facts { grid-template-columns: minmax(0, 1fr); }
+  .facts dt { border-bottom: 0; padding-bottom: 0; }
+  .colophon__grid { grid-template-columns: minmax(0, 1fr); }
+  .moments__head .ui-segmented { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel, .panel.is-on { transform: none; transition: opacity var(--m-small) linear, visibility 0s linear var(--m-small); }
+  .panel.is-on { transition-delay: 0s; }
+  input[type="range"]:active { transform: none; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4.5-4.5M12 15l4.5-4.5M5 19.5h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.5 18.5h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-mark" viewBox="0 0 34 22"><path d="M17 3v17M4 6h26M10 20h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/><path d="M1 13l3-7 3 7a3 3 0 0 1-6 0zM27 13l3-7 3 7a3 3 0 0 1-6 0z" fill="currentColor"/></symbol>
+</svg>
+
+<header class="hero on-red" data-ui-edge>
+  <div class="wrap">
+    <nav class="nav" aria-label="Главная">
+      <a class="mark ui-dim ui-focus" href="#top" id="top" aria-label="Поровну, в начало"><svg aria-hidden="true"><use href="#i-mark"/></svg><span>Поровну</span></a>
+      <a class="btn btn--white ui-press ui-focus" href="#download"><svg aria-hidden="true"><use href="#i-down"/></svg><span>Скачать</span></a>
+    </nav>
+    <div class="hero__corridor" data-ui-group>
+      <h1>Общие траты на&nbsp;одних весах</h1>
+      <p class="lead">Записывайте покупки вдвоём, и&nbsp;стрелка покажет, кто сколько внёс и&nbsp;кому сейчас платить.</p>
+      <div class="store-row" data-store>
+        <button class="btn btn--white store ui-press ui-focus" data-ui-align="start" type="button"><svg aria-hidden="true"><use href="#i-phone"/></svg><span><small>Загрузить в</small><b>App Store</b></span></button>
+        <button class="btn btn--white store ui-press ui-focus" data-ui-align="start" type="button"><svg aria-hidden="true"><use href="#i-play"/></svg><span><small>Доступно в</small><b>Google Play</b></span></button>
+      </div>
+      <p class="store-status" role="status" aria-live="polite"></p>
+    </div>
+    <!-- data-sample: app screen stand-in; names and sums are sample data -->
+    <figure data-ui-overlap class="hero__phone" data-sample="screen" aria-label="Экран приложения: общий счёт за март">
+      <div class="phone"><div class="phone__screen">
+        <div class="app">
+          <div class="app__top"><span class="app__title">Общий счёт</span><span class="app__meta">март</span></div>
+          <svg class="scale" data-scale data-a="41250" data-b="35000" data-intro viewBox="0 0 420 300" role="img"></svg>
+          <div class="app__owe"><span>Миша доплачивает</span><b class="num">3&nbsp;125&nbsp;₽</b></div>
+          <ul class="rows">
+            <li><span>Продукты</span><small>Аня, вчера</small><span class="num">2&nbsp;340&nbsp;₽</span></li>
+            <li><span>Коммуналка</span><small>Миша, 25 марта</small><span class="num">6&nbsp;870&nbsp;₽</span></li>
+            <li><span>Кино</span><small>Аня, 23 марта</small><span class="num">1&nbsp;200&nbsp;₽</span></li>
+          </ul>
+        </div>
+      </div></div>
+    </figure>
+  </div>
+</header>
+
+<main data-ui-edge>
+  <section class="split" aria-labelledby="split-h">
+    <div class="wrap diptych">
+      <div>
+        <h2 class="h2" id="split-h">Делите не&nbsp;только пополам</h2>
+        <p class="lead muted">Доля задаётся для каждой траты: поровну, по&nbsp;доходу или своим процентом.</p>
+        <div class="split__controls">
+          <div class="seg" data-seg aria-label="Как делить аренду">
+            <button type="button" class="ui-focus" aria-pressed="true" data-share="50">Пополам</button>
+            <button type="button" class="ui-focus" aria-pressed="false" data-share="60">По&nbsp;доходу</button>
+            <button type="button" class="ui-focus" aria-pressed="false" data-share="custom">Свой процент</button>
+          </div>
+          <div class="share">
+            <label for="share">Доля Ани <output class="num" for="share" id="share-out">50&nbsp;%</output></label>
+            <input id="share" type="range" min="0" max="100" step="5" value="50">
+          </div>
+        </div>
+      </div>
+      <figure class="split__figure" data-sample="split">
+        <figcaption class="split__caption"><b>Аренда квартиры</b><span class="num">60&nbsp;000&nbsp;₽</span></figcaption>
+        <svg class="scale" id="split-scale" data-scale data-a="30000" data-b="30000" viewBox="0 0 420 300" role="img"></svg>
+      </figure>
+    </div>
+  </section>
+
+  <section class="moments" aria-labelledby="moments-h">
+    <div class="wrap">
+      <div class="moments__head">
+        <h2 class="h2" id="moments-h">Обычный месяц вдвоём</h2>
+        <div class="seg" data-tabs role="tablist" aria-label="Моменты">
+          <button type="button" role="tab" class="ui-focus" aria-selected="true" aria-controls="m-text">Доставка</button>
+          <button type="button" role="tab" class="ui-focus" aria-selected="false" aria-controls="m-text" tabindex="-1">Аренда</button>
+          <button type="button" role="tab" class="ui-focus" aria-selected="false" aria-controls="m-text" tabindex="-1">Отпуск</button>
+          <button type="button" role="tab" class="ui-focus" aria-selected="false" aria-controls="m-text" tabindex="-1">Итоги</button>
+        </div>
+      </div>
+      <div class="moments__body">
+        <div class="moments__phone" data-sample="screen">
+          <div class="phone"><div class="phone__screen" data-panels>
+            <div class="app panel is-on" aria-hidden="false">
+              <div class="app__top"><span class="app__title">Новая трата</span><span class="app__meta">пятница</span></div>
+              <p class="amount-big num">2&nbsp;340&nbsp;₽</p>
+              <div>
+                <p class="field"><span>Категория</span><b>Еда</b></p>
+                <p class="field"><span>Заплатила</span><b>Аня</b></p>
+                <p class="field"><span>Делим</span><b>Пополам</b></p>
+                <p class="field"><span>Миша должен</span><b class="num">1&nbsp;170&nbsp;₽</b></p>
+              </div>
+              <span class="btn" aria-hidden="true">Сохранить</span>
+            </div>
+            <div class="app panel" aria-hidden="true">
+              <div class="app__top"><span class="app__title">Регулярные</span><span class="app__meta">3 платежа</span></div>
+              <ul class="rows">
+                <li><span>Аренда</span><small>1-го числа, платит Миша</small><span class="num">60&nbsp;000&nbsp;₽</span></li>
+                <li><span>Интернет</span><small>15-го числа, платит Аня</small><span class="num">650&nbsp;₽</span></li>
+                <li><span>Онлайн-кинотеатр</span><small>20-го числа, платит Аня</small><span class="num">399&nbsp;₽</span></li>
+              </ul>
+              <div class="settle-line"><span>Завтра: аренда</span><b>напомнить Мише</b></div>
+            </div>
+            <div class="app panel" aria-hidden="true">
+              <div class="app__top"><span class="app__title">Отпуск</span><span class="app__meta">цель</span></div>
+              <p class="amount-big num">84&nbsp;000&nbsp;₽</p>
+              <div class="goal">
+                <div class="goal__bar" role="img" aria-label="Накоплено 84 000 из 150 000 рублей: Аня 46 000, Миша 38 000"><i style="width:30.67%"></i><i style="width:25.33%"></i></div>
+                <p class="app__meta">из&nbsp;<span class="num">150&nbsp;000&nbsp;₽</span></p>
+              </div>
+              <ul class="legend">
+                <li><span class="sw sw--a"></span>Аня<span class="num">46&nbsp;000&nbsp;₽</span></li>
+                <li><span class="sw sw--b"></span>Миша<span class="num">38&nbsp;000&nbsp;₽</span></li>
+              </ul>
+            </div>
+            <div class="app panel" aria-hidden="true">
+              <div class="app__top"><span class="app__title">Итоги марта</span><span class="app__meta">4 категории</span></div>
+              <ul class="rows">
+                <li><span>Дом</span><small>аренда, коммуналка</small><span class="num">67&nbsp;520&nbsp;₽</span></li>
+                <li><span>Еда</span><small>продукты, доставка</small><span class="num">28&nbsp;400&nbsp;₽</span></li>
+                <li><span>Досуг</span><small>кино, кафе</small><span class="num">9&nbsp;850&nbsp;₽</span></li>
+                <li><span>Транспорт</span><small>такси</small><span class="num">4&nbsp;300&nbsp;₽</span></li>
+              </ul>
+              <div class="settle-line"><span>Миша → Аня</span><b class="num">3&nbsp;125&nbsp;₽</b></div>
+            </div>
+          </div></div>
+        </div>
+        <div class="moments__text" id="m-text" role="tabpanel" aria-labelledby="moments-h" data-texts>
+          <div class="panel is-on"><h3 class="h3">Пятничная доставка</h3><p class="lead">Сумма, кто платил и&nbsp;как делить. Три касания, и&nbsp;трата уже в&nbsp;ленте у&nbsp;обоих.</p></div>
+          <div class="panel"><h3 class="h3">Аренда первого числа</h3><p class="lead">Регулярные платежи записываются сами, а&nbsp;за&nbsp;день до&nbsp;срока тому, кто платит, приходит напоминание.</p></div>
+          <div class="panel"><h3 class="h3">Копилка на&nbsp;отпуск</h3><p class="lead">Одна полоса на&nbsp;общую цель: видно и&nbsp;сумму, и&nbsp;вклад каждого.</p></div>
+          <div class="panel"><h3 class="h3">Итоги месяца</h3><p class="lead">Траты по&nbsp;категориям и&nbsp;одна строка внизу: кто кому переводит, чтобы выйти в&nbsp;ноль.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="before" aria-labelledby="before-h">
+    <div class="wrap">
+      <h2 class="h2" id="before-h">Меньше переписки про деньги</h2>
+      <div class="before__grid">
+        <div data-sample="chat">
+          <p class="col-label">Раньше</p>
+          <div class="chat">
+            <p>Я&nbsp;тебе скидывал за&nbsp;продукты?</p>
+            <p>Не&nbsp;помню. А&nbsp;коммуналку кто платил?</p>
+            <p>Давай в&nbsp;выходные сядем и&nbsp;посчитаем</p>
+          </div>
+        </div>
+        <div>
+          <p class="col-label">С&nbsp;«Поровну»</p>
+          <div class="ledger" data-sample="ledger">
+            <svg class="scale ledger__scale" id="ledger-scale" data-scale data-a="41250" data-b="35000" viewBox="0 0 420 300" role="img"></svg>
+            <div>
+              <p class="ledger__who" id="ledger-who">Миша → Аня</p>
+              <p class="ledger__fig num" id="ledger-fig" aria-live="polite">3&nbsp;125&nbsp;₽</p>
+            </div>
+            <div class="ledger__actions">
+              <button class="btn btn--ink ui-press ui-press--on-dark ui-focus" type="button" id="settle"><span class="ui-btn-state"><span class="ui-state-label">Отметить перевод</span><span class="ui-state-pending ui-spinner" aria-hidden="true"></span><span class="ui-state-done">Готово</span></span></button>
+              <button class="linkbtn ui-dim ui-focus" type="button" id="unsettle" hidden>Вернуть долг</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="private" aria-labelledby="private-h">
+    <div class="wrap private__grid">
+      <div>
+        <h2 class="h2" id="private-h">Личное остаётся личным</h2>
+        <p class="lead muted">Трату без отметки «в&nbsp;общих» видите только вы. Подарок не&nbsp;раскроется раньше времени.</p>
+      </div>
+      <div data-sample="week">
+        <ul class="toggles" data-toggles>
+          <li><span class="t-name" id="t1">Продукты<small>Аня</small></span><span class="num" data-v="3480">3&nbsp;480&nbsp;₽</span><button class="ui-switch ui-focus" type="button" role="switch" aria-checked="true" aria-labelledby="t1 s1"><span class="sr" data-ui-ignore id="s1">в общих</span></button></li>
+          <li><span class="t-name" id="t2">Абонемент в&nbsp;бассейн<small>Аня</small></span><span class="num" data-v="2900">2&nbsp;900&nbsp;₽</span><button class="ui-switch ui-focus" type="button" role="switch" aria-checked="false" aria-labelledby="t2 s2"><span class="sr" data-ui-ignore id="s2">в общих</span></button></li>
+          <li><span class="t-name" id="t3">Подарок Мише<small>Аня</small></span><span class="num" data-v="4500">4&nbsp;500&nbsp;₽</span><button class="ui-switch ui-focus" type="button" role="switch" aria-checked="false" aria-labelledby="t3 s3"><span class="sr" data-ui-ignore id="s3">в общих</span></button></li>
+          <li><span class="t-name" id="t4">Такси домой<small>Миша</small></span><span class="num" data-v="640">640&nbsp;₽</span><button class="ui-switch ui-focus" type="button" role="switch" aria-checked="true" aria-labelledby="t4 s4"><span class="sr" data-ui-ignore id="s4">в общих</span></button></li>
+          <li><span class="t-name" id="t5">Коммуналка<small>Миша</small></span><span class="num" data-v="6870">6&nbsp;870&nbsp;₽</span><button class="ui-switch ui-focus" type="button" role="switch" aria-checked="true" aria-labelledby="t5 s5"><span class="sr" data-ui-ignore id="s5">в общих</span></button></li>
+        </ul>
+        <p class="total"><span>Общие за&nbsp;неделю</span><b class="num" id="week-total" aria-live="polite">10&nbsp;990&nbsp;₽</b></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="download on-red" id="download" aria-labelledby="download-h">
+    <div class="wrap download__grid">
+      <div>
+        <h2 class="h2" id="download-h">Поставьте приложение оба</h2>
+        <p class="lead">Один ставит и&nbsp;создаёт общий счёт, второй входит по&nbsp;коду приглашения.</p>
+        <div class="store-row" data-store>
+          <button class="btn btn--white store ui-press ui-focus" data-ui-align="start" type="button"><svg aria-hidden="true"><use href="#i-phone"/></svg><span><small>Загрузить в</small><b>App Store</b></span></button>
+          <button class="btn btn--white store ui-press ui-focus" data-ui-align="start" type="button"><svg aria-hidden="true"><use href="#i-play"/></svg><span><small>Доступно в</small><b>Google Play</b></span></button>
+        </div>
+        <p class="store-status" role="status" aria-live="polite"></p>
+
+      </div>
+      <dl class="facts" data-ui-group>
+          <dt>Телефоны</dt><dd>iPhone и&nbsp;Android</dd>
+          <dt>Счёт</dt><dd>один на&nbsp;двоих, у&nbsp;каждого своё приложение</dd>
+          <dt>Выгрузка</dt><dd>таблица CSV за&nbsp;любой месяц</dd>
+          <dt>Версии ОС</dt><dd>уточняются к&nbsp;релизу</dd>
+        </dl>
+      <figure class="download__phone" data-sample="screen" aria-label="Экран приложения: приглашение партнёра">
+        <div class="phone"><div class="phone__screen">
+          <div class="app">
+            <div class="app__top"><span class="app__title">Общий счёт</span><span class="app__meta">шаг 2 из 2</span></div>
+            <p class="h3">Пригласите Мишу</p>
+            <p class="app__meta">Код действует сутки</p>
+            <p class="code">К7М-29Р</p>
+            <span class="btn" data-ui-group aria-hidden="true">Поделиться кодом</span>
+          </div>
+        </div></div>
+      </figure>
+    </div>
+  </section>
+</main>
+
+<footer class="colophon on-ink" data-ui-edge>
+  <div class="wrap colophon__grid">
+    <div>
+      <a class="mark ui-dim ui-focus" href="#top" style="color:var(--paper)"><svg aria-hidden="true"><use href="#i-mark"/></svg><span>Поровну</span></a>
+      <p>Приложение для общих трат пары: доли, регулярные платежи, цели и&nbsp;итог месяца.</p>
+    </div>
+    <div>
+      <h2>Связь</h2>
+      <p>Почта поддержки уточняется</p>
+    </div>
+    <div>
+      <h2>Об&nbsp;этой странице</h2>
+      <p>Прототип лендинга. Имена, суммы и&nbsp;экраны&nbsp;— пример.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+/*
+ * better-design · interaction kit (JS, no dependencies)
+ *   BetterUI.init(root)                 press/bloom/keyboard feedback for .ui-press, .ui-switch
+ *   BetterUI.segmented(el, opts)        sliding indicator for a segmented control or tabs
+ *   BetterUI.runWithState(btn, task)    pending → done → idle on a .ui-btn-state button
+ *   BetterUI.shake(el)                  one error shake (pair it with visible error text)
+ *   BetterUI.swap(el, ms)               icon swap (copy → check) that returns after ms
+ *   BetterUI.originFrom(popover, trigger)  grow a popover/menu from its trigger
+ * In React/Vue/Svelte call init once at the app root (it uses event delegation), or port
+ * the handlers into a shared Button component. Keep the timing rules below.
+ */
+(function (root) {
+  'use strict';
+
+  var MIN_PRESS_MS = 90;   // a tap shorter than this still shows a full press
+  var reduceMq = root.matchMedia ? root.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+  var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+  var PRESSABLE = '.ui-press, .ui-switch, .ui-dim';
+
+  function disabled(el) { return el.disabled || el.getAttribute('aria-disabled') === 'true'; }
+
+  // Constant visual depth: about 4 px off the perimeter whatever the element's size.
+  function pressScale(el) {
+    if (el.classList.contains('ui-press--surface')) return 0.985;
+    var r = el.getBoundingClientRect();
+    return clamp(1 - 8 / (r.width + r.height), 0.9, 0.985).toFixed(4);
+  }
+
+  function pressOn(el, x, y) {
+    if (disabled(el)) return;
+    var r = el.getBoundingClientRect();
+    el.style.setProperty('--ui-press-scale', pressScale(el));
+    if (x != null) {
+      el.style.setProperty('--ui-px', ((x - r.left) / r.width * 100).toFixed(1) + '%');
+      el.style.setProperty('--ui-py', ((y - r.top) / r.height * 100).toFixed(1) + '%');
+    } else {
+      el.style.setProperty('--ui-px', '50%'); el.style.setProperty('--ui-py', '50%');
+    }
+    el._uiPressAt = performance.now();
+    clearTimeout(el._uiPressTimer);
+    el.setAttribute('data-pressed', '');
+  }
+  function pressOff(el) {
+    if (!el || !el.hasAttribute('data-pressed')) return;
+    var held = performance.now() - (el._uiPressAt || 0);
+    var wait = Math.max(0, MIN_PRESS_MS - held);
+    clearTimeout(el._uiPressTimer);
+    el._uiPressTimer = setTimeout(function () { el.removeAttribute('data-pressed'); }, wait);
+  }
+
+  function init(scope) {
+    scope = scope || document;
+    var active = null;
+    function down(e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      var el = e.target.closest && e.target.closest(PRESSABLE);
+      if (!el || !scope.contains(el)) return;
+      active = el; pressOn(el, e.clientX, e.clientY);
+    }
+    function up() { pressOff(active); active = null; }
+    function key(e) {
+      if (e.repeat) return;
+      var el = e.target.closest && e.target.closest(PRESSABLE);
+      if (!el) return;
+      if (e.key === ' ' || e.key === 'Enter') { if (e.type === 'keydown') pressOn(el); else pressOff(el); }
+    }
+    scope.addEventListener('pointerdown', down, { passive: true });
+    root.addEventListener('pointerup', up, { passive: true });
+    root.addEventListener('pointercancel', up, { passive: true });
+    scope.addEventListener('keydown', key);
+    scope.addEventListener('keyup', key);
+    scope.addEventListener('focusout', function (e) { var el = e.target.closest && e.target.closest(PRESSABLE); if (el) pressOff(el); });
+    return { destroy: function () { scope.removeEventListener('pointerdown', down); root.removeEventListener('pointerup', up); root.removeEventListener('pointercancel', up); scope.removeEventListener('keydown', key); scope.removeEventListener('keyup', key); } };
+  }
+
+  /* Segmented control: buttons with aria-selected (tabs) or aria-pressed; one indicator
+     element is created and slides to the selected option. Arrow keys move selection. */
+  function segmented(el, opts) {
+    var o = Object.assign({ onChange: null }, opts || {});
+    el.classList.add('ui-segmented');
+    var ind = document.createElement('span');
+    ind.className = 'ui-segmented__indicator'; ind.setAttribute('aria-hidden', 'true');
+    el.insertBefore(ind, el.firstChild);
+    var items = Array.prototype.slice.call(el.querySelectorAll(':scope > button'));
+    var attr = items[0] && items[0].hasAttribute('aria-pressed') ? 'aria-pressed' : 'aria-selected';
+    function place(animate) {
+      var cur = items.filter(function (b) { return b.getAttribute(attr) === 'true'; })[0] || items[0];
+      if (!cur) return;
+      if (!animate) ind.style.transition = 'none';
+      el.style.setProperty('--ui-seg-x', cur.offsetLeft + 'px');
+      el.style.setProperty('--ui-seg-w', cur.offsetWidth + 'px');
+      if (!animate) { void ind.offsetWidth; ind.style.transition = ''; }
+    }
+    function select(b) {
+      items.forEach(function (x) { x.setAttribute(attr, String(x === b)); if (attr === 'aria-selected') x.tabIndex = x === b ? 0 : -1; });
+      place(true);
+      if (o.onChange) o.onChange(items.indexOf(b), b);
+    }
+    items.forEach(function (b) { b.addEventListener('click', function () { select(b); }); });
+    el.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (!d) return;
+      var i = items.findIndex(function (x) { return x.getAttribute(attr) === 'true'; });
+      var n = items[(i + d + items.length) % items.length];
+      e.preventDefault(); select(n); n.focus();
+    });
+    var ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(function () { place(false); }) : null;
+    if (ro) ro.observe(el);
+    place(false);
+    return { select: function (i) { select(items[i]); }, destroy: function () { if (ro) ro.disconnect(); ind.remove(); } };
+  }
+
+  /* Button states. The button keeps its width, ignores repeat presses while pending,
+     announces busy state, shows done for doneMs, then returns. task returns a promise. */
+  function runWithState(btn, task, opts) {
+    var o = Object.assign({ doneMs: 1600, onError: null }, opts || {});
+    var box = btn.querySelector('.ui-btn-state') || btn;
+    if (box.getAttribute('data-state') === 'pending') return Promise.resolve();
+    btn.style.minWidth = btn.getBoundingClientRect().width + 'px';
+    box.setAttribute('data-state', 'pending');
+    btn.setAttribute('aria-busy', 'true');
+    return Promise.resolve().then(task).then(function (v) {
+      box.setAttribute('data-state', 'done');
+      btn.removeAttribute('aria-busy');
+      setTimeout(function () { box.removeAttribute('data-state'); btn.style.minWidth = ''; }, o.doneMs);
+      return v;
+    }, function (err) {
+      box.removeAttribute('data-state'); btn.removeAttribute('aria-busy'); btn.style.minWidth = '';
+      shake(btn);
+      if (o.onError) o.onError(err);
+      throw err;
+    });
+  }
+
+  function shake(el) {
+    if (reduceMq.matches) return;
+    el.classList.remove('ui-shake'); void el.offsetWidth; el.classList.add('ui-shake');
+    el.addEventListener('animationend', function () { el.classList.remove('ui-shake'); }, { once: true });
+  }
+
+  function swap(el, ms) {
+    el.setAttribute('data-swapped', '');
+    clearTimeout(el._uiSwap);
+    if (ms) el._uiSwap = setTimeout(function () { el.removeAttribute('data-swapped'); }, ms);
+  }
+
+  // Sets transform-origin so a popover/menu grows out of the control that opened it.
+  function originFrom(pop, trigger) {
+    var p = pop.getBoundingClientRect(), t = trigger.getBoundingClientRect();
+    var x = clamp(t.left + t.width / 2 - p.left, 0, p.width), y = t.top + t.height / 2 < p.top ? 0 : p.height;
+    pop.style.setProperty('--ui-origin', x + 'px ' + y + 'px');
+  }
+
+  var api = root.BetterUI = root.BetterUI || {};
+  api.init = init; api.segmented = segmented; api.runWithState = runWithState;
+  api.shake = shake; api.swap = swap; api.originFrom = originFrom; api.pressScale = pressScale;
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+})(typeof globalThis !== 'undefined' ? globalThis : window);
+
+</script>
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var NS = 'http://www.w3.org/2000/svg';
+  var nf = new Intl.NumberFormat('ru-RU');
+  function rub(n) { return nf.format(Math.round(n)).replace(/\s/g, ' ') + ' ₽'; }
+
+  /* Number roll: tabular digits count to the new value (value-change function). */
+  function roll(el, to, ms) {
+    var from = +(el.dataset.val || to);
+    el.dataset.val = to;
+    if (reduce.matches || from === to) { el.textContent = rub(to); return; }
+    var t0 = performance.now(); ms = ms || 420;
+    cancelAnimationFrame(el._raf);
+    (function step(t) {
+      var p = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - p, 3);
+      el.textContent = rub(from + (to - from) * e);
+      if (p < 1) el._raf = requestAnimationFrame(step);
+    })(t0);
+  }
+
+  /* Balance beam: one damped spring for every scale on the page (signature motion). */
+  function Scale(svg) {
+    var CX = 210, CY = 96, L = 140;
+    function el(tag, attrs, parent) { var n = document.createElementNS(NS, tag); for (var k in attrs) n.setAttribute(k, attrs[k]); (parent || svg).appendChild(n); return n; }
+    var dial = el('path', { class: 'dial', d: 'M' + (CX - 37) + ' ' + (CY - 52) + ' A64 64 0 0 1 ' + (CX + 37) + ' ' + (CY - 52) });
+    [-30, -15, 0, 15, 30].forEach(function (a) {
+      var r = a * Math.PI / 180;
+      el('line', { class: 'tick', x1: CX + 58 * Math.sin(r), y1: CY - 58 * Math.cos(r), x2: CX + 66 * Math.sin(r), y2: CY - 66 * Math.cos(r) });
+    });
+    el('line', { class: 'post', x1: CX, y1: CY, x2: CX, y2: 262 });
+    el('rect', { class: 'base', x: CX - 60, y: 260, width: 120, height: 12, rx: 6 });
+    var beam = el('g', {});
+    el('line', { class: 'needle', x1: CX, y1: CY, x2: CX, y2: CY - 54 }, beam);
+    el('rect', { class: 'beam', x: CX - L, y: CY - 4, width: 2 * L, height: 8, rx: 4 }, beam);
+    el('circle', { class: 'hub', cx: CX, cy: CY, r: 9 });
+    function pan(name) {
+      var g = el('g', {});
+      el('path', { class: 'string', d: 'M0 0 L-46 66 M0 0 L46 66' }, g);
+      el('path', { class: 'dish', d: 'M-58 66 Q0 104 58 66 Z' }, g);
+      var who = el('text', { class: 'who', x: 0, y: 126 }, g); who.textContent = name;
+      var amt = el('text', { class: 'amt', x: 0, y: 152 }, g);
+      return { g: g, amt: amt };
+    }
+    var pa = pan(svg.dataset.nameA || 'Аня'), pb = pan(svg.dataset.nameB || 'Миша');
+    var th = 0, w = 0, target = 0, raf = 0, last = 0, va = 0, vb = 0;
+    function draw() {
+      var r = th * Math.PI / 180, c = Math.cos(r), s = Math.sin(r);
+      beam.setAttribute('transform', 'rotate(' + (-th).toFixed(3) + ' ' + CX + ' ' + CY + ')');
+      pa.g.setAttribute('transform', 'translate(' + (CX - L * c).toFixed(2) + ' ' + (CY + L * s).toFixed(2) + ')');
+      pb.g.setAttribute('transform', 'translate(' + (CX + L * c).toFixed(2) + ' ' + (CY - L * s).toFixed(2) + ')');
+    }
+    function tick(t) {
+      var dt = Math.min(0.032, (t - last) / 1000); last = t;
+      var a = -70 * (th - target) - 7.5 * w;          /* damping ratio ~0.45: a beam with mass */
+      w += a * dt; th += w * dt;
+      draw();
+      if (Math.abs(th - target) > 0.02 || Math.abs(w) > 0.05) raf = requestAnimationFrame(tick);
+      else { th = target; w = 0; draw(); raf = 0; }
+    }
+    function set(a, b, instant) {
+      va = a; vb = b;
+      var sum = a + b || 1;
+      target = Math.max(-14, Math.min(14, (a - b) / sum * 40));
+      [[pa.amt, a], [pb.amt, b]].forEach(function (p) { p[0].textContent = rub(p[1]); });
+      var who = a === b ? 'поровну' : (a > b ? 'больше у Ани' : 'больше у Миши');
+      svg.setAttribute('aria-label', 'Весы: Аня ' + nf.format(a) + ' ₽, Миша ' + nf.format(b) + ' ₽, ' + who);
+      if (instant || reduce.matches) { cancelAnimationFrame(raf); raf = 0; th = target; w = 0; draw(); return; }
+      if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick); }
+    }
+    draw();
+    return { set: set };
+  }
+
+  var scales = {};
+  document.querySelectorAll('[data-scale]').forEach(function (svg, i) {
+    var sc = Scale(svg);
+    scales[svg.id || 'hero'] = sc;
+    var a = +svg.dataset.a, b = +svg.dataset.b;
+    if (svg.hasAttribute('data-intro') && !reduce.matches) {
+      sc.set(a, a, true);
+      setTimeout(function () { sc.set(a, b); }, 350);
+    } else sc.set(a, b, true);
+  });
+
+  BetterUI.init(document);
+
+  /* Store buttons: the app is not published yet; say so instead of a dead link. */
+  document.querySelectorAll('[data-store]').forEach(function (row) {
+    var status = row.nextElementSibling;
+    row.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      var store = b.querySelector('b').textContent;
+      status.textContent = 'Страница в ' + store + ' появится к релизу.';
+    });
+  });
+
+  /* Split: segmented presets + range slider move the beam. */
+  var seg = document.querySelector('[data-seg]');
+  var range = document.getElementById('share'), out = document.getElementById('share-out');
+  var segBtns = seg.querySelectorAll('button');
+  function applyShare(p) {
+    out.textContent = p + ' %';
+    scales['split-scale'].set(60000 * p / 100, 60000 * (100 - p) / 100);
+  }
+  BetterUI.segmented(seg, { onChange: function (i, b) {
+    var v = b.dataset.share;
+    if (v === 'custom') { range.focus(); return; }
+    range.value = v; applyShare(+v);
+  }});
+  range.addEventListener('input', function () {
+    var p = +range.value;
+    var idx = p === 50 ? 0 : p === 60 ? 1 : 2;
+    segBtns.forEach(function (b, i) { b.setAttribute('aria-pressed', String(i === idx)); });
+    applyShare(p);
+    var cur = segBtns[idx];
+    seg.style.setProperty('--ui-seg-x', cur.offsetLeft + 'px');
+    seg.style.setProperty('--ui-seg-w', cur.offsetWidth + 'px');
+  });
+
+  /* Moments: tabs switch the phone screen and its caption together. */
+  var phonePanels = document.querySelectorAll('[data-panels] > .panel');
+  var textPanels = document.querySelectorAll('[data-texts] > .panel');
+  var tabs = document.querySelector('[data-tabs]');
+  BetterUI.segmented(tabs, { onChange: function (i, b) {
+    [phonePanels, textPanels].forEach(function (set) {
+      set.forEach(function (p, j) { p.classList.toggle('is-on', j === i); p.setAttribute('aria-hidden', String(j !== i)); });
+    });
+    document.getElementById('m-text').setAttribute('aria-labelledby', 'moments-h');
+  }});
+
+  /* Before/after: mark the transfer, the beam levels, the figure rolls to zero. Undo restores. */
+  var settle = document.getElementById('settle'), unsettle = document.getElementById('unsettle');
+  var fig = document.getElementById('ledger-fig'), who = document.getElementById('ledger-who');
+  fig.dataset.val = 3125;
+  settle.addEventListener('click', function () {
+    BetterUI.runWithState(settle, function () {
+      scales['ledger-scale'].set(38125, 38125);
+      roll(fig, 0, 520);
+      who.textContent = 'В расчёте';
+    }, { doneMs: 1200 }).then(function () {
+      setTimeout(function () { settle.hidden = true; unsettle.hidden = false; unsettle.focus(); }, 1200);
+    });
+  });
+  unsettle.addEventListener('click', function () {
+    scales['ledger-scale'].set(41250, 35000);
+    roll(fig, 3125, 520);
+    who.textContent = 'Миша → Аня';
+    unsettle.hidden = true; settle.hidden = false; settle.focus();
+  });
+
+  /* Private: switches move a spend in or out of the shared total. */
+  var total = document.getElementById('week-total'); total.dataset.val = 10990;
+  var list = document.querySelector('[data-toggles]');
+  function sync() {
+    var sum = 0;
+    list.querySelectorAll('li').forEach(function (li) {
+      var on = li.querySelector('[role=switch]').getAttribute('aria-checked') === 'true';
+      li.classList.toggle('is-off', !on);
+      if (on) sum += +li.querySelector('[data-v]').dataset.v;
+    });
+    roll(total, sum);
+  }
+  list.addEventListener('click', function (e) {
+    var sw = e.target.closest('[role=switch]'); if (!sw) return;
+    sw.setAttribute('aria-checked', String(sw.getAttribute('aria-checked') !== 'true'));
+    sync();
+  });
+  sync();
+})();
+</script>
+</body>
+</html>

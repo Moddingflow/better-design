@@ -24,8 +24,9 @@ serif type, a 12px radius, 2px spacing, or a platform's material language.
 
 For a brand, landing page, portfolio, consumer app, game, editorial product, or launcher with
 no system and a visual cue from the user, use [art-direction.md](art-direction.md): concept,
-references, 2–3 directions, choice. With no cue, the [house style](house-style.md) supplies
-the direction and its preset supplies the tokens (games excepted).
+references, 2–3 directions, choice. With no cue, deal a direction
+([direction-deal.md](direction-deal.md)); the [house style](house-style.md) and its preset
+apply only when asked for or dealt (games excepted).
 Derive tokens from that choice, not the fallback table, and record them in DESIGN.md
 using the [template](../assets/DESIGN.template.md).
 
@@ -34,7 +35,7 @@ using the [template](../assets/DESIGN.template.md).
 Use only when no system exists (neither DESIGN.md nor code tokens) and the task is a working
 tool such as CRM, admin, internal forms, or an IDE-like surface, or when the user explicitly
 wants a standard appearance. Expressive surfaces need their own direction. Without a user cue,
-take colors, type family, and radii from the house style and density from this table.
+take ground, type voice, and signal from a deal with `--surface app` and density from this table.
 These are internal starting values, not standards.
 
 | Area | Starting point | Reconsider for |

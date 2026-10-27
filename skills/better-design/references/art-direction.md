@@ -4,11 +4,12 @@ Read this for creation or redesign when a surface is new or identity is part of 
 a brand, landing page, portfolio, consumer app, game, editorial product, or launcher.
 For a change within an existing system, use "Inherited direction" below.
 
-When the user gives no visual direction and nothing exists to inherit, the direction is the
-[house style](house-style.md): skip sections 3 and 4 (directions, palette, and type are
-fixed by its preset), but still write the concept (section 1), choose composition (section 5)
-and a signature detail (section 6), and run the critique (section 7) with its adjusted swap
-test. A user's visual cue always replaces the house style.
+When the user gives no visual direction and nothing exists to inherit, run
+[direction-deal.md](direction-deal.md) first: it deals starting materials and a structure,
+and replaces section 3's free choice with seven ranked directions and a roll that never
+builds the top two. Then continue here from section 4 inside the built direction. The
+[house style](house-style.md) is used only when the user asks for it (or the deal hands it
+out); then its preset fixes palette and type, and sections 1, 5, 6, and 7 still apply.
 
 An average model response combines familiar templates. Prohibitions may push it toward
 the next popular template without creating character. Character needs a process: a concept
@@ -59,7 +60,11 @@ options; do not turn this into a mandatory approval gate.
 - **Type:** shortlist three families from the concept, then choose with a reason. Check glyph
   coverage, including Cyrillic when needed, weights, numerals, and actual sizes. No font is
   prohibited. Habitually replacing Inter with Space Grotesk, DM Sans, or Instrument Serif
-  is still a template choice.
+  is still a template choice. Reflex lists and alternatives by class: [fonts.md](fonts.md).
+- **Colour posture** before colours: restrained (accent under ~5% of a screen), committed
+  (one colour carries 30–60% of the surface), full palette, or drenched (the ground is the
+  colour). Light or dark ground comes from the physical scene (who, where, what light), not
+  from habit or the category.
 - **Grid and rhythm:** one grid with a defined step and deliberate exceptions.
 - **Motion:** how things behave in the concept's world: tempo, weight, physics, and elasticity.
   A board flips in steps, a label appears slowly, a console responds with a short spring.
@@ -117,6 +122,9 @@ Do a separate critique after the interface works, in addition to functional QA:
    See [motion.md](motion.md).
 7. Run the [AI slop scan](ai-slop.md), including its copy information test. Record matched
    IDs, replacements, and justified exceptions.
+8. When a subagent is available, give the screenshots and the direction card (not your
+   build notes) to a fresh-context reviewer for steps 2–4 and 7: a reviewer that inherits
+   your transcript inherits your optimism. Act on its findings, then recapture.
 
 Record swap/squint and slop-scan findings in a `distinctiveness` check, and motion evidence
 in a `motion` check. Put the selected direction and tokens in the project's DESIGN.md so
@@ -133,7 +141,8 @@ A button fix does not justify redesigning the product for originality.
 
 - Audit or focused change: verify that the change preserves existing character.
 - Dense working tools such as CRM, admin, or IDE surfaces: express character through precision,
-  data typography, and one or two details. The neutral fallback in
-  [design-contract.md](design-contract.md) is appropriate.
+  data typography, and one or two details. With no cue, deal with `--surface app`
+  ([direction-deal.md](direction-deal.md)); the neutral fallback density in
+  [design-contract.md](design-contract.md) still applies.
 - An explicit request for a simple, standard, system-like interface is itself a direction.
-- No direction from the user and nothing to inherit: the house style is the direction.
+- No direction from the user and nothing to inherit: the dealt direction, not a fixed style.

@@ -84,7 +84,7 @@ Use better-design to build a landing page and a settings screen for a sleep
 tracker. No brand exists yet. Put the design system in DESIGN.md.
 ```
 
-Expected work: the default style from its DESIGN.md preset, a concept that still chooses imagery and one signature detail, the interaction kit on every control, measured layout, and a probe run. Add any visual preference ("warm and playful", "light theme", a reference site) and the agent follows it instead.
+Expected work: a scene sentence and a material inventory, a dealt direction (`deal_direction.mjs`) with seven ranked ideas and the one the roll names, said once as a direction card and written into DESIGN.md, the interaction kit on every control, measured layout, a probe run, and a log entry so the next project moves away from this one. Add any visual preference ("warm and playful", "light theme", a reference site, "like Apple" for the house style) and the agent follows it instead.
 
 ## Plan game UI
 

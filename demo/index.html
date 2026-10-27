@@ -85,6 +85,28 @@
   .section-head .lead { max-width: 640px; }
   @media (prefers-reduced-motion: reduce) { .window__body iframe { transition: none; } }
 
+  /* v1.6 → v1.8 bench: six undirected briefs, both versions live, switched in place. */
+  .bench-controls { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .bench-scroll { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+  .bench-scroll::-webkit-scrollbar { display: none; }
+  .bench-tabs { --ui-seg-track: var(--color-surface); --ui-seg-indicator: var(--color-action); font-size: 15px; font-weight: 400; }
+  .bench-tabs > button { padding: 8px 16px; white-space: nowrap;
+    transition: opacity var(--ui-hover) var(--ui-ease-color), transform var(--ui-release) var(--ui-spring-pop), outline-offset var(--ui-focus) var(--ui-ease-out), outline-color var(--ui-focus) var(--ui-ease-out), color 250ms var(--ui-ease-color); }
+  .bench-tabs > button[aria-selected="true"] { color: var(--color-on-action); }  .verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+  .verdict__cell { background: var(--color-surface); border-radius: var(--radius-card); padding: 24px; }
+  .verdict__score { font-size: 40px; line-height: 1; font-weight: 500; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+  .verdict__score small { font-size: 17px; color: var(--color-text-secondary); letter-spacing: 0; }
+  .verdict__name { font-size: 14px; color: var(--color-text-secondary); margin: 0 0 12px; }
+  .verdict__win { color: var(--color-text); }
+  .verdict__why { font-size: 15px; line-height: 1.47; color: var(--color-text-secondary); margin: 12px 0 0; }
+  .results { width: 100%; border-collapse: collapse; margin-top: 56px; font-size: 15px; font-variant-numeric: tabular-nums; }
+  .results th, .results td { text-align: left; padding: 14px 12px 14px 0; border-bottom: 1px solid var(--color-hairline); font-weight: 400; vertical-align: top; }
+  .results thead th { color: var(--color-text-secondary); font-size: 14px; }
+  .results td:not(:first-child), .results th:not(:first-child) { text-align: right; white-space: nowrap; }
+  .results-wrap { overflow-x: auto; }
+  .bench-note { font-size: 14px; line-height: 1.43; color: var(--color-text-secondary); margin: 20px 0 0; max-width: 760px; }
+  @media (max-width: 734px) { .verdict { grid-template-columns: 1fr; } .verdict__cell { padding: 20px; } }
+
   /* Demo pages: one wide feature, then a pair. Each card is one link to its live page. */
   .demos { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   .demo { grid-column: span 1; display: flex; flex-direction: column; background: var(--color-surface); border-radius: var(--radius-tile); overflow: hidden; color: inherit; }
@@ -150,7 +172,62 @@
           <iframe id="frame-with" src="compare/with/" title="Driftline, built with Better Design" data-on></iframe>
         </div>
       </div>
-      <p class="prompt">Prompt for both: <q>Make me a website for Driftline, a night-train booking service: overnight sleeper routes between European cities. People pick a route and date, compare seat, couchette and private cabin, and book.</q> The second run added “Use the better-design skill.”</p>
+      <p class="prompt">Prompt for both: <q>Make me a website for Driftline, a night-train booking service: overnight sleeper routes between European cities. People pick a route and date, compare seat, couchette and private cabin, and book.</q> The second run added “Use the better-design skill.” Built with v1.7.</p>
+    </div>
+  </section>
+
+  <section id="v18">
+    <div class="wide section-head">
+      <h2 class="headline">v1.6 or v1.8, six briefs with no style given</h2>
+      <p class="lead">Each page was built by a fresh agent from a one-line request and nothing else. v1.6 fell back to one house style; v1.8 deals a direction. Every page is live: open the forms, tabs and menus.</p>
+    </div>
+    <div class="wide">
+      <div class="bench-controls">
+        <div class="bench-scroll">
+          <div class="bench-tabs" id="briefTabs" role="tablist" aria-label="Brief">
+            <button type="button" role="tab" aria-selected="true" aria-controls="bench-panel">Bakery</button>
+            <button type="button" role="tab" aria-selected="false" tabindex="-1" aria-controls="bench-panel">Webhook API</button>
+            <button type="button" role="tab" aria-selected="false" tabindex="-1" aria-controls="bench-panel">Ceramics school</button>
+            <button type="button" role="tab" aria-selected="false" tabindex="-1" aria-controls="bench-panel">Couples' finance</button>
+            <button type="button" role="tab" aria-selected="false" tabindex="-1" aria-controls="bench-panel">Jazz festival</button>
+            <button type="button" role="tab" aria-selected="false" tabindex="-1" aria-controls="bench-panel">Dispatcher admin</button>
+          </div>
+        </div>
+        <div class="bench-tabs" id="versionTabs" role="tablist" aria-label="Skill version">
+          <button type="button" role="tab" aria-selected="false" tabindex="-1" aria-controls="bench-panel">v1.6</button>
+          <button type="button" role="tab" aria-selected="true" aria-controls="bench-panel">v1.8</button>
+        </div>
+      </div>
+      <div class="window" id="bench-panel" role="tabpanel" aria-label="Built page">
+        <div class="window__bar">
+          <span class="window__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="window__label" id="benchLabel"></span>
+          <a class="window__open ui-dim ui-focus" id="benchOpen" href="bench/v1.8/b1/" target="_blank" rel="noopener">Open full page <span class="ui-icon-nudge" aria-hidden="true">›</span></a>
+        </div>
+        <div class="window__body" id="benchBody"></div>
+      </div>
+      <p class="prompt">Request: <q id="benchPrompt"></q></p>
+
+      <div class="verdict" aria-live="polite">
+        <div class="verdict__cell"><p class="verdict__name" id="v16name">v1.6</p><div class="verdict__score" id="v16score"></div></div>
+        <div class="verdict__cell"><p class="verdict__name" id="v18name">v1.8</p><div class="verdict__score" id="v18score"></div></div>
+      </div>
+      <p class="verdict__why" id="benchWhy"></p>
+
+      <div class="results-wrap">
+        <table class="results">
+          <caption class="sr-only">Bench results, six briefs</caption>
+          <thead><tr><th scope="col">Measure</th><th scope="col">v1.6</th><th scope="col">v1.8</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Pages a blind judge grouped into one template</th><td>5 of 6</td><td>0 of 6</td></tr>
+            <tr><th scope="row">Distinct display typefaces</th><td>2</td><td>6</td></tr>
+            <tr><th scope="row">Mechanical slop flags per page</th><td>1.83</td><td>0</td></tr>
+            <tr><th scope="row">Pairs a blind judge would ship</th><td>2</td><td>4</td></tr>
+            <tr><th scope="row">Blind overall score, mean of 10</th><td>5.8</td><td>6.8</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="bench-note">Two blind judges, who saw unlabeled screenshots in random order, each grouped five of the six v1.6 pages into one cluster: the same dark template with different words. One generation per brief and version, so treat it as a signal, not a statistic. Method, both iterations, and the misses are in <a class="ui-dim ui-focus" href="https://github.com/Moddingflow/better-design/blob/main/docs/evaluations/bench-v1.8.0.md">the bench report</a>.</p>
     </div>
   </section>
 
@@ -174,8 +251,8 @@
     <div class="wide demos">
       <a class="demo demo--feature ui-press ui-press--surface ui-press--on-dark ui-focus" href="assets/house-style.html">
         <div class="txt">
-          <h2 class="headline">The default style</h2>
-          <p class="lead">What the agent builds when there is no brief and no design system: a product page and an app screen with a working switch and field error.</p>
+          <h2 class="headline">The house style</h2>
+          <p class="lead">The Apple-like style the agent builds when you ask for it: a product page and an app screen with a working switch and field error.</p>
           <span class="go more">Open the page <span class="ui-icon-nudge" aria-hidden="true">›</span></span>
         </div>
         <div class="shot"><img src="images/house-style.png" width="1600" height="956" alt="Product page in the default style: black canvas, light headline, one white pill button"></div>
@@ -222,6 +299,51 @@
       document.getElementById('compareOpen').href = builds[i].href;
     }
   });
+
+  // v1.6 → v1.8 bench. Frames load on first view and stay loaded, so switching keeps their state.
+  var briefs = [
+    { id: 'b1', name: 'Bakery', prompt: 'Сделай лендинг для небольшой пекарни «Тесто» в Казани.', s: [6, 5], win: 0,
+      why: 'The judge shipped v1.6 here: its live “out of the oven” timetable is a real reason to come. v1.8’s painted sign is bolder, but its header shows a placeholder and the phone hero is half empty.' },
+    { id: 'b2', name: 'Webhook API', prompt: 'Make a landing page for Relayhook, a webhook delivery API for developers.', s: [6, 8], win: 1,
+      why: 'v1.8: an envelope collecting postmarks (503, timeout, delivered) shows retries and receipts at a glance. v1.6 is tidy but the stock dark centred hero.' },
+    { id: 'b3', name: 'Ceramics school', prompt: 'Нужен сайт для школы керамики для взрослых.', s: [4, 7], win: 1,
+      why: 'v1.8: clay ground, glaze test tiles as bookable slots, and a direct “book Tuesday 19:00”. v1.6 presents a hands-on craft as a dark SaaS page.' },
+    { id: 'b4', name: 'Couples’ finance', prompt: 'Сделай лендинг мобильного приложения для учёта общих финансов пары.', s: [5, 7], win: 1,
+      why: 'v1.8: a kitchen scale tips toward whoever paid more and levels when the debt is settled. v1.6 shows the product only inside a phone mock on the black template.' },
+    { id: 'b5', name: 'Jazz festival', prompt: 'Сайт для небольшого джазового фестиваля в Калининграде.', s: [7, 6], win: 0,
+      why: 'The judge shipped v1.6: the one brief where v1.6 left its default, with a record-sleeve poster. v1.8 fell back on a place cliché (Baltic amber); that cliché is now on the refuse list.' },
+    { id: 'b6', name: 'Dispatcher admin', prompt: 'Сделай главный экран админки для диспетчера службы доставки: заказы, курьеры, проблемы.', s: [7, 8], win: 1,
+      why: 'v1.8: a city plan with problem counts per zone and an action on every problem. v1.6 is polished but a dark KPI strip with no spatial picture.' }
+  ];
+  var versions = ['v1.6', 'v1.8'];
+  var bench = { b: 0, v: 1 };
+  var benchBody = document.getElementById('benchBody');
+  var frames = {};
+  function showBench() {
+    var br = briefs[bench.b], ver = versions[bench.v], key = ver + '/' + br.id, src = 'bench/' + key + '/';
+    if (!frames[key]) {
+      var f = document.createElement('iframe');
+      f.src = src; f.title = br.name + ', built with Better Design ' + ver;
+      benchBody.appendChild(f); frames[key] = f;
+    }
+    Object.keys(frames).forEach(function (k) {
+      var f = frames[k];
+      if (k === key) { f.setAttribute('data-on', ''); f.removeAttribute('tabindex'); }
+      else { f.removeAttribute('data-on'); f.setAttribute('tabindex', '-1'); }
+    });
+    document.getElementById('benchLabel').textContent = br.name.toLowerCase() + ' · built with ' + ver;
+    document.getElementById('benchOpen').href = src;
+    document.getElementById('benchPrompt').textContent = br.prompt;
+    [0, 1].forEach(function (i) {
+      var won = br.win === i;
+      document.getElementById(i ? 'v18name' : 'v16name').innerHTML = versions[i] + (won ? ' · <span class="verdict__win">the judge would ship this one</span>' : '');
+      document.getElementById(i ? 'v18score' : 'v16score').innerHTML = br.s[i] + '<small> / 10</small>';
+    });
+    document.getElementById('benchWhy').textContent = br.why;
+  }
+  BetterUI.segmented(document.getElementById('briefTabs'), { onChange: function (i) { bench.b = i; showBench(); } });
+  BetterUI.segmented(document.getElementById('versionTabs'), { onChange: function (i) { bench.v = i; showBench(); } });
+  showBench();
 
   var copyBtn = document.getElementById('copy');
   var copyStatus = document.getElementById('copyStatus');
